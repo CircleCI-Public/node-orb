@@ -1,0 +1,24 @@
+description: >
+  Install/upgrade the NPM package manager. Requires an existing
+  installation of Node.js; if none exists, use the orb's `install`
+  command instead.
+
+parameters:
+  npm-version:
+    type: string
+    default: latest
+    description: >
+      Pick a version of NPM to install:
+      https://nodejs.org/en/download/releases
+
+steps:
+  - run:
+      name: Install NPM
+      command: |
+        [ -w /usr/local/bin ] && SUDO="" || SUDO=sudo
+
+        $SUDO npm install -g npm@"<<parameters.npm-version>>"
+
+        # Workaround to address issues with using npm to upgrade npm
+        $SUDO rm -rf /usr/local/lib/node_modules
+        $SUDO mv node_modules /usr/local/lib/

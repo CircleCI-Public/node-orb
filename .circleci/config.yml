@@ -1,0 +1,195 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@dev:alpha
+
+jobs:
+  macos:
+    macos:
+      xcode: "10.2.0"
+    steps:
+      - checkout
+
+  machine:
+    machine: true
+    steps:
+      - checkout
+
+  node:
+    executor: node/node
+    steps:
+      - checkout
+
+# yaml anchor filters
+integration-dev_filters: &integration-dev_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /integration-.*/
+
+integration-master_filters: &integration-master_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /master-.*/
+
+prod-deploy_requires: &prod-deploy_requires
+  [
+    install-npm-node
+    # placeholder
+  ]
+
+workflows:
+  lint_pack-validate_publish-dev:
+    jobs:
+      - orb-tools/lint
+
+      - orb-tools/pack:
+          requires:
+            - orb-tools/lint
+
+      - orb-tools/publish-dev:
+          orb-name: circleci/node
+          context: orb-publishing
+          requires:
+            - orb-tools/pack
+
+      - orb-tools/trigger-integration-workflow:
+          name: trigger-integration-dev
+          context: orb-publishing
+          ssh-fingerprints: 2a:2b:49:ea:64:7d:39:4a:58:17:18:17:b2:5c:f6:a8
+          requires:
+            - orb-tools/publish-dev
+          filters:
+            branches:
+              ignore: master
+
+      - orb-tools/trigger-integration-workflow:
+          name: trigger-integration-master
+          context: orb-publishing
+          ssh-fingerprints: 2a:2b:49:ea:64:7d:39:4a:58:17:18:17:b2:5c:f6:a8
+          tag: master
+          requires:
+            - orb-tools/publish-dev
+          filters:
+            branches:
+              only: master
+
+  integration-tests_prod-release:
+    jobs:
+      # triggered by non-master branch commits
+      - macos:
+          name: install-yarn-mac
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-yarn
+
+      - machine:
+          name: install-yarn-machine
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-yarn
+
+      - node:
+          name: install-yarn-node
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-yarn
+
+      - macos:
+          name: install-yarn-mac
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-yarn:
+                yarn-version: 1.15.1
+
+      - machine:
+          name: install-yarn-machine
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-yarn:
+                yarn-version: 1.15.1
+
+      - node:
+          name: install-yarn-node
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-yarn:
+                yarn-version: 1.15.1
+
+      - macos:
+          name: install-npm-mac
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-npm
+
+      - machine:
+          name: install-npm-machine
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-npm
+
+      - node:
+          name: install-npm-node
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-npm
+
+      - macos:
+          name: install-npm-mac
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-npm:
+                npm-version: 6.4.1
+
+      - machine:
+          name: install-npm-machine
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-npm:
+                npm-version: 6.4.1
+
+      - node:
+          name: install-npm-node
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-npm:
+                npm-version: 6.4.1
+
+      # triggered by master branch commits
+
+      # patch, minor, or major publishing
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-patch
+          context: orb-publishing
+          orb-name: circleci/node
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-patch.*/
+
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-minor
+          context: orb-publishing
+          orb-name: circleci/node
+          release: minor
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-minor.*/
+
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-major
+          context: orb-publishing
+          orb-name: circleci/node
+          release: major
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-major.*/

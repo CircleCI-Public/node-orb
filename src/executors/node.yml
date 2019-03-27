@@ -1,0 +1,14 @@
+description: >
+  CircleCI's Node convenience image:
+  https://hub.docker.com/r/circleci/node
+
+parameters:
+  tag:
+    type: string
+    default: "latest"
+    description: >
+      Pick a specific circleci/node image variant:
+      https://hub.docker.com/r/circleci/node/tags
+
+docker:
+  - image: circleci/node:<<parameters.tag>>
