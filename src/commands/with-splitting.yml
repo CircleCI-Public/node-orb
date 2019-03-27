@@ -1,0 +1,109 @@
+description: >
+  Run a testing command (`test-command`) with CircleCI's built-in test-
+  splitting feature enabled. This requires that the `parallelism` key be set
+  to a value greater than 1.
+
+  `test-command` should be defined as the command used for initiating
+  testing. The environment variable $TESTFILES is defined prior to this
+  command being called as the group of tests to be run in a given container
+  after running CircleCI's test-splitting logic.
+
+  This command requires one of `test-file`, `test-path`, or `glob-path`
+  parameters that point to a text file with test filenames, a path to
+  test files, or one or more patterns for globbing of test files,
+  respectively.
+
+  CircleCI will then seek historical test timing data in the directory
+  specified by the previously used `store_test_results` step as a basis for
+  splitting tests. If you do not use `store_test_results`, there will be no
+  timing data available for splitting your tests.
+
+  Tests are split by `timings` by default, and can be split based on
+  filesize by setting the `split-by` parameter to `filesize`.
+
+  The CLI expectes both filenames and classnames to be present in the timing
+  data produced by the timing suite. By default, splitting defaults to
+  `filename`. You can specify `classnames` via the `timings-type` parameter.
+
+  See the following for more information on running tests in parallel:
+  https://circleci.com/docs/2.0/parallelism-faster-jobs
+
+parameters:
+  steps:
+    type: steps
+    description: >
+      Input any custom steps to run with test splitting
+
+  test-file:
+    type: string
+    default: ""
+    description: >
+      File containing test filenames
+
+  test-path:
+    type: string
+    default: ""
+    description: >
+      Filepath to your test files
+
+  glob-path:
+    type: string
+    default: ""
+    description: >
+      Glob pattern to find your test files
+
+  split-by:
+    type: enum
+    enum: [timings, filesize]
+    default: timings
+    description: >
+      Choose either "timings" (default) or "filesize"
+
+  timings-type:
+    type: enum
+    enum: [filename, classname]
+    default: filename
+    description: >
+      Does test timing data contain filenames or classnames?
+
+steps:
+  - when:
+      condition: <<parameters.test-file>>
+      steps:
+        - run:
+            name: Split files by test file, assign to $TESTFILES
+            command: |
+              echo 'export TESTFILES=$(circleci tests split \
+                <<parameters.test-file>> | \
+                circleci tests split \
+                --split-by="<<parameters.split-by>>" \
+                --timings-type="<<parameters.timings-type>>")' \
+                >> $BASH_ENV
+
+  - when:
+      condition: <<parameters.test-path>>
+      steps:
+        - run:
+            name: Split files by directory, assign to $TESTFILES
+            command: |
+              echo 'export TESTFILES=$(circleci tests split \
+                <<parameters.test-path>> | \
+                circleci tests split \
+                --split-by="<<parameters.split-by>>" \
+                --timings-type="<<parameters.timings-type>>")' \
+                >> $BASH_ENV
+
+  - when:
+      condition: <<parameters.glob-path>>
+      steps:
+        - run:
+            name: Split files by glob pattern, assign to $TESTFILES
+            command: |
+              echo 'export TESTFILES=$(circleci tests glob \
+                "<<parameters.glob-path >>" | \
+                circleci tests split \
+                --split-by="<<parameters.split-by>>" \
+                --timings-type="<<parameters.timings-type>>")' \
+                >> $BASH_ENV
+
+  - steps: <<parameters.steps>>

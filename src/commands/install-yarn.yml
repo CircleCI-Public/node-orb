@@ -1,0 +1,27 @@
+description: >
+  Install the Yarn package manager
+
+parameters:
+  yarn-version:
+    type: string
+    default: ""
+    description: >
+      Pick a version of Yarn to install (if no version is specified,
+      the latest stable version will be installed):
+      https://github.com/yarnpkg/yarn/releases
+
+
+steps:
+  - run:
+      name: Install Yarn
+      command: |
+        curl -o- -L https://yarnpkg.com/install.sh | \
+        bash<<#parameters.yarn-version>> -s -- --version <<parameters.yarn-version>><</parameters.yarn-version>>
+
+        echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin`"' \>> $BASH_ENV
+
+        source $BASH_ENV
+
+  - run:
+      name: Verify Yarn version
+      command: yarn --version
