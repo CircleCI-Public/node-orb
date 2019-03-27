@@ -1,0 +1,57 @@
+description: >
+  Run a set of steps with node dependencies cached.
+
+  This command will first restore a cache of node dependencies, if one
+  was saved by a previous build. The provided `steps` will then be
+  executed, and if successful, a fresh cache will be saved, if required.
+
+  The contents of the `~/project/node_modules` directory is cached,
+  which will substantially improve build times for projects with many
+  dependencies. This directory can be changed with the `dir` parameter.
+
+  The cache-key is generated from `package.json`. This file path can be
+  changed with the `cache-key` parameter.
+
+parameters:
+  steps:
+    type: steps
+    description: >
+      Input any custom steps to run with your Node cache
+
+  dir:
+    type: string
+    default: ~/project/node_modules
+    description: >
+      Filepath to your Node modules
+
+  cache-key:
+    type: string
+    default: package.json
+    description: >
+      File to use as a Node cache checksum
+
+  cache-version:
+    type: string
+    default: v1
+    description: >
+      Cache version; increment this for a fresh cache
+
+  use-strict-cache:
+    type: boolean
+    default: false
+    description: >
+      If true, ignores non-checksum cache hits
+
+steps:
+  - restore_cache:
+      keys:
+        - node-deps-<<parameters.cache-version>>-{{ .Branch }}-{{ checksum "<<parameters.cache-key>>" }}
+        - <<^parameters.use-strict-cache>>node-deps-<<parameters.cache-version>>-{{ .Branch }}-<</parameters.use-strict-cache>>
+        - <<^parameters.use-strict-cache>>node-deps-<<parameters.cache-version>><</parameters.use-strict-cache>>
+
+  - steps: <<parameters.steps>>
+
+  - save_cache:
+      key: node-deps-<<parameters.cache-version>>-{{ .Branch }}-{{ checksum "<<parameters.cache-key>>" }}
+      paths:
+        - <<parameters.dir>>
