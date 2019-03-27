@@ -59,7 +59,7 @@ steps:
         gpg --verify SHASUMS256.txt.sig SHASUMS256.txt
 
         # verify node tar via shasum256
-        grep node-v$VERSION.tar.gz SHASUMS256.txt | sha256sum -c -
+        grep "node-v$VERSION-$PLATFORM-x64.tar.gz" SHASUMS256.txt | sha256sum -c -
 
         # setup node.js installation
         $SUDO mkdir -p <<parameters.install-dir>>/nodejs
