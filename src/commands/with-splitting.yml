@@ -78,7 +78,7 @@ steps:
                 circleci tests split \
                 --split-by="<<parameters.split-by>>" \
                 --timings-type="<<parameters.timings-type>>")' \
-                \>> $BASH_ENV
+                >> $BASH_ENV
 
   - when:
       condition: <<parameters.test-path>>
@@ -91,7 +91,7 @@ steps:
                 circleci tests split \
                 --split-by="<<parameters.split-by>>" \
                 --timings-type="<<parameters.timings-type>>")' \
-                \>> $BASH_ENV
+                >> $BASH_ENV
 
   - when:
       condition: <<parameters.glob-path>>
@@ -104,6 +104,6 @@ steps:
                 circleci tests split \
                 --split-by="<<parameters.split-by>>" \
                 --timings-type="<<parameters.timings-type>>")' \
-                \>> $BASH_ENV
+                >> $BASH_ENV
 
   - steps: <<parameters.steps>>
