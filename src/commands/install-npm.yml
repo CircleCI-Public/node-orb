@@ -23,6 +23,10 @@ steps:
         $SUDO rm -rf /usr/local/lib/node_modules
         $SUDO mv node_modules /usr/local/lib/ || true
 
+        # create symmlinks
+        ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
+        ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
+
   - run:
       name: Verify NPM version
       command: npm -v
