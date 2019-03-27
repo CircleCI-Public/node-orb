@@ -15,11 +15,9 @@ steps:
   - run:
       name: Install NPM
       command: |
-        npm install -g npm@"<<parameters.npm-version>>"
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
-        # Workaround to address issues with using npm to upgrade npm
-        rm -rf /usr/local/lib/node_modules
-        mv node_modules /usr/local/lib/ || true
+        npm install -g npm@"<<parameters.npm-version>>"
 
   - run:
       name: Verify NPM version
