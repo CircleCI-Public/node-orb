@@ -97,21 +97,21 @@ workflows:
             - node/install-yarn
 
       - macos:
-          name: install-yarn-mac
+          name: install-yarn-mac-versioned
           filters: *integration-dev_filters
           post-steps:
             - node/install-yarn:
                 yarn-version: 1.15.1
 
       - machine:
-          name: install-yarn-machine
+          name: install-yarn-machine-versioned
           filters: *integration-dev_filters
           post-steps:
             - node/install-yarn:
                 yarn-version: 1.15.1
 
       - node:
-          name: install-yarn-node
+          name: install-yarn-node-versioned
           filters: *integration-dev_filters
           post-steps:
             - node/install-yarn:
@@ -136,21 +136,21 @@ workflows:
             - node/install-npm
 
       - macos:
-          name: install-npm-mac
+          name: install-npm-mac-versioned
           filters: *integration-dev_filters
           post-steps:
             - node/install-npm:
                 npm-version: 6.4.1
 
       - machine:
-          name: install-npm-machine
+          name: install-npm-machine-versioned
           filters: *integration-dev_filters
           post-steps:
             - node/install-npm:
                 npm-version: 6.4.1
 
       - node:
-          name: install-npm-node
+          name: install-npm-node-versioned
           filters: *integration-dev_filters
           post-steps:
             - node/install-npm:
