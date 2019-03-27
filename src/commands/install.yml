@@ -64,4 +64,4 @@ steps:
         # setup node.js installation
         $SUDO mkdir -p <<parameters.install-dir>>/nodejs
 
-        $SUDO tar -xJvf "node-v$VERSION-$PLATFORM-x64.tar.gz" -C <<parameters.install-dir>>/nodejs
+        $SUDO tar -xvf "node-v$VERSION-$PLATFORM-x64.tar.gz" -C <<parameters.install-dir>>/nodejs
