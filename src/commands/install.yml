@@ -33,7 +33,7 @@ steps:
           echo "Latest version of Node.js is $VERSION"
         fi
 
-        [ -w /usr/local/bin ] && SUDO="" || SUDO=sudo
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
         # download/install node
         $SUDO curl -O "https://nodejs.org/dist/v$VERSION/node-v$VERSION-$PLATFORM-x64.tar.gz"
@@ -64,4 +64,4 @@ steps:
         # setup node.js installation
         $SUDO mkdir -p <<parameters.install-dir>>/nodejs
 
-        $SUDO tar -xvf "node-v$VERSION-$PLATFORM-x64.tar.gz" -C <<parameters.install-dir>>/nodejs
+        $SUDO tar -xzf "node-v$VERSION-$PLATFORM-x64.tar.gz" -C <<parameters.install-dir>>/nodejs

@@ -15,7 +15,7 @@ steps:
   - run:
       name: Install NPM
       command: |
-        [ -w /usr/local/bin ] && SUDO="" || SUDO=sudo
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
         $SUDO npm install -g npm@"<<parameters.npm-version>>"
 
