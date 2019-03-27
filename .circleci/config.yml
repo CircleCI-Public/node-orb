@@ -36,8 +36,18 @@ integration-master_filters: &integration-master_filters
 
 prod-deploy_requires: &prod-deploy_requires
   [
-    install-npm-node
-    # placeholder
+    install-yarn-machine-master,
+    install-yarn-machine-versioned-master,
+    install-yarn-mac-master,
+    install-yarn-mac-versioned-master,
+    install-yarn-node-master,
+    install-yarn-node-versioned-master,
+    install-npm-machine-master,
+    install-npm-machine-versioned-master,
+    install-npm-mac-master,
+    install-npm-mac-versioned-master,
+    install-npm-node-master,
+    install-npm-node-versioned-master
   ]
 
 workflows:
@@ -170,6 +180,93 @@ workflows:
                 npm-version: 6.4.1
 
       # triggered by master branch commits
+      # yarn
+      # machine
+      - machine:
+          name: install-yarn-machine-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install-yarn
+
+      - machine:
+          name: install-yarn-machine-versioned-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install-yarn:
+                yarn-version: 1.15.1
+
+      # macos
+      - macos:
+          name: install-yarn-mac-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install-yarn
+
+      - macos:
+          name: install-yarn-mac-versioned-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install-yarn:
+                yarn-version: 1.15.1
+
+      # node
+      - node:
+          name: install-yarn-node-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install-yarn
+
+      - node:
+          name: install-yarn-node-versioned-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install-yarn:
+                yarn-version: 1.15.1
+
+      # npm
+      # machine
+      - machine:
+          name: install-npm-machine-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install
+            - node/install-npm
+
+      - machine:
+          name: install-npm-machine-versioned-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install
+            - node/install-npm:
+                npm-version: 6.4.1
+
+      # macos
+      - macos:
+          name: install-npm-mac-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install-npm
+
+      - macos:
+          name: install-npm-mac-versioned-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install-npm:
+                npm-version: 6.4.1
+
+      # node
+      - node:
+          name: install-npm-node-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install-npm
+
+      - node:
+          name: install-npm-node-versioned-master
+          filters: *integration-master_filters
+          post-steps:
+            - node/install-npm:
+                npm-version: 6.4.1
 
       # patch, minor, or major publishing
       - orb-tools/dev-promote-prod:
