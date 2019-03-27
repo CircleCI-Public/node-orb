@@ -17,7 +17,7 @@ steps:
       command: |
         if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
-        npm install -g npm@"<<parameters.npm-version>>"
+        $SUDO npm install -g npm@"<<parameters.npm-version>>"
 
   - run:
       name: Verify NPM version
