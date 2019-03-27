@@ -79,20 +79,24 @@ workflows:
   integration-tests_prod-release:
     jobs:
       # triggered by non-master branch commits
-      - macos:
-          name: install-yarn-mac
-          filters: *integration-dev_filters
-          post-steps:
-            - node/install-yarn
-
+      # yarn
+      # machine
       - machine:
           name: install-yarn-machine
           filters: *integration-dev_filters
           post-steps:
             - node/install-yarn
 
-      - node:
-          name: install-yarn-node
+      - machine:
+          name: install-yarn-machine-versioned
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install-yarn:
+                yarn-version: 1.15.1
+
+      # macos
+      - macos:
+          name: install-yarn-mac
           filters: *integration-dev_filters
           post-steps:
             - node/install-yarn
@@ -104,12 +108,12 @@ workflows:
             - node/install-yarn:
                 yarn-version: 1.15.1
 
-      - machine:
-          name: install-yarn-machine-versioned
+      # node
+      - node:
+          name: install-yarn-node
           filters: *integration-dev_filters
           post-steps:
-            - node/install-yarn:
-                yarn-version: 1.15.1
+            - node/install-yarn
 
       - node:
           name: install-yarn-node-versioned
@@ -118,20 +122,26 @@ workflows:
             - node/install-yarn:
                 yarn-version: 1.15.1
 
-      - macos:
-          name: install-npm-mac
-          filters: *integration-dev_filters
-          post-steps:
-            - node/install-npm
-
+      # npm
+      # machine
       - machine:
           name: install-npm-machine
           filters: *integration-dev_filters
           post-steps:
+            - node/install
             - node/install-npm
 
-      - node:
-          name: install-npm-node
+      - machine:
+          name: install-npm-machine-versioned
+          filters: *integration-dev_filters
+          post-steps:
+            - node/install
+            - node/install-npm:
+                npm-version: 6.4.1
+
+      # macos
+      - macos:
+          name: install-npm-mac
           filters: *integration-dev_filters
           post-steps:
             - node/install-npm
@@ -143,12 +153,12 @@ workflows:
             - node/install-npm:
                 npm-version: 6.4.1
 
-      - machine:
-          name: install-npm-machine-versioned
+      # node
+      - node:
+          name: install-npm-node
           filters: *integration-dev_filters
           post-steps:
-            - node/install-npm:
-                npm-version: 6.4.1
+            - node/install-npm
 
       - node:
           name: install-npm-node-versioned

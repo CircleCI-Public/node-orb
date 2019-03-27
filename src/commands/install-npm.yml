@@ -21,4 +21,8 @@ steps:
 
         # Workaround to address issues with using npm to upgrade npm
         $SUDO rm -rf /usr/local/lib/node_modules
-        $SUDO mv node_modules /usr/local/lib/
+        $SUDO mv node_modules /usr/local/lib/ || true
+
+  - run:
+      name: Verify NPM version
+      command: npm -v

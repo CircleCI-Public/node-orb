@@ -22,4 +22,6 @@ steps:
 
         source $BASH_ENV
 
-        yarn --version
+  - run:
+      name: Verify Yarn version
+      command: yarn --version
