@@ -81,6 +81,8 @@ workflows:
           ssh-fingerprints: 2a:2b:49:ea:64:7d:39:4a:58:17:18:17:b2:5c:f6:a8
           tag: master
           cleanup-tags: true
+          use-git-diff: false
+          static-release-type: patch
           requires:
             - orb-tools/publish-dev
           filters:
