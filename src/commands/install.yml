@@ -29,8 +29,24 @@ steps:
         VERSION=<<parameters.version>>
 
         if [[ <<parameters.version>> == "latest" ]]; then
-          VERSION=$(curl --silent https://api.github.com/repos/nodejs/node/releases/latest | grep tag_name | cut -d '"' -f 4 | cut -d 'v' -f 2)
+          VERSION=$(curl --silent --show-error \
+            --location --fail --retry 3 \
+            https://api.github.com/repos/nodejs/node/releases/latest | \
+            grep tag_name | cut -d '"' -f 4 | \
+            cut -d 'v' -f 2)
           echo "Latest version of Node.js is $VERSION"
+        fi
+
+        # check if Node.js needs to be installed
+        if command -v node >> /dev/null 2>&1; then
+          if node --version | grep "$VERSION" >> /dev/null 2>&1; then
+            echo "Node.js $VERSION is already installed"
+            exit 0
+          else
+            echo "A different version of Node.js is installed ($(node --version)); removing it"
+            $SUDO rm -f "$(command -v node)"
+            $SUDO rm -rf "$(command -v node | sed -E 's|node||')/nodejs"
+          fi
         fi
 
         if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
