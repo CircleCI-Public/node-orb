@@ -1,6 +1,7 @@
 version: 2.1
 
 orbs:
+  build-tools: circleci/build-tools@2.5.0
   node: circleci/node@dev:alpha
   orb-tools: circleci/orb-tools@8.23.1
 
@@ -30,6 +31,7 @@ jobs:
     executor: <<parameters.executor>>
     steps:
       - checkout
+      - build-tools/install-ci-tools
 
       - node/install:
           version: <<parameters.node-version>>
