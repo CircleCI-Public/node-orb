@@ -7,8 +7,21 @@ parameters:
     type: string
     default: latest
     description: >
-      Specific version of Node.js to install. See list of releases:
-      https://nodejs.org/en/download/releases
+      Specific version of Node.js to install. Note: version-selection is
+      not supported for Alpine Linux-based execution environments, as
+      Node.js's Linux binaries are not compiled to run on Alpine. Use the
+      `alpine-version` parameter to select from a limited number of
+      Alpine-based Node.js packages. Otherwise, for a full list of
+      releases, see the following: https://nodejs.org/en/download/releases
+
+  alpine-version:
+    type: enum
+    default: nodejs-current
+    enum: [nodejs, nodejs-current]
+    description: >
+      For Alpine Linux users, select a Node.js version: either a current
+      stable release, or a slightly older stable release. For more
+      information, see https://pkgs.alpinelinux.org/packages?name=nodejs*
 
   install-dir:
     type: string
@@ -20,64 +33,79 @@ steps:
   - run:
       name: Install Node.js
       command: |
-        # detect platform
-        PLATFORM="linux"
-        if [ -n "$(uname | grep "Darwin")" ]; then
-          PLATFORM="darwin"
+        # detect mac vs. alpine vs. other linux
+        PLATFORM=linux
+        if uname -a | grep Darwin > /dev/null 2>&1; then
+          PLATFORM=darwin
+        elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
+          PLATFORM=alpine
         fi
 
-        VERSION=<<parameters.version>>
+        # FUNCTIONS
+        get_node_version () {
+          VERSION=<<parameters.version>>
 
-        if [[ <<parameters.version>> == "latest" ]]; then
-          VERSION=$(curl --silent --show-error \
-            --location --fail --retry 3 \
-            https://api.github.com/repos/nodejs/node/releases/latest | \
-            grep tag_name | cut -d '"' -f 4 | \
-            cut -d 'v' -f 2)
-          echo "Latest version of Node.js is $VERSION"
-        fi
-
-        # check if Node.js needs to be installed
-        if command -v node >> /dev/null 2>&1; then
-          if node --version | grep "$VERSION" >> /dev/null 2>&1; then
-            echo "Node.js $VERSION is already installed"
-            exit 0
-          else
-            echo "A different version of Node.js is installed ($(node --version)); removing it"
-            $SUDO rm -f "$(command -v node)"
-            $SUDO rm -rf "$(command -v node | sed -E 's|node||')/nodejs"
+          if [[ <<parameters.version>> == latest ]]; then
+            VERSION=$(curl --silent --show-error \
+              --location --fail --retry 3 \
+              https://api.github.com/repos/nodejs/node/releases/latest | \
+              grep tag_name | cut -d '"' -f 4 | \
+              cut -d 'v' -f 2)
+            echo "Latest version of Node.js is $VERSION"
           fi
+        }
+
+        installation_check () {
+          # check if Node.js needs to be installed
+          if command -v node >> /dev/null 2>&1; then
+            if node --version | grep "$VERSION" >> /dev/null 2>&1; then
+              echo "Node.js $VERSION is already installed"
+              exit 0
+            else
+              echo "A different version of Node.js is installed ($(node --version)); removing it"
+              $SUDO rm -f "$(command -v node)"
+              $SUDO rm -rf "$(command -v node | sed -E 's|node||')/nodejs"
+            fi
+          fi
+        }
+
+        if [[ "$PLATFORM" == alpine ]]; then
+          installation_check
+          apk add <<parameters.alpine-version>>
+        else
+          if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+          # download/install node
+          $SUDO curl -O "https://nodejs.org/dist/v$VERSION/node-v$VERSION-$PLATFORM-x64.tar.gz"
+
+          # download shasum256
+          $SUDO curl -O https://nodejs.org/dist/v$VERSION/SHASUMS256.txt
+
+          # verify shasum256 via gpg
+          $SUDO curl -O https://nodejs.org/dist/v$VERSION/SHASUMS256.txt.sig
+
+          gpg --keyserver pool.sks-keyservers.net --recv-keys 4ED778F539E3634C779C87C6D7062848A1AB005C
+          gpg --keyserver pool.sks-keyservers.net --recv-keys B9E2F5981AA6E0CD28160D9FF13993A75599653C
+          gpg --keyserver pool.sks-keyservers.net --recv-keys 94AE36675C464D64BAFA68DD7434390BDBE9B9C5
+          gpg --keyserver pool.sks-keyservers.net --recv-keys B9AE9905FFD7803F25714661B63B535A4C206CA9
+          gpg --keyserver pool.sks-keyservers.net --recv-keys 77984A986EBC2AA786BC0F66B01FBB92821C587A
+          gpg --keyserver pool.sks-keyservers.net --recv-keys 71DCFD284A79C3B38668286BC97EC7A07EDE3FC1
+          gpg --keyserver pool.sks-keyservers.net --recv-keys FD3A5288F042B6850C66B31F09FE44734EB7990E
+          gpg --keyserver pool.sks-keyservers.net --recv-keys 8FCCA13FEF1D0C2E91008E09770F7A9A5AE15600
+          gpg --keyserver pool.sks-keyservers.net --recv-keys C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8
+          gpg --keyserver pool.sks-keyservers.net --recv-keys DD8F2338BAE7501E3DD5AC78C273792F7D83545D
+          gpg --keyserver pool.sks-keyservers.net --recv-keys A48C2BEE680E841632CD4E44F07496B3EB3C1762
+
+          gpg --verify SHASUMS256.txt.sig SHASUMS256.txt
+
+          # verify node tar via shasum256
+          grep "node-v$VERSION-$PLATFORM-x64.tar.gz" SHASUMS256.txt | sha256sum -c -
+
+          # setup node.js installation
+          $SUDO mkdir -p <<parameters.install-dir>>/nodejs
+
+          $SUDO tar -xzf "node-v$VERSION-$PLATFORM-x64.tar.gz" -C <<parameters.install-dir>>/nodejs
         fi
 
-        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
-
-        # download/install node
-        $SUDO curl -O "https://nodejs.org/dist/v$VERSION/node-v$VERSION-$PLATFORM-x64.tar.gz"
-
-        # download shasum256
-        $SUDO curl -O https://nodejs.org/dist/v$VERSION/SHASUMS256.txt
-
-        # verify shasum256 via gpg
-        $SUDO curl -O https://nodejs.org/dist/v$VERSION/SHASUMS256.txt.sig
-
-        gpg --keyserver pool.sks-keyservers.net --recv-keys 4ED778F539E3634C779C87C6D7062848A1AB005C
-        gpg --keyserver pool.sks-keyservers.net --recv-keys B9E2F5981AA6E0CD28160D9FF13993A75599653C
-        gpg --keyserver pool.sks-keyservers.net --recv-keys 94AE36675C464D64BAFA68DD7434390BDBE9B9C5
-        gpg --keyserver pool.sks-keyservers.net --recv-keys B9AE9905FFD7803F25714661B63B535A4C206CA9
-        gpg --keyserver pool.sks-keyservers.net --recv-keys 77984A986EBC2AA786BC0F66B01FBB92821C587A
-        gpg --keyserver pool.sks-keyservers.net --recv-keys 71DCFD284A79C3B38668286BC97EC7A07EDE3FC1
-        gpg --keyserver pool.sks-keyservers.net --recv-keys FD3A5288F042B6850C66B31F09FE44734EB7990E
-        gpg --keyserver pool.sks-keyservers.net --recv-keys 8FCCA13FEF1D0C2E91008E09770F7A9A5AE15600
-        gpg --keyserver pool.sks-keyservers.net --recv-keys C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8
-        gpg --keyserver pool.sks-keyservers.net --recv-keys DD8F2338BAE7501E3DD5AC78C273792F7D83545D
-        gpg --keyserver pool.sks-keyservers.net --recv-keys A48C2BEE680E841632CD4E44F07496B3EB3C1762
-
-        gpg --verify SHASUMS256.txt.sig SHASUMS256.txt
-
-        # verify node tar via shasum256
-        grep "node-v$VERSION-$PLATFORM-x64.tar.gz" SHASUMS256.txt | sha256sum -c -
-
-        # setup node.js installation
-        $SUDO mkdir -p <<parameters.install-dir>>/nodejs
-
-        $SUDO tar -xzf "node-v$VERSION-$PLATFORM-x64.tar.gz" -C <<parameters.install-dir>>/nodejs
+        # verify version
+        echo "$(node --version) has been installed to $(which node)"
