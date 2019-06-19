@@ -142,6 +142,7 @@ workflows:
           executor: orb-tools/machine
           yarn: true
           filters: *integration-dev_filters
+          pre-steps: [run: gpg --version]
 
       - test:
           name: install-yarn-machine-versioned-dev
@@ -152,6 +153,7 @@ workflows:
           yarn: true
           yarn-version: "1.15.1"
           filters: *integration-dev_filters
+          pre-steps: [run: gpg --version]
 
       # # macos
       # - test:
@@ -229,6 +231,7 @@ workflows:
           executor: orb-tools/machine
           node-version: "8.9.4"
           filters: *integration-dev_filters
+          pre-steps: [run: gpg --version]
 
       - test:
           name: install-npm-machine-versioned-dev
@@ -237,6 +240,7 @@ workflows:
             image: circleci/classic:latest
           npm-version: "6.4.1"
           filters: *integration-dev_filters
+          pre-steps: [run: gpg --version]
 
       # # macos
       # - test:
