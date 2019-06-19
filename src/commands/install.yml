@@ -33,7 +33,7 @@ steps:
   - run:
       name: Install Node.js
       command: |
-        # detect mac vs. alpine vs. other linux
+        # PLATFORM CHECK: mac vs. alpine vs. other linux
         PLATFORM=linux
         if uname -a | grep Darwin > /dev/null 2>&1; then
           PLATFORM=darwin
@@ -73,9 +73,11 @@ steps:
           fi
         }
 
-        if [[ "$PLATFORM" == alpine ]]; then
-          installation_check
+        # DOWNLOAD/INSTALL LOGIC
+        get_node_version
+        installation_check
 
+        if [[ "$PLATFORM" == alpine ]]; then
           apk add <<parameters.alpine-version>>
         else
           if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
