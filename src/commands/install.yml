@@ -92,6 +92,16 @@ steps:
 
           installation_check
 
+          # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
+          sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
+          apk upgrade --update-cache --available > /dev/null 2>&1
+
+          # https://wiki.alpinelinux.org/wiki/Enable_Community_Repository
+          if cat /etc/apk/repositories | grep -v community > /dev/null 2>&1; then
+            echo -e "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
+          fi
+
+          apk --no-cache add libuv
           apk --no-cache add --repository \
             "http://dl-cdn.alpinelinux.org/alpine/edge/$APK_REPO" \
             <<parameters.alpine-version>> \
