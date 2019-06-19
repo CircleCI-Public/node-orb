@@ -108,6 +108,7 @@ steps:
             > /dev/null 2>&1
         else
           get_node_version
+          installation_check
 
           if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
