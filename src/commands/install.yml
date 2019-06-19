@@ -158,7 +158,7 @@ steps:
 
           $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS
 
-          $SUDO curl -) \
+          $SUDO curl \
             --silent --show-error --location --fail --retry 3 \
             "https://nodejs.org/dist/v$VERSION/SHASUMS256.txt.asc"
 
