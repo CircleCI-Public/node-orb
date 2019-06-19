@@ -83,18 +83,18 @@ steps:
           if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
           # download/install node
-          $SUDO curl \
-            --silent --show-error --location --fail --retry 3 --output \
+          $SUDO curl -O \
+            --silent --show-error --location --fail --retry 3 \
               "https://nodejs.org/dist/v$VERSION/node-v$VERSION-$PLATFORM-x64.tar.gz"
 
           # download shasum256
-          $SUDO curl \
-            --silent --show-error --location --fail --retry 3 --output \
+          $SUDO curl -O \
+            --silent --show-error --location --fail --retry 3 \
             "https://nodejs.org/dist/v$VERSION/SHASUMS256.txt"
 
           # verify shasum256 via gpg
-          $SUDO curl \
-            --silent --show-error --location --fail --retry 3 --output \
+          $SUDO curl -O \
+            --silent --show-error --location --fail --retry 3 \
             "https://nodejs.org/dist/v$VERSION/SHASUMS256.txt.sig"
 
           $SUDO curl \
