@@ -88,14 +88,14 @@ steps:
           # download shasum256
           $SUDO curl \
             --silent --show-error --location --fail --retry 3 --output \
-            https://nodejs.org/dist/v$VERSION/SHASUMS256.txt
+            "https://nodejs.org/dist/v$VERSION/SHASUMS256.txt"
 
           # verify shasum256 via gpg
           $SUDO curl \
             --silent --show-error --location --fail --retry 3 --output \
-            https://nodejs.org/dist/v$VERSION/SHASUMS256.txt.sig
+            "https://nodejs.org/dist/v$VERSION/SHASUMS256.txt.sig"
 
-          curl \
+          $SUDO curl \
             --silent --show-error --location --fail --retry 3 \
             https://raw.githubusercontent.com/nodejs/node/master/README.md | \
             grep -E '[A-Z0-9]{40}' | \
