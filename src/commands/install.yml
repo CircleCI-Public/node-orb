@@ -92,7 +92,9 @@ steps:
 
           installation_check
 
-          apk add <<parameters.alpine-version>> \
+          apk --no-cache add --repository \
+            "http://dl-cdn.alpinelinux.org/alpine/edge/$APK_REPO" \
+            <<parameters.alpine-version>> \
             > /dev/null 2>&1
         else
           get_node_version
