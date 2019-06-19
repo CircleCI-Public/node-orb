@@ -16,6 +16,10 @@ jobs:
         type: string
         default: latest
 
+      node-version-alpine:
+        type: string
+        default: nodejs-current
+
       yarn:
         type: boolean
         default: false
@@ -35,6 +39,7 @@ jobs:
 
       - node/install:
           version: <<parameters.node-version>>
+          alpine-version: <<parameters.node-version-alpine>>
 
       # - unless:
       #     condition: <<parameters.yarn>>
@@ -195,6 +200,7 @@ workflows:
       - test:
           name: install-yarn-alpine-versioned-dev
           executor: orb-tools/alpine
+          node-version-alpine: nodejs
           yarn: true
           yarn-version: "1.15.1"
           filters: *integration-dev_filters
@@ -269,6 +275,7 @@ workflows:
       - test:
           name: install-npm-alpine-versioned-dev
           executor: orb-tools/alpine
+          node-version-alpine: nodejs
           npm-version: "6.4.1"
           filters: *integration-dev_filters
 
@@ -350,6 +357,7 @@ workflows:
       - test:
           name: install-yarn-alpine-versioned-master
           executor: orb-tools/alpine
+          node-version-alpine: nodejs
           yarn: true
           yarn-version: "1.15.1"
           filters: *integration-master_filters
@@ -424,6 +432,7 @@ workflows:
       - test:
           name: install-npm-alpine-versioned-master
           executor: orb-tools/alpine
+          node-version-alpine: nodejs
           npm-version: "6.4.1"
           filters: *integration-master_filters
 
