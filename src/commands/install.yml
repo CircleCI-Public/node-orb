@@ -101,7 +101,7 @@ steps:
             echo -e "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
           fi
 
-          apk --no-cache add libuv
+          apk --no-cache add libuv > /dev/null 2>&1
           apk --no-cache add --repository \
             "http://dl-cdn.alpinelinux.org/alpine/edge/$APK_REPO" \
             <<parameters.alpine-version>> \
