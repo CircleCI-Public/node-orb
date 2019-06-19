@@ -75,7 +75,7 @@ steps:
 
         # DOWNLOAD/INSTALL LOGIC
         if [[ "$PLATFORM" == alpine ]]; then
-          if [[ <<parameters.alpine-version>> == nodejs ]; then
+          if [[ <<parameters.alpine-version>> == nodejs ]]; then
             APK_REPO=main
           elif [[ <<parameters.alpine-version>> == nodejs-current ]]; then
             APK_REPO=community
