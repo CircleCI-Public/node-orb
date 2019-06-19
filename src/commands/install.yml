@@ -74,12 +74,26 @@ steps:
         }
 
         # DOWNLOAD/INSTALL LOGIC
-        get_node_version
-        installation_check
-
         if [[ "$PLATFORM" == alpine ]]; then
+          if [[ <<parameters.alpine-version>> == nodejs ]; then
+            APK_REPO=main
+          elif [[ <<parameters.alpine-version>> == nodejs-current ]]; then
+            APK_REPO=community
+          fi
+
+          VERSION=$(curl \
+            --silent --show-error --location --fail --retry 3 \
+            "http://dl-cdn.alpinelinux.org/alpine/edge/$APK_REPO/x86_64/" | \
+            grep nodejs | grep -E -v '(dev|doc)' | \
+            sed -E 's%<a href="%%' | sed -E 's%.apk">nodejs-.*.apk</a>.*%%' | \
+            sed -E 's/(nodejs-|nodejs-current-)//' | sed -E 's/-r0//')
+
+          installation_check
+
           apk add <<parameters.alpine-version>>
         else
+          get_node_version
+
           if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
           # download/install node
