@@ -136,59 +136,59 @@ workflows:
     jobs:
       # triggered by non-master branch commits
       # yarn
-      # machine
-      - test:
-          name: install-yarn-machine-dev
-          executor: orb-tools/machine
-          yarn: true
-          filters: *integration-dev_filters
+      # # machine
+      # - test:
+      #     name: install-yarn-machine-dev
+      #     executor: orb-tools/machine
+      #     yarn: true
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-yarn-machine-versioned-dev
-          executor: orb-tools/machine
-          yarn: true
-          yarn-version: "1.15.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-yarn-machine-versioned-dev
+      #     executor: orb-tools/machine
+      #     yarn: true
+      #     yarn-version: "1.15.1"
+      #     filters: *integration-dev_filters
 
-      # macos
-      - test:
-          name: install-yarn-mac-dev
-          executor: orb-tools/macos
-          yarn: true
-          filters: *integration-dev_filters
+      # # macos
+      # - test:
+      #     name: install-yarn-mac-dev
+      #     executor: orb-tools/macos
+      #     yarn: true
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-yarn-mac-versioned-dev
-          executor: orb-tools/macos
-          yarn: true
-          yarn-version: "1.15.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-yarn-mac-versioned-dev
+      #     executor: orb-tools/macos
+      #     yarn: true
+      #     yarn-version: "1.15.1"
+      #     filters: *integration-dev_filters
 
-      # node
-      - test:
-          name: install-yarn-node-dev
-          yarn: true
-          filters: *integration-dev_filters
+      # # node
+      # - test:
+      #     name: install-yarn-node-dev
+      #     yarn: true
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-yarn-node-versioned-dev
-          yarn: true
-          yarn-version: "1.15.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-yarn-node-versioned-dev
+      #     yarn: true
+      #     yarn-version: "1.15.1"
+      #     filters: *integration-dev_filters
 
-      # cimg
-      - test:
-          name: install-yarn-ubuntu-dev
-          executor: orb-tools/ubuntu
-          yarn: true
-          filters: *integration-dev_filters
+      # # cimg
+      # - test:
+      #     name: install-yarn-ubuntu-dev
+      #     executor: orb-tools/ubuntu
+      #     yarn: true
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-yarn-ubuntu-versioned-dev
-          executor: orb-tools/ubuntu
-          yarn: true
-          yarn-version: "1.15.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-yarn-ubuntu-versioned-dev
+      #     executor: orb-tools/ubuntu
+      #     yarn: true
+      #     yarn-version: "1.15.1"
+      #     filters: *integration-dev_filters
 
       # alpine
       - test:
@@ -205,91 +205,91 @@ workflows:
           yarn-version: "1.15.1"
           filters: *integration-dev_filters
 
-      # oracle
-      - test:
-          name: install-yarn-oracle-dev
-          executor: orb-tools/oracle
-          yarn: true
-          filters: *integration-dev_filters
+      # # oracle
+      # - test:
+      #     name: install-yarn-oracle-dev
+      #     executor: orb-tools/oracle
+      #     yarn: true
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-yarn-oracle-versioned-dev
-          executor: orb-tools/oracle
-          yarn: true
-          yarn-version: "1.15.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-yarn-oracle-versioned-dev
+      #     executor: orb-tools/oracle
+      #     yarn: true
+      #     yarn-version: "1.15.1"
+      #     filters: *integration-dev_filters
 
-      # npm
-      # machine
-      - test:
-          name: install-npm-machine-dev
-          executor: orb-tools/machine
-          filters: *integration-dev_filters
+      # # npm
+      # # machine
+      # - test:
+      #     name: install-npm-machine-dev
+      #     executor: orb-tools/machine
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-npm-machine-versioned-dev
-          executor: orb-tools/machine
-          npm-version: "6.4.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-npm-machine-versioned-dev
+      #     executor: orb-tools/machine
+      #     npm-version: "6.4.1"
+      #     filters: *integration-dev_filters
 
-      # macos
-      - test:
-          name: install-npm-mac-dev
-          executor: orb-tools/macos
-          filters: *integration-dev_filters
+      # # macos
+      # - test:
+      #     name: install-npm-mac-dev
+      #     executor: orb-tools/macos
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-npm-mac-versioned-dev
-          executor: orb-tools/macos
-          npm-version: "6.4.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-npm-mac-versioned-dev
+      #     executor: orb-tools/macos
+      #     npm-version: "6.4.1"
+      #     filters: *integration-dev_filters
 
-      # node
-      - test:
-          name: install-npm-node-dev
-          filters: *integration-dev_filters
+      # # node
+      # - test:
+      #     name: install-npm-node-dev
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-npm-node-versioned-dev
-          npm-version: "6.4.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-npm-node-versioned-dev
+      #     npm-version: "6.4.1"
+      #     filters: *integration-dev_filters
 
-      # cimg
-      - test:
-          name: install-npm-ubuntu-dev
-          executor: orb-tools/ubuntu
-          filters: *integration-dev_filters
+      # # cimg
+      # - test:
+      #     name: install-npm-ubuntu-dev
+      #     executor: orb-tools/ubuntu
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-npm-ubuntu-versioned-dev
-          executor: orb-tools/ubuntu
-          npm-version: "6.4.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-npm-ubuntu-versioned-dev
+      #     executor: orb-tools/ubuntu
+      #     npm-version: "6.4.1"
+      #     filters: *integration-dev_filters
 
-      # alpine
-      - test:
-          name: install-npm-alpine-dev
-          executor: orb-tools/alpine
-          filters: *integration-dev_filters
+      # # alpine
+      # - test:
+      #     name: install-npm-alpine-dev
+      #     executor: orb-tools/alpine
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-npm-alpine-versioned-dev
-          executor: orb-tools/alpine
-          node-version-alpine: nodejs
-          npm-version: "6.4.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-npm-alpine-versioned-dev
+      #     executor: orb-tools/alpine
+      #     node-version-alpine: nodejs
+      #     npm-version: "6.4.1"
+      #     filters: *integration-dev_filters
 
-      # oracle
-      - test:
-          name: install-npm-oracle-dev
-          executor: orb-tools/oracle
-          filters: *integration-dev_filters
+      # # oracle
+      # - test:
+      #     name: install-npm-oracle-dev
+      #     executor: orb-tools/oracle
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-npm-oracle-versioned-dev
-          executor: orb-tools/oracle
-          npm-version: "6.4.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-npm-oracle-versioned-dev
+      #     executor: orb-tools/oracle
+      #     npm-version: "6.4.1"
+      #     filters: *integration-dev_filters
 
       # triggered by master branch commits
       # yarn

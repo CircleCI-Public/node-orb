@@ -88,9 +88,12 @@ steps:
             sed -E 's%<a href="%%' | sed -E 's%.apk">nodejs-.*.apk</a>.*%%' | \
             sed -E 's/(nodejs-|nodejs-current-)//' | sed -E 's/-r0//')
 
+          echo "Selected version of Node.js is: $VERSION (Alpine APK)"
+
           installation_check
 
-          apk add <<parameters.alpine-version>>
+          apk add <<parameters.alpine-version>> \
+            > /dev/null 2>&1
         else
           get_node_version
 
@@ -137,4 +140,4 @@ steps:
         fi
 
         # verify version
-        echo "$(node --version) has been installed to $(which node)"
+        echo "Node.js $(node --version) has been installed to $(which node)"
