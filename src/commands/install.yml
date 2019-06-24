@@ -175,6 +175,9 @@ steps:
           if [[ ! -e <<parameters.install-dir>>/bin/nodejs ]]; then
             $SUDO ln -s <<parameters.install-dir>>/bin/node <<parameters.install-dir>>/bin/nodejs
           fi
+
+          # test version
+          node --version | grep <<parameters.version>> > /dev/null
         fi
 
         # verify version
