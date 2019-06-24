@@ -196,20 +196,20 @@ workflows:
           yarn-version: "1.15.1"
           filters: *integration-dev_filters
 
-      # alpine
-      - test:
-          name: install-yarn-alpine-dev
-          executor: orb-tools/alpine
-          yarn: true
-          filters: *integration-dev_filters
+      # # alpine
+      # - test:
+      #     name: install-yarn-alpine-dev
+      #     executor: orb-tools/alpine
+      #     yarn: true
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-yarn-alpine-versioned-dev
-          executor: orb-tools/alpine
-          node-version-alpine: nodejs
-          yarn: true
-          yarn-version: "1.15.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-yarn-alpine-versioned-dev
+      #     executor: orb-tools/alpine
+      #     node-version-alpine: nodejs
+      #     yarn: true
+      #     yarn-version: "1.15.1"
+      #     filters: *integration-dev_filters
 
       # # oracle
       # - test:
@@ -279,18 +279,18 @@ workflows:
           npm-version: "6.4.1"
           filters: *integration-dev_filters
 
-      # alpine
-      - test:
-          name: install-npm-alpine-dev
-          executor: orb-tools/alpine
-          filters: *integration-dev_filters
+      # # alpine
+      # - test:
+      #     name: install-npm-alpine-dev
+      #     executor: orb-tools/alpine
+      #     filters: *integration-dev_filters
 
-      - test:
-          name: install-npm-alpine-versioned-dev
-          executor: orb-tools/alpine
-          node-version-alpine: nodejs
-          npm-version: "6.4.1"
-          filters: *integration-dev_filters
+      # - test:
+      #     name: install-npm-alpine-versioned-dev
+      #     executor: orb-tools/alpine
+      #     node-version-alpine: nodejs
+      #     npm-version: "6.4.1"
+      #     filters: *integration-dev_filters
 
       # # oracle
       # - test:
