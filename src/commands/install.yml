@@ -83,7 +83,7 @@ steps:
             else
               echo "A different version of Node.js is installed ($(node --version)); removing it"
 
-              $SUDO rm -f "$(command -v node)"
+              $SUDO rm -rf "$(command -v node)"
               $SUDO rm -rf "$(command -v node | sed -E 's|node||')/nodejs"
             fi
           fi
@@ -123,11 +123,11 @@ steps:
             <<parameters.alpine-version>> \
             > /dev/null 2>&1
         else
+          if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
           get_node_version
           nvm_check
           installation_check
-
-          if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
           $SUDO curl \
             --silent --show-error --location --fail --retry 3 \
