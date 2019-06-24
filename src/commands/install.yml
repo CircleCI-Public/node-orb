@@ -163,8 +163,8 @@ steps:
 
           $SUDO rm -f SHASUMS256.txt
 
-          # setup node.js installation
-          $SUDO mkdir -p <<parameters.install-dir>>/nodejs
+          # # setup node.js installation
+          # $SUDO mkdir -p <<parameters.install-dir>>/nodejs
 
           $SUDO tar -xzf "node-v$VERSION-$PLATFORM-x64.tar.gz" \
             -C <<parameters.install-dir>> \
@@ -172,7 +172,9 @@ steps:
 
           $SUDO rm -f "node-v$VERSION-$PLATFORM-x64.tar.gz"
 
-          $SUDO ln -s /usr/local/bin/node /usr/local/bin/nodejs
+          if [[ ! -e <<parameters.install-dir>>/bin/nodejs ]]; then
+            $SUDO ln -s <<parameters.install-dir>>/bin/node <<parameters.install-dir>>/bin/nodejs
+          fi
         fi
 
         # verify version
