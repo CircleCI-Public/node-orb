@@ -137,13 +137,20 @@ steps:
             sed -E 's/(`|\$ )//g' > \
             NODEJS_TRUSTED_RELEASE_KEYS
 
+          cat > KEYSERVERS \<< EOM
+          hkp://p80.pool.sks-keyservers.net:80
+          hkp://ipv4.pool.sks-keyservers.net
+          hkp://pgp.mit.edu:80
+          hkp://ha.pool.sks-keyservers.net
+          hkp://keyserver.ubuntu.com:80
+          EOM
+
+          echo "Importing Node.js trusted release keys..."
           while read key; do
-            # use fallback keyservers to mitigate docker networking issues
-            gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
-              gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-              gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" || \
-              gpg --keyserver hkp://ha.pool.sks-keyservers.net --recv-keys "$key" || \
-              gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys "$key"
+            for keyserver in $(cat KEYSERVERS); do
+              gpg --keyserver "$keyserver" --recv-keys "$key" > /dev/null 2>&1 || continue
+              echo "Success! Imported $key from $keyserver"
+            done
           done < NODEJS_TRUSTED_RELEASE_KEYS
 
           $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS
