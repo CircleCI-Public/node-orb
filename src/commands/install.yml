@@ -141,7 +141,9 @@ steps:
             # use fallback keyservers to mitigate docker networking issues
             gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
               gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-              gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key"
+              gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" || \
+              gpg --keyserver hkp://ha.pool.sks-keyservers.net --recv-keys "$key" || \
+              gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys "$key"
           done < NODEJS_TRUSTED_RELEASE_KEYS
 
           $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS
@@ -177,8 +179,9 @@ steps:
           fi
         fi
 
-        # test version
-        node --version | grep "$VERSION" > /dev/null
-
-        # verify version
-        echo "Node.js $(node --version) has been installed to $(which node)"
+        # test/verify version
+        if [[ $(node --version | grep "$VERSION" > /dev/null) ]]; then
+          echo "Node.js $(node --version) has been installed to $(which node)"
+        else
+          echo "Something went wrong; the specified version of Node.js could not be installed"
+        fi
