@@ -138,9 +138,10 @@ steps:
             NODEJS_TRUSTED_RELEASE_KEYS
 
           while read key; do
-            echo "importing $key"
-            gpg --keyserver pool.sks-keyservers.net --recv-keys "$key" || echo "$key may be an issue here"
-            echo "$key imported!"
+            # use fallback keyservers to mitigate docker networking issues
+            gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
+              gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
+              gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key"
           done < NODEJS_TRUSTED_RELEASE_KEYS
 
           $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS
