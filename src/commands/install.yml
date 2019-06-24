@@ -187,13 +187,8 @@ steps:
         fi
 
         # test/verify version
-        if [[ $(node --version | grep "$VERSION" > /dev/null) ]]; then
+        if node --version | grep "$VERSION" > /dev/null; then
           echo "Node.js $(node --version) has been installed to $(which node)"
         else
           echo "Something went wrong; the specified version of Node.js could not be installed"
         fi
-
-        echo "Node.js $(node --version) has been installed to $(which node)"
-
-        echo "version: $(node --version)"
-        echo "var: $VERSION"
