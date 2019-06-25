@@ -89,13 +89,10 @@ steps:
           fi
         }
 
-        receive_key () {
-          gpg --batch --no-tty --keyserver "$2" \
-            --keyserver-options "timeout=1" \
-            --recv-keys "$1"
-
-          echo "Success! Imported $1 from $2"
-        }
+        # receive_key () {
+        #   gpg --keyserver "$2" --keysver-options "timeout=5" --recv-keys "$1" > /dev/null 2>&1
+        #   echo "Success! Imported $1 from $2"
+        # }
 
         # DOWNLOAD/INSTALL LOGIC
         if [[ "$PLATFORM" == alpine ]]; then
@@ -145,16 +142,33 @@ steps:
             sed -E 's/(`|\$ )//g' > \
             NODEJS_TRUSTED_RELEASE_KEYS
 
+          cat > KEYSERVERS \<< EOM
+          hkp://p80.pool.sks-keyservers.net:80
+          hkp://ipv4.pool.sks-keyservers.net
+          hkp://pgp.mit.edu:80
+          hkp://ha.pool.sks-keyservers.net
+          hkp://keyserver.ubuntu.com:80
+        EOM
+
           echo "Importing Node.js trusted release keys..."
+          # https://stackoverflow.com/a/26217767
           while read key; do
-            receive_key "$key" hkp://p80.pool.sks-keyservers.net:80 || \
-            receive_key "$key" hkp://ipv4.pool.sks-keyservers.net || \
-            receive_key "$key" hkp://pgp.mit.edu:80 || \
-            receive_key "$key" hkp://ha.pool.sks-keyservers.net || \
-            receive_key "$key" hkp://keyserver.ubuntu.com:80
+            for keyserver in $(cat KEYSERVERS); do
+              tempName=$(mktemp)
+              gpg --status-fd 1 \
+                --keyserver "$keyserver" --keyserver-options "timeout=1" \
+                --recv-keys "$key" 1> "$tempName" 2>/dev/null
+              if [[ $(grep "^\[GNUPG\:\] IMPORT_OK "[[:digit:]]*" "$key"$" $tempName && \
+                grep "^\[GNUPG\:\] IMPORT_RES 1" $tempName) ]]; then
+                echo "Success! Imported $key from $keyserver"
+                break
+              else
+                continue
+              fi
+            done
           done < NODEJS_TRUSTED_RELEASE_KEYS
 
-          $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS
+          $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS KEYSERVERS
 
           $SUDO curl -O \
             --silent --show-error --location --fail --retry 3 \
