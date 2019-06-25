@@ -90,9 +90,9 @@ steps:
         }
 
         receive_key () {
-          gpg --batch --keyserver "$2" --recv-keys "$1" \
-            --keyserver-options timeout=10 \
-            > /dev/null 2>&1
+          gpg --batch --no-tty --keyserver "$2" \
+            --keyserver-options "timeout=1" \
+            --recv-keys "$1"
 
           echo "Success! Imported $1 from $2"
         }
