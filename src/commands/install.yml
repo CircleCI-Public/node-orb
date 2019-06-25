@@ -158,7 +158,8 @@ steps:
               tempName=$(mktemp)
               gpg --status-fd 1 \
                 --keyserver "$keyserver" --keyserver-options "timeout=5" \
-                --recv-keys "$key" 1> "$tempName" 2>/dev/null
+                --recv-keys "$key" 1> "$tempName" 2>/dev/null || true
+              cat "$tempName"
               if [[ $(grep "^\[GNUPG\:\] IMPORT_OK "[[:digit:]]*" "$key"$" $tempName && \
                 grep "^\[GNUPG\:\] IMPORT_RES 1" $tempName) ]]; then
                 echo "Success! Imported $key from $keyserver"
