@@ -153,19 +153,19 @@ steps:
           echo "Importing Node.js trusted release keys..."
           # https://stackoverflow.com/a/26217767
           while read key; do
+            "Trying to import key ${key}..."
             for keyserver in $(cat KEYSERVERS); do
-              echo "Trying import with $keyserver"
+              echo "Trying import with ${keyserver}..."
               tempName=$(mktemp)
               gpg --status-fd 1 \
-                --keyserver "$keyserver" --keyserver-options "timeout=5" \
+                --keyserver "$keyserver" --keyserver-options "timeout=1" \
                 --recv-keys "$key" 1> "$tempName" 2>/dev/null || true
-              cat "$tempName"
               if [[ $(grep "^\[GNUPG\:\] IMPORT_OK "[[:digit:]]*" "$key"$" $tempName && \
                 grep "^\[GNUPG\:\] IMPORT_RES 1" $tempName) ]]; then
                 echo "Success! Imported $key from $keyserver"
                 break
               else
-                echo "Moving on to try next keyserver..."
+                echo "Import failed; trying again with next keyserver..."
                 continue
               fi
             done
