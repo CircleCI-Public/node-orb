@@ -138,21 +138,22 @@ steps:
             NODEJS_TRUSTED_RELEASE_KEYS
 
           cat > KEYSERVERS \<< EOM
+          hkp://p80.pool.sks-keyservers.net:80
+          hkp://ipv4.pool.sks-keyservers.net
+          hkp://pgp.mit.edu:80
           hkp://ha.pool.sks-keyservers.net
+          hkp://keyserver.ubuntu.com:80
         EOM
 
-          # hkp://p80.pool.sks-keyservers.net:80
-          # hkp://ipv4.pool.sks-keyservers.net
-          # hkp://pgp.mit.edu:80
-          # hkp://keyserver.ubuntu.com:80
-
           echo "Importing Node.js trusted release keys..."
-          while read key; do
-            for keyserver in $(cat KEYSERVERS); do
-              gpg --keyserver "$keyserver" --recv-keys "$key"
-              echo "Success! Imported $key from $keyserver"
+
+          while read keyserver; do
+            for key in $(cat NODEJS_TRUSTED_RELEASE_KEYS); do
+              [[ $(gpg --keyserver "$keyserver" --recv-keys "$key" && \
+                perl -i -pe "s|${KEY}||" NODEJS_TRUSTED_RELEASE_KEYS) ]] || \
+                continue
             done
-          done < NODEJS_TRUSTED_RELEASE_KEYS
+          done < KEYSERVERS
 
           $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS KEYSERVERS
 
