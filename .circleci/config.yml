@@ -41,17 +41,17 @@ jobs:
           version: <<parameters.node-version>>
           alpine-version: <<parameters.node-version-alpine>>
 
-      # - unless:
-      #     condition: <<parameters.yarn>>
-      #     steps:
-      #       - node/install-npm:
-      #           npm-version: <<parameters.npm-version>>
+      - unless:
+          condition: <<parameters.yarn>>
+          steps:
+            - node/install-npm:
+                npm-version: <<parameters.npm-version>>
 
-      # - when:
-      #     condition: <<parameters.yarn>>
-      #     steps:
-      #       - node/install-yarn:
-      #           yarn-version: <<parameters.yarn-version>>
+      - when:
+          condition: <<parameters.yarn>>
+          steps:
+            - node/install-yarn:
+                yarn-version: <<parameters.yarn-version>>
 
 
 # yaml anchor filters
