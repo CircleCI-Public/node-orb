@@ -154,15 +154,17 @@ steps:
           # https://stackoverflow.com/a/26217767
           while read key; do
             for keyserver in $(cat KEYSERVERS); do
+              echo "Trying import with $keyserver"
               tempName=$(mktemp)
               gpg --status-fd 1 \
-                --keyserver "$keyserver" --keyserver-options "timeout=1" \
+                --keyserver "$keyserver" --keyserver-options "timeout=5" \
                 --recv-keys "$key" 1> "$tempName" 2>/dev/null
               if [[ $(grep "^\[GNUPG\:\] IMPORT_OK "[[:digit:]]*" "$key"$" $tempName && \
                 grep "^\[GNUPG\:\] IMPORT_RES 1" $tempName) ]]; then
                 echo "Success! Imported $key from $keyserver"
                 break
               else
+                echo "Moving on to try next keyserver..."
                 continue
               fi
             done
