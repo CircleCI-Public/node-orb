@@ -89,6 +89,11 @@ steps:
           fi
         }
 
+        receive_key () {
+          gpg --batch --keyserver "$1" --recv-keys "$2" > /dev/null 2>&1
+          echo "Success! Imported $2 from $1"
+        }
+
         # DOWNLOAD/INSTALL LOGIC
         if [[ "$PLATFORM" == alpine ]]; then
           if [[ <<parameters.alpine-version>> == nodejs ]]; then
@@ -137,25 +142,16 @@ steps:
             sed -E 's/(`|\$ )//g' > \
             NODEJS_TRUSTED_RELEASE_KEYS
 
-          cat > KEYSERVERS \<< EOM
-          hkp://p80.pool.sks-keyservers.net:80
-          hkp://ipv4.pool.sks-keyservers.net
-          hkp://pgp.mit.edu:80
-          hkp://ha.pool.sks-keyservers.net
-          hkp://keyserver.ubuntu.com:80
-        EOM
-
           echo "Importing Node.js trusted release keys..."
+          while read key; do
+            receive_key hkp://p80.pool.sks-keyservers.net:80 "$key" || \
+              receive_key hkp://ipv4.pool.sks-keyservers.net "$key" || \
+              receive_key hkp://pgp.mit.edu:80 "$key" || \
+              receive_key hkp://ha.pool.sks-keyservers.net "$key" || \
+              receive_key hkp://keyserver.ubuntu.com:80 "$key"
+          done < NODEJS_TRUSTED_RELEASE_KEYS
 
-          while read keyserver; do
-            for key in $(cat NODEJS_TRUSTED_RELEASE_KEYS); do
-              [[ $(gpg --keyserver "$keyserver" --recv-keys "$key" && \
-                perl -i -pe "s|${KEY}||" NODEJS_TRUSTED_RELEASE_KEYS) ]] || \
-                continue
-            done
-          done < KEYSERVERS
-
-          $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS KEYSERVERS
+          $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS
 
           $SUDO curl -O \
             --silent --show-error --location --fail --retry 3 \
