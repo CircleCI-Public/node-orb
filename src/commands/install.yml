@@ -153,9 +153,9 @@ steps:
           echo "Importing Node.js trusted release keys..."
           # https://stackoverflow.com/a/26217767
           while read key; do
-            "Trying to import key ${key}..."
+            "Trying to import key $key..."
             for keyserver in $(cat KEYSERVERS); do
-              echo "Trying import with ${keyserver}..."
+              echo "Trying import with $keyserver..."
               tempName=$(mktemp)
               gpg --status-fd 1 \
                 --keyserver "$keyserver" --keyserver-options "timeout=1" \
