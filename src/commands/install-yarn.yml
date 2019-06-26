@@ -45,13 +45,13 @@ steps:
         installation_check
 
         curl -o- --silent --show-error --fail --retry 3 -L \
-          https://yarnpkg.com/install.sh | \
+          https://yarnpkg.com/install.shd | \
           bash<<#parameters.yarn-version>> -s -- \
           --version <<parameters.yarn-version>><</parameters.yarn-version>> \
           > /dev/null
 
         echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin`"' \
-          \>> $BASH_ENV
+          1\>> $BASH_ENV 2> /dev/null
 
         source $BASH_ENV
 
