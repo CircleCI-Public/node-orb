@@ -263,7 +263,7 @@ workflows:
       - test:
           name: install-npm-node-versioned-dev
           node-version: "6.1.0"
-          npm-version: "6.4.1"
+          npm-version: "6.3.0"
           filters: *integration-dev_filters
 
       # cimg
