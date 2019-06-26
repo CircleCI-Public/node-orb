@@ -20,6 +20,23 @@ steps:
       command: |
         if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
+        # FUNCTIONS
+        get_npm_version () {
+          if [[ <<parameters.version>> == latest ]]; then
+            VERSION=$(curl --silent --show-error \
+              --location --fail --retry 3 \
+              https://api.github.com/repos/npm/cli/releases/latest | \
+              grep tag_name | cut -d '"' -f 4 | \
+              cut -d 'v' -f 2)
+
+            echo "Latest version of NPM is $VERSION"
+          else
+            VERSION=<<parameters.version>>
+
+            echo "Selected version of NPM is $VERSION"
+          fi
+        }
+
         if cat /etc/issue 2> /dev/null | grep Alpine > /dev/null 2>&1; then
           # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
           sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
@@ -29,11 +46,13 @@ steps:
 
           echo "Success: NPM $(npm -v) (Alpine APK) has been installed to $(which npm)"
         else
-          npm install -g npm@<<parameters.npm-version>> || \
-            $SUDO npm install -g npm@<<parameters.npm-version>>
+          get_npm_version
+
+          npm install -g "npm@$VERSION" || \
+            $SUDO npm install -g "npm@$VERSION"
 
           # test/verify version
-          if npm -v | grep <<parameters.npm-version>>; then
+          if npm -v | grep "$VERSION"; then
             echo "Success! NPM $(npm -v) has been installed to $(which npm)"
           else
             echo "Something went wrong; the specified version of NPM could not be installed"
