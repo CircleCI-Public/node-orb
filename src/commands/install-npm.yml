@@ -40,9 +40,9 @@ steps:
         if cat /etc/issue 2> /dev/null | grep Alpine > /dev/null 2>&1; then
           # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
           sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
-          apk upgrade --update-cache --available
+          apk upgrade --update-cache --available > /dev/null 2>&1
 
-          apk --no-cache add npm
+          apk --no-cache add npm > /dev/null 2>&1
 
           echo "Success: NPM $(npm -v) (Alpine APK) has been installed to $(which npm)"
         else
@@ -52,7 +52,7 @@ steps:
             npm install -g "npm@$VERSION"
 
           # test/verify version
-          if npm -v | grep "$VERSION"; then
+          if npm -v | grep "$VERSION" > /dev/null 2>&1; then
             echo "Success! NPM $(npm -v) has been installed to $(which npm)"
           else
             echo "Something went wrong; the specified version of NPM could not be installed"
