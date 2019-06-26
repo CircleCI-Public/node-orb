@@ -20,23 +20,22 @@ steps:
       command: |
         if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
-        if cat /etc/issue | grep Alpine > /dev/null 2>&1; then
+        if cat /etc/issue | grep Alpine; then
 
           # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
           sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
-          apk upgrade --update-cache --available > /dev/null 2>&1
+          apk upgrade --update-cache --available
 
-          apk --no-cache add npm > /dev/null 2>&1
+          apk --no-cache add npm
 
           echo "Success: NPM $(npm -v) (Alpine APK) has been installed to $(which npm)"
         else
-          npm install -g npm@<<parameters.npm-version>> > /dev/null 2>&1
+          npm install -g npm@<<parameters.npm-version>>
 
-          echo "Success! NPM $(npm -v) has been installed to $(which npm)"
+          # test/verify version
+          if npm -v | grep <<parameters.npm-version>>; then
+            echo "Success! NPM $(npm -v) has been installed to $(which npm)"
+          else
+            echo "Something went wrong; the specified version of NPM could not be installed"
+          fi
         fi
-
-
-
-  - run:
-      name: Verify NPM version
-      command: npm -v
