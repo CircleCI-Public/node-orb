@@ -17,7 +17,7 @@ steps:
       command: |
         # FUNCTIONS
         get_yarn_version () {
-          if [[ <<parameters.yarn-version>> == "" ]]; then
+          if [[ "<<parameters.yarn-version>>" == "" ]]; then
             VERSION=$(curl --silent --show-error \
               --location --fail --retry 3 \
               https://api.github.com/repos/yarnpkg/yarn/releases/latest | \
