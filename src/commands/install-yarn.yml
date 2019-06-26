@@ -45,7 +45,7 @@ steps:
         installation_check
 
         curl -o- --silent --show-error --fail --retry 3 -L \
-          https://yarnpkg.com/install.shd | \
+          https://yarnpkg.com/install.sh | \
           bash<<#parameters.yarn-version>> -s -- \
           --version <<parameters.yarn-version>><</parameters.yarn-version>> \
           > /dev/null
