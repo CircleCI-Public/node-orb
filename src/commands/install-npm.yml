@@ -48,6 +48,12 @@ steps:
         else
           get_npm_version
 
+          # start with a clean slate
+          $SUDO rm -rf \
+            /usr/local/lib/node_modules \
+            /usr/local/include/node_modules \
+            /opt/local/lib/node_modules
+
           $SUDO npm install -g "npm@$VERSION" || \
             npm install -g "npm@$VERSION"
 
