@@ -29,6 +29,12 @@ parameters:
     description: >
       Where should Node.js be installed?
 
+  debug:
+    type: boolean
+    default: false
+    description: >
+      Extra output for orb developers
+
 steps:
   - run:
       name: Install Node.js
@@ -97,11 +103,6 @@ steps:
           fi
         }
 
-        # receive_key () {
-        #   gpg --keyserver "$2" --keysver-options "timeout=5" --recv-keys "$1" > /dev/null 2>&1
-        #   echo "Success! Imported $1 from $2"
-        # }
-
         # DOWNLOAD/INSTALL LOGIC
         if [[ "$PLATFORM" == alpine ]]; then
           if [[ <<parameters.alpine-version>> == nodejs ]]; then
@@ -168,7 +169,7 @@ steps:
                 --recv-keys "$key" 1> "$tempName" 2>/dev/null || true
               if [[ $(grep "^\[GNUPG\:\] IMPORT_OK "[[:digit:]]*" "$key"$" $tempName && \
                 grep "^\[GNUPG\:\] IMPORT_RES 1" $tempName) ]]; then
-                echo "Success! Imported $key from $keyserver"
+                <<#parameters.debug>>echo "Success! Imported $key from $keyserver"<</parameters.debug>>
                 break
               else
                 continue
@@ -194,9 +195,6 @@ steps:
           grep "node-v$VERSION-$PLATFORM-x64.tar.gz" SHASUMS256.txt | sha256sum -c -
 
           $SUDO rm -f SHASUMS256.txt
-
-          # # setup node.js installation
-          # $SUDO mkdir -p <<parameters.install-dir>>/nodejs
 
           $SUDO tar -xzf "node-v$VERSION-$PLATFORM-x64.tar.gz" \
             -C <<parameters.install-dir>> \
