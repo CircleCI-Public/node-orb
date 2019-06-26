@@ -48,8 +48,8 @@ steps:
         else
           get_npm_version
 
-          $SUDO npm install -g "npm@$VERSION" || \
-            npm install -g "npm@$VERSION"
+          $SUDO npm install -g "npm@$VERSION" > /dev/null || \
+            npm install -g "npm@$VERSION" > /dev/null
 
           # test/verify version
           if npm -v | grep "$VERSION" > /dev/null 2>&1; then

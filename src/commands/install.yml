@@ -182,7 +182,7 @@ steps:
             --silent --show-error --location --fail --retry 3 \
             "https://nodejs.org/dist/v$VERSION/SHASUMS256.txt.asc"
 
-          gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
+          gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc > /dev/null \
             && $SUDO rm -f SHASUMS256.txt.asc
 
           # download/install node
