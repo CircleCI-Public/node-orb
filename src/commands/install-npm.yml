@@ -20,8 +20,7 @@ steps:
       command: |
         if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
-        if cat /etc/issue | grep Alpine; then
-
+        if cat /etc/issue 2> /dev/null | grep Alpine > /dev/null 2>&1; then
           # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
           sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
           apk upgrade --update-cache --available
@@ -30,7 +29,8 @@ steps:
 
           echo "Success: NPM $(npm -v) (Alpine APK) has been installed to $(which npm)"
         else
-          npm install -g npm@<<parameters.npm-version>>
+          npm install -g npm@<<parameters.npm-version>> || \
+            $SUDO npm install -g npm@<<parameters.npm-version>>
 
           # test/verify version
           if npm -v | grep <<parameters.npm-version>>; then
