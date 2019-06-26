@@ -15,13 +15,49 @@ steps:
   - run:
       name: Install Yarn
       command: |
-        curl -o- -L https://yarnpkg.com/install.sh | \
-        bash<<#parameters.yarn-version>> -s -- --version <<parameters.yarn-version>><</parameters.yarn-version>>
+        # FUNCTIONS
+        get_yarn_version () {
+          if [[ <<parameters.yarn-version>> == "" ]]; then
+            VERSION=$(curl --silent --show-error \
+              --location --fail --retry 3 \
+              https://api.github.com/repos/yarnpkg/yarn/releases/latest | \
+              grep tag_name | cut -d '"' -f 4 | \
+              cut -d 'v' -f 2)
 
-        echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin`"' \>> $BASH_ENV
+            echo "Latest version of Yarn is $VERSION"
+          else
+            VERSION=<<parameters.yarn-version>>
+
+            echo "Selected version of Yarn is $VERSION"
+          fi
+        }
+
+        installation_check () {
+          if command -v yarn > /dev/null 2>&1; then
+            if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+              echo "Yarn $VERSION is already installed"
+              exit 0
+            fi
+          fi
+        }
+
+        get_yarn_version
+        installation_check
+
+        curl -o- --silent --show-error --fail --retry 3 -L \
+          https://yarnpkg.com/install.sh | \
+          bash<<#parameters.yarn-version>> -s -- \
+          --version <<parameters.yarn-version>><</parameters.yarn-version>> \
+          > /dev/null
+
+        echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin`"' \
+          \>> $BASH_ENV
 
         source $BASH_ENV
 
-  - run:
-      name: Verify Yarn version
-      command: yarn --version
+        # test/verify version
+        if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+          echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+        else
+          echo "Something went wrong; the specified version of Yarn could not be installed"
+        fi
