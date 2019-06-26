@@ -85,6 +85,14 @@ steps:
 
               $SUDO rm -rf "$(command -v node)"
               $SUDO rm -rf "$(command -v node | sed -E 's|node||')/nodejs"
+
+              $SUDO rm -rf "$(command -v npm)"
+
+              $SUDO rm -rf \
+                /usr/local/lib/node_modules \
+                /usr/local/include/node_modules \
+                /opt/local/lib/node_modules
+
             fi
           fi
         }
