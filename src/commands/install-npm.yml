@@ -37,6 +37,15 @@ steps:
           fi
         }
 
+        installation_check () {
+          if command -v npm > /dev/null 2>&1; then
+            if npm -v | grep "$VERSION" > /dev/null 2>&1; then
+              echo "NPM $VERSION is already installed"
+              exit 0
+            fi
+          fi
+        }
+
         if cat /etc/issue 2> /dev/null | grep Alpine > /dev/null 2>&1; then
           # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
           sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
@@ -47,6 +56,7 @@ steps:
           echo "Success! NPM $(npm -v) (Alpine APK) has been installed to $(which npm)"
         else
           get_npm_version
+          installation_check
 
           $SUDO npm install -g "npm@$VERSION" > /dev/null 2>&1 || \
             npm install -g "npm@$VERSION" > /dev/null 2>&1
