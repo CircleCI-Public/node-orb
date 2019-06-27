@@ -61,8 +61,13 @@ steps:
           get_npm_version
           installation_check
 
-          $SUDO npm install -g "npm@$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> || \
-            npm install -g "npm@$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+          if [[ <<parameters.version>> == latest ]]; then
+            $SUDO npm install -g npm@latest<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> || \
+              npm install -g npm@latest<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+          else
+            $SUDO npm install -g "npm@$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> || \
+              npm install -g "npm@$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+          fi
 
           # test/verify version
           if npm -v | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
