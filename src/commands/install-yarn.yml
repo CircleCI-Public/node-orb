@@ -58,20 +58,10 @@ steps:
         bash install.sh<<#parameters.version>> -s -- \
           --version <<parameters.version>><</parameters.version>><<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
-        exec bash
+        echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin`"' \
+          1>> $BASH_ENV 2> /dev/null
 
-  - run:
-      name: Verify Yarn installation
-      command: |
-        VERSION="<<parameters.version>>"
-
-        if [[ "<<parameters.version>>" == "" ]]; then
-          VERSION=$(curl --silent --show-error \
-            --location --fail --retry 3 \
-            https://api.github.com/repos/yarnpkg/yarn/releases/latest | \
-            grep tag_name | cut -d '"' -f 4 | \
-            cut -d 'v' -f 2)
-        fi
+        source $BASH_ENV
 
         # test/verify version
         if yarn --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
