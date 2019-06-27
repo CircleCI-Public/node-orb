@@ -150,7 +150,7 @@ workflows:
             image: circleci/classic:latest
           node-version: "6.1.0"
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-dev_filters
 
       # macos
@@ -165,7 +165,7 @@ workflows:
           executor: orb-tools/macos
           node-version: "8.9.4"
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-dev_filters
 
       # node
@@ -178,7 +178,7 @@ workflows:
           name: install-yarn-node-versioned-dev
           node-version: "8.9.4"
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-dev_filters
 
       # cimg
@@ -193,7 +193,7 @@ workflows:
           executor: orb-tools/ubuntu
           node-version: "8.9.4"
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-dev_filters
 
       # alpine
@@ -208,7 +208,7 @@ workflows:
           executor: orb-tools/alpine
           node-version-alpine: nodejs
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-dev_filters
 
       # oracle
@@ -223,7 +223,7 @@ workflows:
           name: install-yarn-oracle-versioned-dev
           executor: orb-tools/oracle
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-dev_filters
 
       # # npm
@@ -318,7 +318,7 @@ workflows:
           name: install-yarn-machine-versioned-master
           executor: orb-tools/machine
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-master_filters
 
       # macos
@@ -332,7 +332,7 @@ workflows:
           name: install-yarn-mac-versioned-master
           executor: orb-tools/macos
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-master_filters
 
       # node
@@ -344,7 +344,7 @@ workflows:
       - test:
           name: install-yarn-node-versioned-master
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-master_filters
 
       # cimg
@@ -358,7 +358,7 @@ workflows:
           name: install-yarn-ubuntu-versioned-master
           executor: orb-tools/ubuntu
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-master_filters
 
       # alpine
@@ -373,7 +373,7 @@ workflows:
           executor: orb-tools/alpine
           node-version-alpine: nodejs
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-master_filters
 
       # oracle
@@ -387,7 +387,7 @@ workflows:
           name: install-yarn-oracle-versioned-master
           executor: orb-tools/oracle
           yarn: true
-          yarn-version: "1.15.1"
+          yarn-version: "1.15.2"
           filters: *integration-master_filters
 
       # npm
