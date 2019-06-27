@@ -42,11 +42,17 @@ parameters:
     description: >
       If true, ignores non-checksum cache hits
 
+  include-branch-in-cache-key:
+    type: boolean
+    default: true
+    description: >
+      If true, includes current branch name in cache key
+
 steps:
   - restore_cache:
       keys:
-        - node-deps-<<parameters.cache-version>>-{{ .Branch }}-{{ checksum "<<parameters.cache-key>>" }}
-        - <<^parameters.use-strict-cache>>node-deps-<<parameters.cache-version>>-{{ .Branch }}-<</parameters.use-strict-cache>>
+        - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.cache-key>>" }}
+        - <<^parameters.use-strict-cache>>node-deps-<<parameters.cache-version>><<#parameters.include-branch-in-cache-key>>-{{ .Branch }}<</parameters.include-branch-in-cache-key>><</parameters.use-strict-cache>>
         - <<^parameters.use-strict-cache>>node-deps-<<parameters.cache-version>><</parameters.use-strict-cache>>
 
   - steps: <<parameters.steps>>
