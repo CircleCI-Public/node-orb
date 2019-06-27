@@ -55,13 +55,13 @@ steps:
           https://yarnpkg.com/install.sh
 
         # install yarn
-        bash<<#parameters.version>> -s -- \
+        bash install.sh<<#parameters.version>> -s -- \
           --version <<parameters.version>><</parameters.version>><<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
   - run:
       name: Verify Yarn installation
       command: |
-        VERSION=<<parameters.version>>
+        VERSION="<<parameters.version>>"
 
         if [[ "<<parameters.version>>" == "" ]]; then
           VERSION=$(curl --silent --show-error \
