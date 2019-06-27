@@ -58,10 +58,18 @@ steps:
         bash install.sh<<#parameters.version>> -s -- \
           --version <<parameters.version>><</parameters.version>><<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
-        echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin`"' \
-          1>> $BASH_ENV 2> /dev/null
+        echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin<<^parameters.debug>> 2> /dev/null<</parameters.debug>>`"' \
+          1>> $BASH_ENV<<^parameters.debug>> 2> /dev/null<</parameters.debug>>
 
         source $BASH_ENV
+
+        # test/verify version
+        if yarn --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+          echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+        else
+          echo "Something went wrong; the specified version of Yarn could not be installed"
+          exit 1
+        fi
 
   - run:
       name: Verify Yarn
