@@ -53,10 +53,7 @@ steps:
           --version <<parameters.version>><</parameters.version>> \
           > /dev/null 2>&1
 
-        # echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin`"' \
-          1\>> $BASH_ENV 2> /dev/null
-
-        # source $BASH_ENV
+        exec bash
 
         # test/verify version
         if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
