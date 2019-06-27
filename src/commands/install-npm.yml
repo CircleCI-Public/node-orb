@@ -29,11 +29,8 @@ steps:
         # FUNCTIONS
         get_npm_version () {
           if [[ <<parameters.version>> == latest ]]; then
-            VERSION=$(curl --silent --show-error \
-              --location --fail --retry 3 \
-              https://api.github.com/repos/npm/cli/releases/latest | \
-              grep tag_name | cut -d '"' -f 4 | \
-              cut -d 'v' -f 2)
+            VERSION=$(npm view npm | grep "latest" | sort | head -n1 | \
+              sed -E 's|latest||' | sed -E 's|: ||')
 
             echo "Latest version of NPM is $VERSION"
           else
