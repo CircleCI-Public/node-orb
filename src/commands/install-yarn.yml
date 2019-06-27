@@ -60,6 +60,7 @@ steps:
               fi
 
               $SUDO rm -rf "$HOME/.yarn"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+            fi
           fi
         }
 
