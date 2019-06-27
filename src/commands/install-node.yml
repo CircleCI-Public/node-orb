@@ -41,9 +41,9 @@ steps:
       command: |
         # PLATFORM CHECK: mac vs. alpine vs. other linux
         PLATFORM=linux
-        if uname -a | grep Darwin > /dev/null 2>&1; then
+        if uname -a | grep Darwin<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
           PLATFORM=darwin
-        elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
+        elif cat /etc/issue | grep Alpine<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
           PLATFORM=alpine
         fi
 
@@ -79,10 +79,10 @@ steps:
         }
 
         installation_check () {
-          if command -v node > /dev/null 2>&1; then
+          if command -v node<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
             nvm_check
 
-            if node --version | grep "$VERSION" > /dev/null 2>&1; then
+            if node --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
 
               echo "Node.js $VERSION is already installed"
               exit 0
@@ -124,18 +124,17 @@ steps:
 
           # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
           sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
-          apk upgrade --update-cache --available > /dev/null 2>&1
+          apk upgrade --update-cache --available<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
           # https://wiki.alpinelinux.org/wiki/Enable_Community_Repository
-          if cat /etc/apk/repositories | grep -v community > /dev/null 2>&1; then
+          if cat /etc/apk/repositories | grep -v community<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
             echo -e "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
           fi
 
-          apk --no-cache add libuv > /dev/null 2>&1
+          apk --no-cache add libuv<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
           apk --no-cache add --repository \
             "http://dl-cdn.alpinelinux.org/alpine/edge/$APK_REPO" \
-            <<parameters.alpine-version>> \
-            > /dev/null 2>&1
+            <<parameters.alpine-version>><<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
         else
           if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
@@ -166,7 +165,7 @@ steps:
               tempName=$(mktemp)
               gpg --status-fd 1 \
                 --keyserver "$keyserver" --keyserver-options "timeout=1" \
-                --recv-keys "$key" 1> "$tempName" 2>/dev/null || true
+                --recv-keys "$key" 1> "$tempName"<<^parameters.debug>> 2>/dev/null<</parameters.debug>> || true
               if [[ $(grep "^\[GNUPG\:\] IMPORT_OK "[[:digit:]]*" "$key"$" $tempName && \
                 grep "^\[GNUPG\:\] IMPORT_RES 1" $tempName) ]]; then
                 <<#parameters.debug>>echo "Success! Imported $key from $keyserver"<</parameters.debug>>
@@ -183,7 +182,7 @@ steps:
             --silent --show-error --location --fail --retry 3 \
             "https://nodejs.org/dist/v$VERSION/SHASUMS256.txt.asc"
 
-          gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc > /dev/null \
+          gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc<<^parameters.debug>> > /dev/null<</parameters.debug>> \
             && $SUDO rm -f SHASUMS256.txt.asc
 
           # download/install node
@@ -198,7 +197,7 @@ steps:
 
           $SUDO tar -xzf "node-v$VERSION-$PLATFORM-x64.tar.gz" \
             -C <<parameters.install-dir>> \
-            --strip-components=1 --no-same-owner > /dev/null 2>&1
+            --strip-components=1 --no-same-owner<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
           $SUDO rm -f "node-v$VERSION-$PLATFORM-x64.tar.gz"
 
@@ -208,7 +207,7 @@ steps:
         fi
 
         # test/verify version
-        if node --version | grep "$VERSION" > /dev/null; then
+        if node --version | grep "$VERSION"<<^parameters.debug>> > /dev/null<</parameters.debug>>; then
           echo "Node.js $(node --version) has been installed to $(which node)"
         else
           echo "Something went wrong; the specified version of Node.js could not be installed"

@@ -10,6 +10,12 @@ parameters:
       the latest stable version will be installed):
       https://github.com/yarnpkg/yarn/releases
 
+  debug:
+    type: boolean
+    default: false
+    description: >
+      Extra output for orb developers
+
 steps:
   - run:
       name: Install Yarn
@@ -32,8 +38,8 @@ steps:
         }
 
         installation_check () {
-          if command -v yarn > /dev/null 2>&1; then
-            if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+          if command -v yarn<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+            if yarn --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
               echo "Yarn $VERSION is already installed"
               exit 0
             fi
@@ -50,13 +56,12 @@ steps:
 
         # install yarn
         bash<<#parameters.version>> -s -- \
-          --version <<parameters.version>><</parameters.version>> \
-          > /dev/null 2>&1
+          --version <<parameters.version>><</parameters.version>><<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
         exec bash
 
         # test/verify version
-        if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+        if yarn --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
           echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
         else
           echo "Something went wrong; the specified version of Yarn could not be installed"

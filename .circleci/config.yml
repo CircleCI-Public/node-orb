@@ -40,7 +40,6 @@ jobs:
       - node/install-node:
           version: <<parameters.node-version>>
           alpine-version: <<parameters.node-version-alpine>>
-          debug: true
 
       - unless:
           condition: <<parameters.yarn>>

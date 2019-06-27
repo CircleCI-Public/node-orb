@@ -14,6 +14,12 @@ parameters:
       on Alpine, the `npm` Alpine pkg will be installed:
       https://pkgs.alpinelinux.org/packages?name=npm)
 
+  debug:
+    type: boolean
+    default: false
+    description: >
+      Extra output for orb developers
+
 steps:
   - run:
       name: Install NPM
@@ -38,31 +44,31 @@ steps:
         }
 
         installation_check () {
-          if command -v npm > /dev/null 2>&1; then
-            if npm -v | grep "$VERSION" > /dev/null 2>&1; then
+          if command -v npm<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+            if npm -v | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
               echo "NPM $VERSION is already installed"
               exit 0
             fi
           fi
         }
 
-        if cat /etc/issue 2> /dev/null | grep Alpine > /dev/null 2>&1; then
+        if cat /etc/issue<<^parameters.debug>> 2> /dev/null<</parameters.debug>> | grep Alpine<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
           # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
           sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
-          apk upgrade --update-cache --available > /dev/null 2>&1
+          apk upgrade --update-cache --available<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
-          apk --no-cache add npm > /dev/null 2>&1
+          apk --no-cache add npm<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
           echo "Success! NPM $(npm -v) (Alpine APK) has been installed to $(which npm)"
         else
           get_npm_version
           installation_check
 
-          $SUDO npm install -g "npm@$VERSION" > /dev/null 2>&1 || \
-            npm install -g "npm@$VERSION" > /dev/null 2>&1
+          $SUDO npm install -g "npm@$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> || \
+            npm install -g "npm@$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
           # test/verify version
-          if npm -v | grep "$VERSION" > /dev/null 2>&1; then
+          if npm -v | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
             echo "Success! NPM $(npm -v) has been installed to $(which npm)"
           else
             echo "Something went wrong; the specified version of NPM could not be installed"
