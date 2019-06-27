@@ -38,6 +38,7 @@ jobs:
           node-alpine-version: <<parameters.node-alpine-version>>
           npm-version: <<parameters.npm-version>>
           yarn-version: <<parameters.yarn-version>>
+          debug: true
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
@@ -74,21 +75,18 @@ workflows:
       - orb-tools/lint
 
       - orb-tools/pack:
-          requires:
-            - orb-tools/lint
+          requires: [orb-tools/lint]
 
       - orb-tools/publish-dev:
           orb-name: circleci/node
           context: orb-publishing
-          requires:
-            - orb-tools/pack
+          requires: [orb-tools/pack]
 
       - orb-tools/trigger-integration-workflow:
           name: trigger-integration-dev
           context: orb-publishing
           ssh-fingerprints: 2a:2b:49:ea:64:7d:39:4a:58:17:18:17:b2:5c:f6:a8
-          requires:
-            - orb-tools/publish-dev
+          requires: [orb-tools/publish-dev]
           filters:
             branches:
               ignore: master
@@ -99,8 +97,7 @@ workflows:
           ssh-fingerprints: 2a:2b:49:ea:64:7d:39:4a:58:17:18:17:b2:5c:f6:a8
           tag: master
           cleanup-tags: true
-          requires:
-            - orb-tools/publish-dev
+          requires: [orb-tools/publish-dev]
           filters:
             branches:
               only: master
