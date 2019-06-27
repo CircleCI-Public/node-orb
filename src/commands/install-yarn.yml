@@ -58,6 +58,8 @@ steps:
         bash install.sh<<#parameters.version>> -s -- \
           --version <<parameters.version>><</parameters.version>><<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
+        exec bash
+
   - run:
       name: Verify Yarn installation
       command: |
@@ -76,4 +78,5 @@ steps:
           echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
         else
           echo "Something went wrong; the specified version of Yarn could not be installed"
+          exit 1
         fi
