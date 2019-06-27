@@ -42,7 +42,24 @@ steps:
             if yarn --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
               echo "Yarn $VERSION is already installed"
               exit 0
-            fi
+            else
+              echo "A different version of Yarn is installed ($(yarn --version)); removing it"
+
+              if uname -a | grep Darwin<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+                brew uninstall yarn<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+              elif cat /etc/issue | grep Alpine<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+                apk del yarn<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+              elif cat /etc/issue | grep Debian<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+                $SUDO apt-get remove yarn<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> && \
+                  $SUDO apt-get purge yarn<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+              elif cat /etc/issue | grep Ubuntu<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+                $SUDO apt-get remove yarn<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> && \
+                  $SUDO apt-get purge yarn<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+              elif command -v yum<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+                yum remove yarn<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+              fi
+
+              $SUDO rm -rf "$HOME/.yarn"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
           fi
         }
 
@@ -55,7 +72,7 @@ steps:
           https://yarnpkg.com/install.sh
 
         # install yarn
-        bash install.sh<<#parameters.version>> -s -- \
+        bash install.sh<<#parameters.version>> \
           --version <<parameters.version>><</parameters.version>><<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
         echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin<<^parameters.debug>> 2> /dev/null<</parameters.debug>>`"' \
