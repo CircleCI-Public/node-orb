@@ -1,10 +1,10 @@
 description: >
-  Install/upgrade the NPM package manager. Requires an existing
-  installation of Node.js; if none exists, use this orb's `install`
-  command first/instead.
+  Install/upgrade the NPM package manager to a custom version. Requires
+  an existing installation of Node.js; if none exists, use this orb's
+  `install` or `install-node` command first/instead.
 
 parameters:
-  npm-version:
+  version:
     type: string
     default: latest
     description: >
@@ -22,7 +22,7 @@ steps:
 
         # FUNCTIONS
         get_npm_version () {
-          if [[ <<parameters.npm-version>> == latest ]]; then
+          if [[ <<parameters.version>> == latest ]]; then
             VERSION=$(curl --silent --show-error \
               --location --fail --retry 3 \
               https://api.github.com/repos/npm/cli/releases/latest | \
@@ -31,7 +31,7 @@ steps:
 
             echo "Latest version of NPM is $VERSION"
           else
-            VERSION=<<parameters.npm-version>>
+            VERSION=<<parameters.version>>
 
             echo "Selected version of NPM is $VERSION"
           fi

@@ -1,0 +1,215 @@
+description: >
+  Install a custom version of Node.js in any execution environment
+  (Docker/Linux, macOS, machine) that does not have it preinstalled
+
+parameters:
+  version:
+    type: string
+    default: latest
+    description: >
+      Specific version of Node.js to install. Note: version-selection is
+      not supported for Alpine Linux-based execution environments, as
+      Node.js's Linux binaries are not compiled to run on Alpine. Use the
+      `alpine-version` parameter to select from a limited number of
+      Alpine-based Node.js packages. Otherwise, for a full list of
+      releases, see the following: https://nodejs.org/en/download/releases
+
+  alpine-version:
+    type: enum
+    default: nodejs-current
+    enum: [nodejs, nodejs-current]
+    description: >
+      For Alpine Linux users, select a Node.js version: either a current
+      stable release, or a slightly older stable release. For more
+      information, see https://pkgs.alpinelinux.org/packages?name=nodejs*
+
+  install-dir:
+    type: string
+    default: /usr/local
+    description: >
+      Where should Node.js be installed?
+
+  debug:
+    type: boolean
+    default: false
+    description: >
+      Extra output for orb developers
+
+steps:
+  - run:
+      name: Install Node.js
+      command: |
+        # PLATFORM CHECK: mac vs. alpine vs. other linux
+        PLATFORM=linux
+        if uname -a | grep Darwin > /dev/null 2>&1; then
+          PLATFORM=darwin
+        elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
+          PLATFORM=alpine
+        fi
+
+        # FUNCTIONS
+        get_node_version () {
+          if [[ <<parameters.version>> == latest ]]; then
+            VERSION=$(curl --silent --show-error \
+              --location --fail --retry 3 \
+              https://api.github.com/repos/nodejs/node/releases/latest | \
+              grep tag_name | cut -d '"' -f 4 | \
+              cut -d 'v' -f 2)
+
+            echo "Latest version of Node.js is $VERSION"
+          else
+            VERSION=<<parameters.version>>
+
+            echo "Selected version of Node.js is $VERSION"
+          fi
+        }
+
+        nvm_check () {
+          if [[ ! -z "$NVM_DIR" ]]; then
+            echo "nvm (Node.js version manager) is installed; removing it to manually install the specified version of Node.js"
+
+            $SUDO rm -rf "$NVM_DIR"
+
+            perl -i -pe 's|export NVM_DIR=/opt/circleci/.nvm||' ~/.circlerc
+            perl -i -pe 's|source $NVM_DIR/nvm.sh||' ~/.circlerc
+
+            perl -i -pe 's|export NVM_DIR="/opt/circleci/.nvm"||' ~/.bashrc
+            perl -i -pe 's|[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm||' ~/.bashrc
+          fi
+        }
+
+        installation_check () {
+          if command -v node > /dev/null 2>&1; then
+            nvm_check
+
+            if node --version | grep "$VERSION" > /dev/null 2>&1; then
+
+              echo "Node.js $VERSION is already installed"
+              exit 0
+            else
+              echo "A different version of Node.js is installed ($(node --version)); removing it"
+
+              $SUDO rm -rf "$(command -v node)"
+              $SUDO rm -rf "$(command -v node | sed -E 's|node||')/nodejs"
+
+              $SUDO rm -rf "$(command -v npm)"
+
+              $SUDO rm -rf \
+                /usr/local/lib/node_modules \
+                /usr/local/include/node_modules \
+                /opt/local/lib/node_modules
+
+            fi
+          fi
+        }
+
+        # DOWNLOAD/INSTALL LOGIC
+        if [[ "$PLATFORM" == alpine ]]; then
+          if [[ <<parameters.alpine-version>> == nodejs ]]; then
+            APK_REPO=main
+          elif [[ <<parameters.alpine-version>> == nodejs-current ]]; then
+            APK_REPO=community
+          fi
+
+          VERSION=$(curl \
+            --silent --show-error --location --fail --retry 3 \
+            "http://dl-cdn.alpinelinux.org/alpine/edge/$APK_REPO/x86_64/" | \
+            grep nodejs | grep -E -v '(dev|doc)' | \
+            sed -E 's%<a href="%%' | sed -E 's%.apk">nodejs-.*.apk</a>.*%%' | \
+            sed -E 's/(nodejs-|nodejs-current-)//' | sed -E 's/-r0//')
+
+          echo "Selected version of Node.js is: $VERSION (Alpine APK)"
+
+          installation_check
+
+          # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
+          sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
+          apk upgrade --update-cache --available > /dev/null 2>&1
+
+          # https://wiki.alpinelinux.org/wiki/Enable_Community_Repository
+          if cat /etc/apk/repositories | grep -v community > /dev/null 2>&1; then
+            echo -e "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
+          fi
+
+          apk --no-cache add libuv > /dev/null 2>&1
+          apk --no-cache add --repository \
+            "http://dl-cdn.alpinelinux.org/alpine/edge/$APK_REPO" \
+            <<parameters.alpine-version>> \
+            > /dev/null 2>&1
+        else
+          if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+          get_node_version
+          nvm_check
+          installation_check
+
+          $SUDO curl \
+            --silent --show-error --location --fail --retry 3 \
+            https://raw.githubusercontent.com/nodejs/node/master/README.md | \
+            grep -E '[A-Z0-9]{40}' | \
+            sed -E 's/gpg --keyserver pool.sks-keyservers.net --recv-keys //g' | \
+            sed -E 's/(`|\$ )//g' > \
+            NODEJS_TRUSTED_RELEASE_KEYS
+
+          cat > KEYSERVERS \<< EOM
+          hkp://p80.pool.sks-keyservers.net:80
+          hkp://ipv4.pool.sks-keyservers.net
+          hkp://pgp.mit.edu:80
+          hkp://ha.pool.sks-keyservers.net
+          hkp://keyserver.ubuntu.com:80
+        EOM
+
+          echo "Importing Node.js trusted release keys..."
+          # https://stackoverflow.com/a/26217767
+          while read key; do
+            for keyserver in $(cat KEYSERVERS); do
+              tempName=$(mktemp)
+              gpg --status-fd 1 \
+                --keyserver "$keyserver" --keyserver-options "timeout=1" \
+                --recv-keys "$key" 1> "$tempName" 2>/dev/null || true
+              if [[ $(grep "^\[GNUPG\:\] IMPORT_OK "[[:digit:]]*" "$key"$" $tempName && \
+                grep "^\[GNUPG\:\] IMPORT_RES 1" $tempName) ]]; then
+                <<#parameters.debug>>echo "Success! Imported $key from $keyserver"<</parameters.debug>>
+                break
+              else
+                continue
+              fi
+            done
+          done < NODEJS_TRUSTED_RELEASE_KEYS
+
+          $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS KEYSERVERS
+
+          $SUDO curl -O \
+            --silent --show-error --location --fail --retry 3 \
+            "https://nodejs.org/dist/v$VERSION/SHASUMS256.txt.asc"
+
+          gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc > /dev/null \
+            && $SUDO rm -f SHASUMS256.txt.asc
+
+          # download/install node
+          $SUDO curl -O \
+            --silent --show-error --location --fail --retry 3 \
+              "https://nodejs.org/dist/v$VERSION/node-v$VERSION-$PLATFORM-x64.tar.gz"
+
+          # verify node tar via shasum256
+          grep "node-v$VERSION-$PLATFORM-x64.tar.gz" SHASUMS256.txt | sha256sum -c -
+
+          $SUDO rm -f SHASUMS256.txt
+
+          $SUDO tar -xzf "node-v$VERSION-$PLATFORM-x64.tar.gz" \
+            -C <<parameters.install-dir>> \
+            --strip-components=1 --no-same-owner > /dev/null 2>&1
+
+          $SUDO rm -f "node-v$VERSION-$PLATFORM-x64.tar.gz"
+
+          if [[ ! -e <<parameters.install-dir>>/bin/nodejs ]]; then
+            $SUDO ln -s <<parameters.install-dir>>/bin/node <<parameters.install-dir>>/bin/nodejs
+          fi
+        fi
+
+        # test/verify version
+        if node --version | grep "$VERSION" > /dev/null; then
+          echo "Node.js $(node --version) has been installed to $(which node)"
+        else
+          echo "Something went wrong; the specified version of Node.js could not be installed"
+        fi

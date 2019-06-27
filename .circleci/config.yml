@@ -37,7 +37,7 @@ jobs:
       - checkout
       - build-tools/install-ci-tools
 
-      - node/install:
+      - node/install-node:
           version: <<parameters.node-version>>
           alpine-version: <<parameters.node-version-alpine>>
           debug: true
@@ -46,14 +46,13 @@ jobs:
           condition: <<parameters.yarn>>
           steps:
             - node/install-npm:
-                npm-version: <<parameters.npm-version>>
+                version: <<parameters.npm-version>>
 
       - when:
           condition: <<parameters.yarn>>
           steps:
             - node/install-yarn:
-                yarn-version: <<parameters.yarn-version>>
-
+                version: <<parameters.yarn-version>>
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters

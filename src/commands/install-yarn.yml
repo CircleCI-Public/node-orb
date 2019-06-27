@@ -1,8 +1,8 @@
 description: >
-  Install the Yarn package manager
+  Install a custom version of the Yarn package manager
 
 parameters:
-  yarn-version:
+  version:
     type: string
     default: ""
     description: >
@@ -10,14 +10,13 @@ parameters:
       the latest stable version will be installed):
       https://github.com/yarnpkg/yarn/releases
 
-
 steps:
   - run:
       name: Install Yarn
       command: |
         # FUNCTIONS
         get_yarn_version () {
-          if [[ "<<parameters.yarn-version>>" == "" ]]; then
+          if [[ "<<parameters.version>>" == "" ]]; then
             VERSION=$(curl --silent --show-error \
               --location --fail --retry 3 \
               https://api.github.com/repos/yarnpkg/yarn/releases/latest | \
@@ -26,7 +25,7 @@ steps:
 
             echo "Latest version of Yarn is $VERSION"
           else
-            VERSION=<<parameters.yarn-version>>
+            VERSION=<<parameters.version>>
 
             echo "Selected version of Yarn is $VERSION"
           fi
@@ -44,16 +43,20 @@ steps:
         get_yarn_version
         installation_check
 
-        curl -o- --silent --show-error --fail --retry 3 -L \
-          https://yarnpkg.com/install.sh | \
-          bash<<#parameters.yarn-version>> -s -- \
-          --version <<parameters.yarn-version>><</parameters.yarn-version>> \
-          > /dev/null
+        # downloaod install script
+        curl -O \
+          --silent --show-error --location --fail --retry 3 \
+          https://yarnpkg.com/install.sh
 
-        echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin`"' \
+        # install yarn
+        bash<<#parameters.version>> -s -- \
+          --version <<parameters.version>><</parameters.version>> \
+          > /dev/null 2>&1
+
+        # echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin`"' \
           1\>> $BASH_ENV 2> /dev/null
 
-        source $BASH_ENV
+        # source $BASH_ENV
 
         # test/verify version
         if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
