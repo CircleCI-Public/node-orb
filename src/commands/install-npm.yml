@@ -1,15 +1,24 @@
 description: >
-  Install/upgrade the NPM package manager. Requires an existing
-  installation of Node.js; if none exists, use the orb's `install`
-  command instead.
+  Install/upgrade the NPM package manager to a custom version. Requires
+  an existing installation of Node.js; if none exists, use this orb's
+  `install` or `install-node` command first/instead.
 
 parameters:
-  npm-version:
+  version:
     type: string
     default: latest
     description: >
       Pick a version of NPM to install:
       https://nodejs.org/en/download/releases
+      (Note: NPM version selection is not possible on Alpine Linux;
+      on Alpine, the `npm` Alpine pkg will be installed:
+      https://pkgs.alpinelinux.org/packages?name=npm)
+
+  debug:
+    type: boolean
+    default: false
+    description: >
+      Extra output for orb developers
 
 steps:
   - run:
@@ -17,8 +26,51 @@ steps:
       command: |
         if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
-        $SUDO npm install -g npm@<<parameters.npm-version>> || npm install -g npm@"<<parameters.npm-version>>"
+        # FUNCTIONS
+        get_npm_version () {
+          if [[ <<parameters.version>> == latest ]]; then
+            VERSION=$(curl --silent --show-error \
+              --location --fail --retry 3 \
+              https://api.github.com/repos/npm/cli/releases/latest | \
+              grep tag_name | cut -d '"' -f 4 | \
+              cut -d 'v' -f 2)
 
-  - run:
-      name: Verify NPM version
-      command: npm -v
+            echo "Latest version of NPM is $VERSION"
+          else
+            VERSION=<<parameters.version>>
+
+            echo "Selected version of NPM is $VERSION"
+          fi
+        }
+
+        installation_check () {
+          if command -v npm<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+            if npm -v | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+              echo "NPM $VERSION is already installed"
+              exit 0
+            fi
+          fi
+        }
+
+        if cat /etc/issue<<^parameters.debug>> 2> /dev/null<</parameters.debug>> | grep Alpine<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+          # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
+          sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
+          apk upgrade --update-cache --available<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+
+          apk --no-cache add npm<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+
+          echo "Success! NPM $(npm -v) (Alpine APK) has been installed to $(which npm)"
+        else
+          get_npm_version
+          installation_check
+
+          $SUDO npm install -g "npm@$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> || \
+            npm install -g "npm@$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+
+          # test/verify version
+          if npm -v | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+            echo "Success! NPM $(npm -v) has been installed to $(which npm)"
+          else
+            echo "Something went wrong; the specified version of NPM could not be installed"
+          fi
+        fi
