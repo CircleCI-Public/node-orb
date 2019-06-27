@@ -46,7 +46,7 @@ parameters:
     type: boolean
     default: true
     description: >
-      If true, includes current branch name to cache key
+      If true, includes current branch name in cache key
 
 steps:
   - restore_cache:
