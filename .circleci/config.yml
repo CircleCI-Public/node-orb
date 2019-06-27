@@ -142,6 +142,14 @@ workflows:
           executor: orb-tools/machine
           yarn: true
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       - test:
           name: install-yarn-machine-versioned-dev
@@ -152,6 +160,14 @@ workflows:
           yarn: true
           yarn-version: "1.15.1"
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       # macos
       - test:
@@ -159,6 +175,14 @@ workflows:
           executor: orb-tools/macos
           yarn: true
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       - test:
           name: install-yarn-mac-versioned-dev
@@ -167,12 +191,28 @@ workflows:
           yarn: true
           yarn-version: "1.15.1"
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       # node
       - test:
           name: install-yarn-node-dev
           yarn: true
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       - test:
           name: install-yarn-node-versioned-dev
@@ -180,6 +220,14 @@ workflows:
           yarn: true
           yarn-version: "1.15.1"
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       # cimg
       - test:
@@ -187,6 +235,14 @@ workflows:
           executor: orb-tools/ubuntu
           yarn: true
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       - test:
           name: install-yarn-ubuntu-versioned-dev
@@ -195,6 +251,14 @@ workflows:
           yarn: true
           yarn-version: "1.15.1"
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       # alpine
       - test:
@@ -202,6 +266,14 @@ workflows:
           executor: orb-tools/alpine
           yarn: true
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       - test:
           name: install-yarn-alpine-versioned-dev
@@ -210,6 +282,14 @@ workflows:
           yarn: true
           yarn-version: "1.15.1"
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       # oracle
       - test:
@@ -218,6 +298,14 @@ workflows:
           node-version: "8.9.4"
           yarn: true
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       - test:
           name: install-yarn-oracle-versioned-dev
@@ -225,6 +313,14 @@ workflows:
           yarn: true
           yarn-version: "1.15.1"
           filters: *integration-dev_filters
+          post-steps:
+            - run: |
+                # test/verify version
+                if yarn --version | grep "$VERSION" > /dev/null 2>&1; then
+                  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                else
+                  echo "Something went wrong; the specified version of Yarn could not be installed"
+                fi
 
       # # npm
       # # machine
