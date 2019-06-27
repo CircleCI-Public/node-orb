@@ -40,18 +40,21 @@ jobs:
       - node/install-node:
           version: <<parameters.node-version>>
           alpine-version: <<parameters.node-version-alpine>>
+          debug: true
 
       - unless:
           condition: <<parameters.yarn>>
           steps:
             - node/install-npm:
                 version: <<parameters.npm-version>>
+                debug: true
 
       - when:
           condition: <<parameters.yarn>>
           steps:
             - node/install-yarn:
                 version: <<parameters.yarn-version>>
+                debug: true
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters

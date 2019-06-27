@@ -88,24 +88,3 @@ steps:
           echo "Something went wrong; the specified version of Yarn could not be installed"
           exit 1
         fi
-
-  - run:
-      name: Verify Yarn
-      command: |
-        if [[ "<<parameters.version>>" == "" ]]; then
-          VERSION=$(curl --silent --show-error \
-            --location --fail --retry 3 \
-            https://api.github.com/repos/yarnpkg/yarn/releases/latest | \
-            grep tag_name | cut -d '"' -f 4 | \
-            cut -d 'v' -f 2)
-        else
-          VERSION=<<parameters.version>>
-        fi
-
-        # test/verify version
-        if yarn --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
-          echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
-        else
-          echo "Something went wrong; the specified version of Yarn could not be installed"
-          exit 1
-        fi
