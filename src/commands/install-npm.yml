@@ -30,7 +30,7 @@ steps:
         get_npm_version () {
           if [[ <<parameters.version>> == latest ]]; then
             VERSION="$(npm view npm | sed -E 's|.*-||g' | grep latest | \
-              perl -pe 's/.*: //g')"
+              perl -pe 's/.*: //g' | perl -pe "s/'|,//g")"
 
             echo "Latest version of NPM is $VERSION"
           else
