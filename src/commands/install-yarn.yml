@@ -81,7 +81,9 @@ steps:
 
         source $BASH_ENV
 
-        $SUDO chown -R "$USER:$GROUP" ~/.config
+        if uname -a | grep Darwin<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+          $SUDO chown -R "$USER:$GROUP" ~/.config
+        fi
 
         # test/verify version
         if yarn --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
