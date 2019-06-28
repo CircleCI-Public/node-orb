@@ -211,4 +211,5 @@ steps:
           echo "Node.js $(node --version) has been installed to $(which node)"
         else
           echo "Something went wrong; the specified version of Node.js could not be installed"
+          exit 1
         fi
