@@ -81,6 +81,8 @@ steps:
 
         source $BASH_ENV
 
+        $SUDO chown -R "$USER:$GROUP" ~/.config
+
         # test/verify version
         if yarn --version | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
           echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
