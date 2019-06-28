@@ -29,7 +29,7 @@ steps:
         # FUNCTIONS
         get_npm_version () {
           if [[ <<parameters.version>> == latest ]]; then
-            VERSION="$(npm view npm | grep latest | sort | head -n1 | \
+            VERSION="$(npm view npm | sed -E 's|.*-||g' | grep latest | \
               perl -pe 's/.*: //g')"
 
             echo "Latest version of NPM is $VERSION"
@@ -74,5 +74,6 @@ steps:
             echo "Success! NPM $(npm -v) has been installed to $(which npm)"
           else
             echo "Something went wrong; the specified version of NPM could not be installed"
+            exit 1
           fi
         fi
