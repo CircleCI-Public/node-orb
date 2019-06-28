@@ -20,6 +20,8 @@ steps:
   - run:
       name: Install Yarn
       command: |
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
         # FUNCTIONS
         get_yarn_version () {
           if [[ "<<parameters.version>>" == "" ]]; then
@@ -83,7 +85,7 @@ steps:
 
         if uname -a | grep Darwin<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
           mkdir -p ~/.config
-          sudo chown -R "$USER:$GROUP" ~/.config
+          $SUDO chown -R "$USER:$GROUP" ~/.config
         fi
 
         # test/verify version
