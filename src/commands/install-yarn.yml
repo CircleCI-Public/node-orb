@@ -83,7 +83,7 @@ steps:
 
         if uname -a | grep Darwin<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
           mkdir -p ~/.config
-          $SUDO chown -R "$USER:$GROUP" ~/.config
+          sudo chown -R "$USER:$GROUP" ~/.config
         fi
 
         # test/verify version
