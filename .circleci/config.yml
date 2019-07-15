@@ -3,7 +3,7 @@ version: 2.1
 orbs:
   build-tools: circleci/build-tools@2.6.2
   node: circleci/node@dev:alpha
-  orb-tools: circleci/orb-tools@8.27.2
+  orb-tools: circleci/orb-tools@8.27.3
 
 jobs:
   test:
