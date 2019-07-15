@@ -280,6 +280,7 @@ workflows:
           context: orb-publishing
           orb-name: circleci/node
           ssh-fingerprints: 2a:2b:49:ea:64:7d:39:4a:58:17:18:17:b2:5c:f6:a8
+          cleanup-tags: true
           requires: *prod-deploy_requires
           filters:
             branches:
@@ -292,6 +293,7 @@ workflows:
           context: orb-publishing
           orb-name: circleci/node
           ssh-fingerprints: 2a:2b:49:ea:64:7d:39:4a:58:17:18:17:b2:5c:f6:a8
+          cleanup-tags: true
           release: minor
           requires: *prod-deploy_requires
           filters:
@@ -305,6 +307,7 @@ workflows:
           context: orb-publishing
           orb-name: circleci/node
           ssh-fingerprints: 2a:2b:49:ea:64:7d:39:4a:58:17:18:17:b2:5c:f6:a8
+          cleanup-tags: true
           release: major
           requires: *prod-deploy_requires
           filters:
