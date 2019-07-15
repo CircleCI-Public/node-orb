@@ -123,7 +123,21 @@ steps:
           installation_check
 
           # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
-          sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
+
+          <<#parameters.debug>>echo "Old /etc/apk/repositories:"
+          cat /etc/apk/repositories<</parameters.debug>>
+
+          if ! command -v perl<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+            apk add perl<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+          fi
+
+          perl -i -pe 's|v([0-9]+){0,1}(.[0-9]+){0,1}(.[0-9]+)|edge|g' \
+            /etc/apk/repositories
+
+          <<#parameters.debug>>echo "New /etc/apk/repositories:"
+          cat /etc/apk/repositories<</parameters.debug>>
+
+          <<#parameters.debug>>echo "Running apk upgrade..."<</parameters.debug>>
           apk upgrade --update-cache --available<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
           # https://wiki.alpinelinux.org/wiki/Enable_Community_Repository
@@ -154,7 +168,7 @@ steps:
           hkp://p80.pool.sks-keyservers.net:80
           hkp://ipv4.pool.sks-keyservers.net
           hkp://pgp.mit.edu:80
-          hkp://ha.pool.sks-keyservers.net
+          hkps://ha.pool.sks-keyservers.net
           hkp://keyserver.ubuntu.com:80
         EOM
 
