@@ -69,19 +69,13 @@ steps:
         get_yarn_version
         installation_check
 
-        # downloaod install script
-        curl -O \
-          --silent --show-error --location --fail --retry 3 \
-          https://yarnpkg.com/install.sh
-
         # install yarn
-        bash install.sh<<#parameters.version>> \
-          --version <<parameters.version>><</parameters.version>><<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
-
-        echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH:`yarn global bin<<^parameters.debug>> 2> /dev/null<</parameters.debug>>`"' \
-          1>> $BASH_ENV<<^parameters.debug>> 2> /dev/null<</parameters.debug>>
-
-        source $BASH_ENV
+        curl -L -o yarn.tar.gz "https://yarnpkg.com/downloads/$VERSION/yarn-v$VERSION.tar.gz" \
+          && $SUDO tar -xzf yarn.tar.gz -C /opt/ \
+          && rm yarn.tar.gz \
+          && $SUDO ln -s /opt/yarn-v${VERSION}/bin/yarn /usr/local/bin/yarn \
+          && $SUDO ln -s /opt/yarn-v${VERSION}/bin/yarnpkg /usr/local/bin/yarnpkg \
+          && command -v yarn
 
         if uname -a | grep Darwin<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
           mkdir -p ~/.config

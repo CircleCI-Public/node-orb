@@ -21,7 +21,9 @@ steps:
   - run:
       name: Install `n`
       command: |
-        while :; do INDEX_BODY=$(curl --show-error --location --fail --retry 3 \
+        declare -i INDEX=0
+
+        while true; do INDEX_BODY=$(curl --show-error --location --fail --retry 3 \
           https://api.github.com/repos/tj/n/releases | \
           jq --argjson index "$INDEX" '.[$index]')
 
