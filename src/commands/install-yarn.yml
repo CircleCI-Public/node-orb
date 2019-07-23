@@ -85,6 +85,7 @@ steps:
 
         $SUDO ln -s /opt/yarn/bin/yarn /usr/local/bin/yarn
         $SUDO ln -s /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg
+        $SUDO ln -s /opt/yarn/bin/yarn.js /usr/local/bin/yarn.js
 
         command -v yarn
 
