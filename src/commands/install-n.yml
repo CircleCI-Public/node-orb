@@ -37,14 +37,16 @@ steps:
           fi
         done
 
-        curl --show-error --location --fail --retry 3 --output /usr/local/bin/n \
+        curl --show-error --location --fail --retry 3 --output /usr/local/n \
           "https://raw.githubusercontent.com/tj/n/$N_VERSION/bin/n"
 
-        chmod +x /usr/local/bin/n
+        chmod +x /usr/local/n
 
         command -v n
 
         n --version | grep "${N_VERSION:1}"
+
+        echo 'export PATH=/usr/local:$PATH' >> $BASH_ENV
 
   - when:
       condition: <<parameters.select-node-version>>

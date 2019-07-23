@@ -62,6 +62,7 @@ steps:
               fi
 
               $SUDO rm -rf "$HOME/.yarn"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+              $SUDO rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
             fi
           fi
         }
