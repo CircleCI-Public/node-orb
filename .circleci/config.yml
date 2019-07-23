@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   build-tools: circleci/build-tools@2.6.2
+  jq: circleci/jq@volatile
   node: circleci/node@dev:alpha
   orb-tools: circleci/orb-tools@8.27.3
 
@@ -39,6 +40,8 @@ jobs:
           npm-version: <<parameters.npm-version>>
           yarn-version: <<parameters.yarn-version>>
           debug: true
+
+      - jq/install
 
       - node/install-n
 
