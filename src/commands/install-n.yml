@@ -25,7 +25,6 @@ steps:
           do INDEX_BODY=$(curl --show-error --location --fail --retry 3 \
             https://api.github.com/repos/tj/n/releases | \
             jq --argjson index "$INDEX" '.[$index]') \
-            # Filter out drafts & prereleases
             && if [[ $(echo "$INDEX_BODY" | tr '\r\n' ' ' | grep -v '"draft": true' && echo "$INDEX_BODY" | tr '\r\n' ' ' | grep -v '"prerelease": true') ]]; then \
               INDEX_VERSION=$(echo "$INDEX_BODY" | tr '\r\n' ' ' | jq '.tag_name') \
               && N_VERSION="${INDEX_VERSION:1:$((${#INDEX_VERSION} - 1 - 1))}" \
@@ -34,11 +33,9 @@ steps:
               INDEX=$((INDEX + 1)); \
             fi; \
           done \
-        # Download/install N
         && curl --show-error --location --fail --retry 3 --output /usr/local/bin/n \
           "https://raw.githubusercontent.com/tj/n/$N_VERSION/bin/n" \
         && chmod +x /usr/local/bin/n \
-        # Test/verify N version
         && command -v n \
         && n --version | grep "${N_VERSION:1}" \
 
