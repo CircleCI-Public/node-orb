@@ -71,16 +71,22 @@ steps:
         installation_check
 
         # install yarn
-        curl -L -o yarn.tar.gz "https://yarnpkg.com/downloads/$VERSION/yarn-v$VERSION.tar.gz" \
-          && $SUDO tar -xzf yarn.tar.gz \
-          && rm yarn.tar.gz \
-          && $SUDO mkdir -p /opt/yarn \
-          && $SUDO mv "yarn-v${VERSION}/*" /opt \
-          && $SUDO rm -rf "yarn-v${VERSION}" \
-          && $SUDO chmod 777 "/opt/yarn" \
-          && $SUDO ln -s /opt/yarn/bin/yarn /usr/local/bin/yarn \
-          && $SUDO ln -s /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg \
-          && command -v yarn
+        curl -L -o yarn.tar.gz "https://yarnpkg.com/downloads/$VERSION/yarn-v$VERSION.tar.gz"
+
+        $SUDO tar -xzf yarn.tar.gz && rm yarn.tar.gz
+
+        $SUDO mkdir -p /opt/yarn
+
+        $SUDO mv yarn-v${VERSION}/* /opt
+
+        $SUDO rm -rf "yarn-v${VERSION}"
+
+        $SUDO chmod 777 "/opt/yarn"
+
+        $SUDO ln -s /opt/yarn/bin/yarn /usr/local/bin/yarn
+        $SUDO ln -s /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg
+
+        command -v yarn
 
         if uname -a | grep Darwin<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
           mkdir -p ~/.config
