@@ -72,8 +72,10 @@ steps:
 
         # install yarn
         curl -L -o yarn.tar.gz "https://yarnpkg.com/downloads/$VERSION/yarn-v$VERSION.tar.gz" \
-          && $SUDO tar -xzf yarn.tar.gz -C /opt/ \
+          && $SUDO tar -xzf yarn.tar.gz \
           && rm yarn.tar.gz \
+          && $SUDO mv "yarn-v${VERSION}" /opt \
+          && $SUDO chmod 777 "/opt/yarn-v${VERSION}" \
           && $SUDO ln -s /opt/yarn-v${VERSION}/bin/yarn /usr/local/bin/yarn \
           && $SUDO ln -s /opt/yarn-v${VERSION}/bin/yarnpkg /usr/local/bin/yarnpkg \
           && command -v yarn
