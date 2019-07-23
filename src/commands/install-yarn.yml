@@ -77,7 +77,7 @@ steps:
 
         $SUDO mkdir -p /opt/yarn
 
-        $SUDO mv yarn-v${VERSION}/* /opt
+        $SUDO mv yarn-v${VERSION}/* /opt/yarn
 
         $SUDO rm -rf "yarn-v${VERSION}"
 
