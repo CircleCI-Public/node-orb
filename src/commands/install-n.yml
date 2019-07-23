@@ -37,7 +37,7 @@ steps:
           "https://raw.githubusercontent.com/tj/n/$N_VERSION/bin/n" \
         && chmod +x /usr/local/bin/n \
         && command -v n \
-        && n --version | grep "${N_VERSION:1}" \
+        && n --version | grep "${N_VERSION:1}"
 
   - when:
       condition: <<parameters.select-node-version>>
