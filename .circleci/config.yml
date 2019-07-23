@@ -40,6 +40,8 @@ jobs:
           yarn-version: <<parameters.yarn-version>>
           debug: true
 
+      - node/install-n
+
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
   branches:
