@@ -51,7 +51,7 @@ steps:
 
         if cat /etc/issue<<^parameters.debug>> 2> /dev/null<</parameters.debug>> | grep Alpine<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
           # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
-          sed -i -e 's/v[[:digit:]]\.[[:digit:]]/edge/g' /etc/apk/repositories
+          sed -i -e 's/v[[:digit:]]\.[[:digit:]][[:digit:]]?/edge/g' /etc/apk/repositories
           apk upgrade --update-cache --available<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
 
           apk --no-cache add npm<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
