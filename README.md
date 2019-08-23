@@ -4,6 +4,25 @@ An orb for working with Node.js on CircleCI.
 
 ## Usage
 
+A quick example of using `with-cache`:
+
+```yaml
+version: 2.1
+orbs:
+  node: circleci/node@1.1.4
+jobs:
+  build:
+    docker:
+      - image: circleci/node:12.7
+    working_directory: ~/project
+    steps:
+      - checkout
+      - node/with-cache:
+          steps:
+            - run: npm install
+      - run: npm run test
+```
+
 For full usage guidelines, see the [orb registry listing](http://circleci.com/orbs/registry/orb/circleci/node).
 
 ## Contributing
