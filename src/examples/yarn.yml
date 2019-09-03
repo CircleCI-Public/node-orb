@@ -1,0 +1,16 @@
+description: "Short example of using Node.js with Yarn."
+usage:
+  version: 2.1
+  orbs:
+    node: circleci/node@1.1
+  jobs:
+    build:
+      executor:
+        name: node/default
+        tag: "10.4"
+      steps:
+        - checkout
+        - node/with-cache:
+            steps:
+              - run: yarn install
+        - run: yarn test
