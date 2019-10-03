@@ -4,6 +4,44 @@ An orb for working with Node.js on CircleCI.
 
 ## Usage
 
+### npm
+
+```yaml
+jobs:
+  build:
+    executor:
+      name: node/default
+      tag: '10.4'
+    steps:
+      - checkout
+      - node/with-cache:
+          steps:
+            - run: npm install
+      - run: npm run test
+orbs:
+  node: circleci/node@1.1
+version: 2.1
+```
+
+### yarn
+
+```yarn
+jobs:
+  build:
+    executor:
+      name: node/default
+      tag: '10.4'
+    steps:
+      - checkout
+      - node/with-cache:
+          steps:
+            - run: yarn install
+      - run: yarn test
+orbs:
+  node: circleci/node@1.1
+version: 2.1
+```
+
 For full usage guidelines, see the [orb registry listing](http://circleci.com/orbs/registry/orb/circleci/node).
 
 ## Contributing
