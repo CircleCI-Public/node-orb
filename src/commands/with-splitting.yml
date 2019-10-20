@@ -21,7 +21,7 @@ description: >
   Tests are split by `timings` by default, and can be split based on
   filesize by setting the `split-by` parameter to `filesize`.
 
-  The CLI expectes both filenames and classnames to be present in the timing
+  The CLI expects both filenames and classnames to be present in the timing
   data produced by the timing suite. By default, splitting defaults to
   `filename`. You can specify `classnames` via the `timings-type` parameter.
 
