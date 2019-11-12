@@ -1,0 +1,36 @@
+description: >
+  Install your dependencies using `npm ci`
+
+parameters:
+  cache-dir:
+    type: string
+    default: ~/.npm
+    description: >
+      Path to the npm package cache
+
+  cache-version:
+    type: string
+    default: v1
+    description: >
+      Cache version; increment this for a fresh cache
+
+  use-strict-cache:
+    type: boolean
+    default: false
+    description: >
+      If true, ignores non-checksum cache hits
+
+  include-branch-in-cache-key:
+    type: boolean
+    default: true
+    description: >
+      If true, includes current branch name in cache key
+
+steps:
+  - with-cache:
+      dir: <<parameters.cache-dir>>
+      cache-version: <<parameters.cache-version>>
+      use-strict-cache: <<parameters.use-strict-cache>>
+      include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
+      steps:
+        - run: npm ci

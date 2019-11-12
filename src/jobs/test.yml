@@ -1,0 +1,48 @@
+description: |
+  Install npm dependencies then run tests
+
+parameters:
+  tag:
+    type: string
+    default: "latest"
+    description: >
+      Pick a specific circleci/node image variant:
+      https://hub.docker.com/r/circleci/node/tags
+  test-command:
+    type: string
+    default: "npm test"
+    description: >
+      The command to be used for running tests
+  test-results-path:
+    type: string
+    default: ""
+    description: >
+      Folder container junit test results files to be saved
+  before-tests:
+    type: steps
+    default: []
+    description: >
+      Run extra steps before the tests
+  after-tests:
+    type: steps
+    default: []
+    description: >
+      Run extra steps after the tests
+
+executor:
+  name: default
+  tag: << parameters.tag >>
+
+steps:
+  - checkout
+  - npm-ci
+  - steps: << parameters.before-tests >>
+  - run: << parameters.test-command >>
+  - steps: << parameters.after-tests >>
+  - when:
+      condition: << parameters.test-results-path >>
+      steps:
+        - store_artifacts:
+            path: << parameters.test-results-path >>
+        - store_test_results:
+            path: << parameters.test-results-path >>

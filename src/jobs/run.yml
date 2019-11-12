@@ -1,0 +1,32 @@
+description: |
+  Install npm dependencies then run some commands
+
+parameters:
+  tag:
+    type: string
+    default: "latest"
+    description: >
+      Pick a specific circleci/node image variant:
+      https://hub.docker.com/r/circleci/node/tags
+  command:
+    type: string
+    default: ""
+    description: Run a single command
+  steps:
+    type: steps
+    default: []
+    description: >
+      Run a series of steps
+
+executor:
+  name: default
+  tag: << parameters.tag >>
+
+steps:
+  - checkout
+  - npm-ci
+  - when:
+      condition: << parameters.command >>
+      steps:
+        - run: << parameters.command >>
+  - steps: << parameters.steps >>
