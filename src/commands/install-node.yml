@@ -16,7 +16,7 @@ parameters:
 
   alpine-version:
     type: enum
-    default: nodejs-current
+    default: nodejs
     enum: [nodejs, nodejs-current]
     description: >
       For Alpine Linux users, select a Node.js version: either a current
