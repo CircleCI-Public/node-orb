@@ -9,7 +9,7 @@ orbs:
 executors:
   alpine:
     docker:
-      - image: cibuilds/base:2019.10
+      - image: cibuilds/base:2019.09
 
 jobs:
   test:
