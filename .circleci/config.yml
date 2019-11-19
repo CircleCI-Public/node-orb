@@ -6,6 +6,11 @@ orbs:
   node: circleci/node@dev:alpha
   orb-tools: circleci/orb-tools@8.27.3
 
+executors:
+  alpine:
+    docker:
+      - image: cibuilds/base:2019.10
+
 jobs:
   test:
     parameters:
@@ -165,12 +170,12 @@ workflows:
       # alpine
       - test:
           name: install-alpine-dev
-          executor: orb-tools/alpine
+          executor: alpine
           filters: *integration-dev_filters
 
       - test:
           name: install-alpine-versioned-dev
-          executor: orb-tools/alpine
+          executor: alpine
           node-alpine-version: nodejs
           npm-version: "6.4.1"
           yarn-version: "1.15.2"
@@ -250,12 +255,12 @@ workflows:
       # alpine
       - test:
           name: install-alpine-master
-          executor: orb-tools/alpine
+          executor: alpine
           filters: *integration-master_filters
 
       - test:
           name: install-alpine-versioned-master
-          executor: orb-tools/alpine
+          executor: alpine
           node-alpine-version: nodejs
           npm-version: "6.4.1"
           yarn-version: "1.15.2"
