@@ -5,9 +5,7 @@ usage:
     node: circleci/node@1.1
   jobs:
     build:
-      executor:
-        name: node/default
-        tag: "10.4"
+      executor: node/default@10.4
       steps:
         - checkout
         - node/with-cache:
