@@ -31,12 +31,6 @@ parameters:
     description: >
       Where should Node.js be installed?
 
-  debug:
-    type: boolean
-    default: false
-    description: >
-      Extra output for orb developers
-
   # npm
   install-npm:
     type: boolean
@@ -72,18 +66,15 @@ steps:
       version: <<parameters.node-version>>
       alpine-version: <<parameters.node-alpine-version>>
       install-dir: <<parameters.node-install-dir>>
-      debug: <<parameters.debug>>
 
   - when:
       condition: <<parameters.install-npm>>
       steps:
         - install-npm:
             version: <<parameters.npm-version>>
-            debug: <<parameters.debug>>
 
   - when:
       condition: <<parameters.install-yarn>>
       steps:
         - install-yarn:
             version: <<parameters.yarn-version>>
-            debug: <<parameters.debug>>
