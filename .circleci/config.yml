@@ -23,13 +23,13 @@ jobs:
     steps:
       - checkout
       - node/install:
-            node-version: 13
-            install-yarn: false # To skip installing yarn (or npm)
-        - run:
-            command: |
-              if ! node --version | grep -q "13"; then
-                echo "Node version 13 not found"
-              fi
+          node-version: 13
+          install-yarn: false # To skip installing yarn (or npm)
+      - run:
+          command: |
+            if ! node --version | grep -q "13"; then
+              echo "Node version 13 not found"
+            fi
 
 
 workflows:
