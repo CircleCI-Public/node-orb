@@ -138,7 +138,6 @@ steps:
             if [[ ! -e <<parameters.node-install-dir>>/bin/nodejs ]]; then
               $SUDO ln -s <<parameters.node-install-dir>>/bin/node <<parameters.node-install-dir>>/bin/nodejs
             fi
-          fi
           ;;
 
           darwin)
