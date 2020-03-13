@@ -86,7 +86,7 @@ steps:
               cut -d 'v' -f 2)
             echo "Latest version of Node.js is $NODE_ORB_INSTALL_VERSION"
           else
-            NODE_ORB_INSTALL_VERSION="v<<parameters.version>>"
+            NODE_ORB_INSTALL_VERSION="v<<parameters.node-version>>"
             echo "Selected version of Node.js is $NODE_ORB_INSTALL_VERSION"
           fi
         }
