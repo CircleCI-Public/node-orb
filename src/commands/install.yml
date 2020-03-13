@@ -183,13 +183,13 @@ steps:
             $SUDO rm -f SHASUMS256.txt
 
             $SUDO tar -xzf "node-v$NODE_ORB_INSTALL_VERSION-$PLATFORM-x64.tar.gz" \
-              -C <<parameters.install-dir>> \
+              -C <<parameters.node-install-dir>> \
               --strip-components=1 --no-same-owner
 
             $SUDO rm -f "node-v$NODE_ORB_INSTALL_VERSION-$PLATFORM-x64.tar.gz"
 
-            if [[ ! -e <<parameters.install-dir>>/bin/nodejs ]]; then
-              $SUDO ln -s <<parameters.install-dir>>/bin/node <<parameters.install-dir>>/bin/nodejs
+            if [[ ! -e <<parameters.node-install-dir>>/bin/nodejs ]]; then
+              $SUDO ln -s <<parameters.node-install-dir>>/bin/node <<parameters.node-install-dir>>/bin/nodejs
             fi
           fi
           ;;
