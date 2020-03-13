@@ -7,9 +7,9 @@ usage:
   jobs:
     test:
       executor:
-        name: node/default:
+        name: node/default
         tag: "13" # You could specify the node version via the docker image.
       steps:
         - checkout
         - node/install-modules
-        - npm run test
+        - npm run tes

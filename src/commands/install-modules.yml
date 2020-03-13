@@ -10,7 +10,7 @@ parameters:
   override-ci:
     type: boolean
     default: false
-    description: | 
+    description: |
       By default, modules will be installed with "npm ci" or "yarn install --frozen-lockfile", this override will use the standard "install" command.
   with-cache:
     type: boolean

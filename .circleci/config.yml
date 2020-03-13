@@ -16,20 +16,20 @@ parameters:
     default: "dev:alpha"
 
 jobs:
-# Install NodeJS into a non-node container. 
+# Install NodeJS into a non-node container.
   integration-test-1:
     docker:
       - image: cimg/python:3.6
     steps:
       - checkout
-      # - node/install:
-      #       node-version: 13
-      #       install-yarn: false # To skip installing yarn (or npm)
-      #   - run:
-      #       command: |
-      #         if ! node --version | grep -q "13"; then
-      #           echo "Node version 13 not found"
-      #         fi
+      - node/install:
+            node-version: 13
+            install-yarn: false # To skip installing yarn (or npm)
+        - run:
+            command: |
+              if ! node --version | grep -q "13"; then
+                echo "Node version 13 not found"
+              fi
 
 
 workflows:
