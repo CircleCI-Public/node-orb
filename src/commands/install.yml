@@ -131,6 +131,7 @@ steps:
             installation_check
 
             # download/install node
+            echo "Downloading: https://nodejs.org/download/release/v$NODE_ORB_INSTALL_VERSION/node-v$NODE_ORB_INSTALL_VERSION-$PLATFORM-x64.tar.gz"
             $SUDO curl -O \
               --show-error --location --fail --retry 3 \
               "https://nodejs.org/download/release/v$NODE_ORB_INSTALL_VERSION/node-v$NODE_ORB_INSTALL_VERSION-$PLATFORM-x64.tar.gz"
