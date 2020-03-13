@@ -23,7 +23,7 @@ jobs:
     steps:
       - checkout
       - node/install:
-          node-version: "13"
+          node-version: "13.11.0"
           install-yarn: false # To skip installing yarn (or npm)
       - run:
           command: |
