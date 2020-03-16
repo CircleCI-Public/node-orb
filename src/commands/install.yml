@@ -133,7 +133,7 @@ steps:
             # download/install node
             echo "Downloading: https://nodejs.org/download/release/v$NODE_ORB_INSTALL_VERSION/node-v$NODE_ORB_INSTALL_VERSION-$SYS_ENV_PLATFORM-x64.tar.gz"
             $SUDO curl -O \
-              --silent --show-error --location --fail --retry 3 \
+              --show-error --location --fail --retry 3 \
               "https://nodejs.org/download/release/v$NODE_ORB_INSTALL_VERSION/node-$NODE_ORB_INSTALL_VERSION-$SYS_ENV_PLATFORM-x64.tar.gz"
 
             if [[ ! -e <<parameters.node-install-dir>>/bin/nodejs ]]; then
