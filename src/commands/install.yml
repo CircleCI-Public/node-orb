@@ -146,7 +146,7 @@ steps:
               hkp://pgp.mit.edu:80
               hkps://ha.pool.sks-keyservers.net
               hkp://keyserver.ubuntu.com:80
-            EOM
+              EOM
 
               echo "Importing Node.js trusted release keys..."
               # https://stackoverflow.com/a/26217767
