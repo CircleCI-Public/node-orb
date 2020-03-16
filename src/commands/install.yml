@@ -135,7 +135,7 @@ steps:
             $SUDO curl -O \
               --show-error --location --fail --retry 3 \
               "https://nodejs.org/download/release/v$NODE_ORB_INSTALL_VERSION/node-v$NODE_ORB_INSTALL_VERSION-$SYS_ENV_PLATFORM-x64.tar.gz"
-            
+
             # Install Binary
             $SUDO tar -xzf "node-v$VERSION-$PLATFORM-x64.tar.gz" \
               -C <<parameters.node-install-dir>> \
