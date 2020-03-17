@@ -169,20 +169,24 @@ steps:
               $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS KEYSERVERS
 
               # Download binary
+              echo Node binary downloaded
               echo "Downloading: https://nodejs.org/download/release/v$NODE_ORB_INSTALL_VERSION/node-v$NODE_ORB_INSTALL_VERSION-$SYS_ENV_PLATFORM-x64.tar.gz"
               $SUDO curl -O \
                 --silent --show-error --location --fail --retry 3 \
                 "https://nodejs.org/download/release/v$NODE_ORB_INSTALL_VERSION/node-v$NODE_ORB_INSTALL_VERSION-$SYS_ENV_PLATFORM-x64.tar.gz"
 
               # Download SHASUMS256 and sig
-              curl -O https://nodejs.org/dist/v$NODE_ORB_INSTALL_VERSION/SHASUMS256.txt
-              curl -O https://nodejs.org/dist/v$NODE_ORB_INSTALL_VERSION/SHASUMS256.txt.sig
+              echo Fetching SHASUM256 verification
+              curl -O --silent --show-error --location --fail --retry 3 https://nodejs.org/dist/v$NODE_ORB_INSTALL_VERSION/SHASUMS256.txt
+              curl -O --silent --show-error --location --fail --retry 3 https://nodejs.org/dist/v$NODE_ORB_INSTALL_VERSION/SHASUMS256.txt.sig
 
               # Verify checksum file sig
+              echo Verifing SHASUM256
               gpg --verify SHASUMS256.txt.sig SHASUMS256.txt
 
               # Verify checksum of binary
-              grep node-v$NODE_ORB_INSTALL_VERSION.tar.gz SHASUMS256.txt | sha256sum -c -
+              echo Verifing binary checksum
+              grep node-v$NODE_ORB_INSTALL_VERSION-$SYS_ENV_PLATFORM-x64.tar.gz SHASUMS256.txt | sha256sum -c -
 
               # Install Binary
               echo Installing Node binary
