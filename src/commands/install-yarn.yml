@@ -34,7 +34,7 @@ steps:
         }
 
         installation_check () {
-          echo "Checking if YARN si already installed..."
+          echo "Checking if YARN is already installed..."
           if command -v yarn > /dev/null 2>&1; then
             if yarn --version | grep "$YARN_ORB_VERSION" > /dev/null 2>&1; then
               echo "Yarn $YARN_ORB_VERSION is already installed"
@@ -42,7 +42,7 @@ steps:
             else
               echo "A different version of Yarn is installed ($(yarn --version)); removing it"
 
-              if uname -a | grep Darwin> /dev/null 2>&1; then
+              if uname -a | grep Darwin > /dev/null 2>&1; then
                 brew uninstall yarn > /dev/null 2>&1
               elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
                 apk del yarn > /dev/null 2>&1
@@ -82,8 +82,14 @@ steps:
         $SUDO ln -s /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg
         $SUDO ln -s /opt/yarn/bin/yarn.js /usr/local/bin/yarn.js
 
-        $SUDO mkdir -p ~/.config
-        $SUDO chown -R "$USER:$GROUP" ~/.config
+        $SUDO chown -R "$(whoami):$(whoami)" /opt/yarn
+
+        if [ uname -a | grep Darwin ]; then
+          $SUDO mkdir -p ~/.config
+          $SUDO chown -R "$USER:$GROUP" ~/.config
+        fi
+
+        $SUDO chown -R "$(whoami):$(whoami)" ~/.config
 
         # test/verify version
         echo "Verifying YARN install"
