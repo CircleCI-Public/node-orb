@@ -34,6 +34,7 @@ steps:
         }
 
         installation_check () {
+          echo "Checking if YARN si already installed..."
           if command -v yarn > /dev/null 2>&1; then
             if yarn --version | grep "$YARN_ORB_VERSION" > /dev/null 2>&1; then
               echo "Yarn $YARN_ORB_VERSION is already installed"
@@ -65,6 +66,7 @@ steps:
         installation_check
 
         # install yarn
+        echo "Installing YARN v$YARN_ORB_VERSION"
         curl -L -o yarn.tar.gz --silent "https://yarnpkg.com/downloads/$YARN_ORB_VERSION/yarn-v$YARN_ORB_VERSION.tar.gz"
 
         $SUDO tar -xzf yarn.tar.gz && rm yarn.tar.gz
@@ -75,18 +77,19 @@ steps:
 
         $SUDO mkdir -p /opt/yarn
 
-        $SUDO mv yarn-v${YARN_ORB_VERSION}/* /opt/yarn
-
-        $SUDO rm -rf "yarn-v${YARN_ORB_VERSION}"
-
-        $SUDO chmod 777 "/opt/yarn"
+        $SUDO chmod 777 -R "/opt/yarn"
+        $SUDO chmod 777 -R "~/.config"
         $SUDO chown -R "$USER:$GROUP" ~/.config
+
+        $SUDO mv yarn-v${YARN_ORB_VERSION}/* /opt/yarn
+        $SUDO rm -rf "yarn-v${YARN_ORB_VERSION}"
 
         $SUDO ln -s /opt/yarn/bin/yarn /usr/local/bin/yarn
         $SUDO ln -s /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg
         $SUDO ln -s /opt/yarn/bin/yarn.js /usr/local/bin/yarn.js
 
         # test/verify version
+        echo "Verifying YARN install"
         if yarn --version | grep "$YARN_ORB_VERSION" > /dev/null 2>&1; then
           echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
         else
