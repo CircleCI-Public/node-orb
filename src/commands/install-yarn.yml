@@ -71,9 +71,9 @@ steps:
 
         $SUDO mkdir -p /opt/yarn
 
-        $SUDO mv yarn-v${VERSION}/* /opt/yarn
+        $SUDO mv yarn-v${YARN_ORB_VERSION}/* /opt/yarn
 
-        $SUDO rm -rf "yarn-v${VERSION}"
+        $SUDO rm -rf "yarn-v${YARN_ORB_VERSION}"
 
         $SUDO chmod 777 "/opt/yarn"
 
