@@ -37,7 +37,7 @@ parameters:
   # yarn
   install-yarn:
     type: boolean
-    default: true
+    default: false
     description: Install Yarn?
 
   yarn-version:
@@ -123,7 +123,7 @@ steps:
             echo "Install for alpine, or remove"
           ;;
 
-          linux)
+          *)
             if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
               get_node_version
@@ -202,10 +202,6 @@ steps:
                 $SUDO ln -s <<parameters.node-install-dir>>/bin/node <<parameters.node-install-dir>>/bin/nodejs
               fi
             ;;
-
-          darwin)
-            echo "install for MacOS"
-          ;;
         esac
 
         # test/verify version

@@ -24,7 +24,7 @@ jobs:
       - checkout
       - node/install:
           node-version: "13.11.0"
-          install-yarn: false # To skip installing yarn (or npm)
+          install-yarn: true # Test the install of YARN
       - run:
           command: |
             if ! node --version | grep -q "13"; then

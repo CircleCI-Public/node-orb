@@ -14,12 +14,6 @@ parameters:
       on Alpine, the `npm` Alpine pkg will be installed:
       https://pkgs.alpinelinux.org/packages?name=npm)
 
-  debug:
-    type: boolean
-    default: false
-    description: >
-      Extra output for orb developers
-
 steps:
   - run:
       name: Install NPM
@@ -29,32 +23,32 @@ steps:
         # FUNCTIONS
         get_npm_version () {
           if [[ <<parameters.version>> == latest ]]; then
-            VERSION="$(npm view npm | sed -E 's|.*-||g' | grep latest | \
+            NPM_ORB_VERSION="$(npm view npm | sed -E 's|.*-||g' | grep latest | \
               perl -pe 's/.*: //g' | perl -pe "s/'|,//g")"
 
-            echo "Latest version of NPM is $VERSION"
+            echo "Latest version of NPM is $NPM_ORB_VERSION"
           else
-            VERSION=<<parameters.version>>
+            NPM_ORB_VERSION=<<parameters.version>>
 
-            echo "Selected version of NPM is $VERSION"
+            echo "Selected version of NPM is $NPM_ORB_VERSION"
           fi
         }
 
         installation_check () {
-          if command -v npm<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
-            if npm -v | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
-              echo "NPM $VERSION is already installed"
+          if command -v npm > /dev/null 2>&1; then
+            if npm -v | grep "$NPM_ORB_VERSION" > /dev/null 2>&1; then
+              echo "NPM $NPM_ORB_VERSION is already installed"
               exit 0
             fi
           fi
         }
 
-        if cat /etc/issue<<^parameters.debug>> 2> /dev/null<</parameters.debug>> | grep Alpine<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+        if cat /etc/issue 2> /dev/null | grep Alpine > /dev/null 2>&1; then
           # https://wiki.alpinelinux.org/wiki/Include:Upgrading_to_Edge
           sed -i -e 's/v[[:digit:]]\.[[:digit:]]\+/edge/g' /etc/apk/repositories
-          apk upgrade --update-cache --available<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+          apk upgrade --update-cache --available > /dev/null 2>&1
 
-          apk --no-cache add npm<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+          apk --no-cache add npm > /dev/null 2>&1
 
           echo "Success! NPM $(npm -v) (Alpine APK) has been installed to $(which npm)"
         else
@@ -62,15 +56,15 @@ steps:
           installation_check
 
           if [[ <<parameters.version>> == latest ]]; then
-            $SUDO npm install -g npm@latest<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> || \
-              npm install -g npm@latest<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+            $SUDO npm install -g npm@latest > /dev/null 2>&1 || \
+              npm install -g npm@latest > /dev/null 2>&1
           else
-            $SUDO npm install -g "npm@$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>> || \
-              npm install -g "npm@$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>
+            $SUDO npm install -g "npm@$NPM_ORB_VERSION" > /dev/null 2>&1 || \
+              npm install -g "npm@$NPM_ORB_VERSION" > /dev/null 2>&1
           fi
 
           # test/verify version
-          if npm -v | grep "$VERSION"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+          if npm -v | grep "$NPM_ORB_VERSION" > /dev/null 2>&1; then
             echo "Success! NPM $(npm -v) has been installed to $(which npm)"
           else
             echo "Something went wrong; the specified version of NPM could not be installed"
