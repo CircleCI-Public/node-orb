@@ -81,8 +81,6 @@ steps:
         $SUDO ln -s /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg
         $SUDO ln -s /opt/yarn/bin/yarn.js /usr/local/bin/yarn.js
 
-        command -v yarn
-
         if uname -a | grep Darwin > /dev/null 2>&1; then
           mkdir -p ~/.config
           $SUDO chown -R "$USER:$GROUP" ~/.config
