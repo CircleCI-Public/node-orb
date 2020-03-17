@@ -71,22 +71,21 @@ steps:
 
         $SUDO tar -xzf yarn.tar.gz && rm yarn.tar.gz
 
-        if uname -a | grep Darwin > /dev/null 2>&1; then
-          mkdir -p ~/.config
-        fi
-
         $SUDO mkdir -p /opt/yarn
-
-        $SUDO chmod 777 -R "/opt/yarn"
-        $SUDO chmod 777 -R "~/.config"
-        $SUDO chown -R "$USER:$GROUP" ~/.config
-
         $SUDO mv yarn-v${YARN_ORB_VERSION}/* /opt/yarn
+
         $SUDO rm -rf "yarn-v${YARN_ORB_VERSION}"
+
+        $SUDO chmod 777 "/opt/yarn"
 
         $SUDO ln -s /opt/yarn/bin/yarn /usr/local/bin/yarn
         $SUDO ln -s /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg
         $SUDO ln -s /opt/yarn/bin/yarn.js /usr/local/bin/yarn.js
+
+        if uname -a | grep Darwin /dev/null 2>&1; then
+            $SUDO mkdir -p ~/.config
+            $SUDO chown -R "$USER:$GROUP" ~/.config
+        fi
 
         # test/verify version
         echo "Verifying YARN install"
