@@ -15,11 +15,31 @@ parameters:
     type: string
     default: "dev:alpha"
 
+integration-tests: &integration-tests
+  [
+    integration-test-install-linux,
+    integration-test-install-mac
+  ]
+
 jobs:
 # Install NodeJS into a non-node container.
-  integration-test-1:
+  integration-test-install-linux:
     docker:
       - image: cimg/base:stable
+    steps:
+      - checkout
+      - node/install:
+          node-version: "13.11.0"
+          install-yarn: true # Test the install of YARN
+      - run:
+          command: |
+            if ! node --version | grep -q "13"; then
+              echo "Node version 13 not found"
+            fi
+
+  integration-test-install-mac:
+    macos:
+      xcode: "11.4"
     steps:
       - checkout
       - node/install:
@@ -73,16 +93,8 @@ workflows:
       # your integration test jobs go here: essentially, run all your orb's
       # jobs and commands to ensure they behave as expected. or, run other
       # integration tests of your choosing
-
-      # Run Copy and Sync commands. Requires credentials. These are already set in the CircleCI Project
-      - integration-test-1
-
-      # publish a semver version of the orb. relies on
-      # the commit subject containing the text "[semver:patch|minor|major|skip]"
-      # as that will determine whether a patch, minor or major
-      # version will be published or if publishing should
-      # be skipped.
-      # e.g. [semver:patch] will cause a patch version to be published.
+      - integration-test-install-linux
+      - integration-test-install-mac
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/node
           context: orb-publishing
@@ -91,8 +103,7 @@ workflows:
           bot-user: cpe-bot
           fail-if-semver-not-indicated: true
           publish-version-tag: false
-          requires:
-            - integration-test-1
+          requires: *integration-tests
           filters:
             branches:
               only: master
