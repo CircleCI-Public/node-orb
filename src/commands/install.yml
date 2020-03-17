@@ -123,7 +123,7 @@ steps:
             echo "Install for alpine, or remove"
           ;;
 
-          *)
+          *) # Applies to all non-alpine platforms which will work on Linux and MacOS
             if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
               get_node_version
