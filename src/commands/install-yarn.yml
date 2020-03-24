@@ -19,12 +19,8 @@ steps:
         # FUNCTIONS
         get_yarn_version () {
           if [[ "<<parameters.version>>" == "" ]]; then
-            YARN_ORB_VERSION=$(curl --silent --show-error \
-              --location --fail --retry 3 \
-              https://api.github.com/repos/yarnpkg/yarn/releases/latest | \
-              grep tag_name | cut -d '"' -f 4 | \
-              cut -d 'v' -f 2)
-
+            YARN_ORB_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} \
+              "https://github.com/yarnpkg/yarn/releases/latest" | sed 's:.*/::' | cut -d 'v' -f 2 | cut -d 'v' -f 2)
             echo "Latest version of Yarn is $YARN_ORB_VERSION"
           else
             YARN_ORB_VERSION=<<parameters.version>>

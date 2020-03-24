@@ -76,11 +76,8 @@ steps:
 
         get_node_version () {
           if [[ <<parameters.node-version>> == "" ]]; then
-            NODE_ORB_INSTALL_VERSION=$(curl -Ls --fail --retry 3 -o /dev/null \ 
-              -w %{url_effective} \ 
-              "https://github.com/nodejs/node/releases/latest" | \ 
-              sed 's:.*/::' | \ 
-              cut -d 'v' -f 2)
+            NODE_ORB_INSTALL_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} \
+              "https://github.com/nodejs/node/releases/latest" | sed 's:.*/::' | cut -d 'v' -f 2)
             echo "Latest version of Node.js is $NODE_ORB_INSTALL_VERSION"
           else
             NODE_ORB_INSTALL_VERSION="<<parameters.node-version>>"

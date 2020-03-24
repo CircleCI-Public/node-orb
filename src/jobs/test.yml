@@ -21,7 +21,6 @@ parameters:
     default: "test"
     description: The name of the script within your package.json which will run your tests.
 
-
 executor:
   name: default
   tag: << parameters.version >>
