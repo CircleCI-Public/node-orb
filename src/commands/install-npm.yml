@@ -10,9 +10,7 @@ parameters:
     description: >
       Pick a version of NPM to install:
       https://nodejs.org/en/download/releases
-      (Note: NPM version selection is not possible on Alpine Linux;
-      on Alpine, the `npm` Alpine pkg will be installed:
-      https://pkgs.alpinelinux.org/packages?name=npm)
+
 
 steps:
   - run:

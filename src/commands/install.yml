@@ -30,9 +30,6 @@ parameters:
     description: >
       Pick a version of NPM to install:
       https://nodejs.org/en/download/releases
-      (Note: NPM version selection is not possible on Alpine Linux;
-      on Alpine, the `npm` Alpine pkg will be installed:
-      https://pkgs.alpinelinux.org/packages?name=npm)
 
   # yarn
   install-yarn:
@@ -79,10 +76,10 @@ steps:
 
         get_node_version () {
           if [[ <<parameters.node-version>> == "" ]]; then
-            NODE_ORB_INSTALL_VERSION=$(curl --show-error \
-              --silent --location --fail --retry 3 \
-              https://api.github.com/repos/nodejs/node/releases/latest | \
-              grep tag_name | cut -d '"' -f 4 | \
+            NODE_ORB_INSTALL_VERSION=$(curl -Ls --fail --retry 3 -o /dev/null \ 
+              -w %{url_effective} \ 
+              "https://github.com/nodejs/node/releases/latest" | \ 
+              sed 's:.*/::' | \ 
               cut -d 'v' -f 2)
             echo "Latest version of Node.js is $NODE_ORB_INSTALL_VERSION"
           else

@@ -1,0 +1,45 @@
+description: |
+  Simple drop-in job to test your NodeJS application automatically.
+
+parameters:
+  version:
+    type: string
+    default: "13.11"
+    description: >
+      Select the version of NodeJS to use. Any available tag from this list can be used: https://hub.docker.com/r/cimg/node/tags
+  pkg-manager:
+    type: enum
+    enum: ["npm", "yarn"]
+    default: "npm"
+    description: Select the default node package manager to use.
+  setup:
+    type: steps
+    description: Provide any optitonal steps you would like to run prior to installing the node dependencies. This is a good place to install global modules.
+    default: []
+  run-command:
+    type: string
+    default: "test"
+    description: The name of the script within your package.json which will run your tests.
+
+
+executor:
+  name: default
+  tag: << parameters.version >>
+
+steps:
+  - checkout
+  - steps: << parameters.setup >>
+  - install-modules:
+      pkg-manager: <<parameters.pkg-manager>>
+  - run:
+      name: Run Node Tests
+      command: |
+        SELECTED_PKG_MANAGER=<<parameters.pkg-manager>>
+        case SELECTED_PKG_MANAGER in
+          npm)
+            npm run test
+          ;;
+          yarn)
+            yarn test
+          ;;
+        esac
