@@ -84,7 +84,7 @@ steps:
 
         $SUDO mkdir -p ~/.config
 
-        if [ uname -a | grep Darwin ]; then
+        if uname -a | grep Darwin; then
           $SUDO chown -R "$USER:$GROUP" ~/.config
           $SUDO chown -R "$USER:$GROUP" /opt/yarn
         else
