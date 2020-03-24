@@ -14,4 +14,3 @@ usage:
             node-version: latest
             install-yarn: false # To skip installing yarn (or npm)
         - run: node --version
-
