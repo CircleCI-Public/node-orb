@@ -82,14 +82,15 @@ steps:
         $SUDO ln -s /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg
         $SUDO ln -s /opt/yarn/bin/yarn.js /usr/local/bin/yarn.js
 
-        $SUDO chown -R "$(whoami):$(whoami)" /opt/yarn
+        $SUDO mkdir -p ~/.config
 
         if [ uname -a | grep Darwin ]; then
-          $SUDO mkdir -p ~/.config
           $SUDO chown -R "$USER:$GROUP" ~/.config
+          $SUDO chown -R "$USER:$GROUP" /opt/yarn
+        else
+          $SUDO chown -R "$(whoami):$(whoami)" /opt/yarn
+          $SUDO chown -R "$(whoami):$(whoami)" ~/.config
         fi
-
-        $SUDO chown -R "$(whoami):$(whoami)" ~/.config
 
         # test/verify version
         echo "Verifying YARN install"
