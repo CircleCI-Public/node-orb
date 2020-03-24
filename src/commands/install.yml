@@ -125,6 +125,7 @@ steps:
           darwin)
             if ! command -v gpg; then
               HOMEBREW_NO_AUTO_UPDATE=1 brew install gnupg
+              HOMEBREW_NO_AUTO_UPDATE=1 brew install coreutils
             fi
           ;;
         esac
