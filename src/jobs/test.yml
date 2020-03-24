@@ -36,9 +36,9 @@ steps:
         SELECTED_PKG_MANAGER=<<parameters.pkg-manager>>
         case SELECTED_PKG_MANAGER in
           npm)
-            npm run test
+            npm run <<parameters.run-command>>
           ;;
           yarn)
-            yarn test
+            yarn <<parameters.run-command>>
           ;;
         esac
