@@ -1,5 +1,5 @@
 description: |
-  Download and install any version of NodeJS. By default this will also install both NPM and Yarn. For production pipelines we highly recommend installing NodeJS into your Docker image.
+  Download and install any version of NodeJS. Optionally installs Yarn with a parameter. For production pipelines, we highly recommend installing NodeJS into your Docker image, or utilizing one of our Node convenience images. You may use the default executor of this orb for a Node execution evironment as well.
 usage:
   version: 2.1
   orbs:

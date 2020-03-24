@@ -12,4 +12,4 @@ usage:
       steps:
         - checkout
         - node/install-modules
-        - npm run tes
+        - npm run test
