@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"This example currently only proves the test command will run. Real sample project coming.\" && exit 0"
+    "test": "ls && echo \"This example currently only proves the test command will run. Real sample project coming.\" && exit 0"
   },
   "author": "",
   "license": "ISC",

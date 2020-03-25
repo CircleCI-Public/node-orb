@@ -12,5 +12,5 @@ usage:
         - checkout
         - node/install:
             node-version: latest
-            install-yarn: false # To skip installing yarn (or npm)
+            install-yarn: true # Set to true if you would like to install Yarn. NPM will install automatically.
         - run: node --version

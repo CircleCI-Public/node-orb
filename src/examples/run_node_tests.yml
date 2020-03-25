@@ -1,5 +1,5 @@
 description: |
-  Drop-in soluition to automatically test your NodeJS applications. This job will automatically download your code into any version node environment, install your dependancies with caching enabled, and execute your testing script.
+  Drop-in solution to automatically test your NodeJS applications. This job will automatically download your code into any version node environment, install your dependencies with caching enabled, and execute your testing script.
   This example shows how easily with two orbs you can test your Node application and automatically deploy to Heroku when successful, and on the master branch.
 usage:
   version: 2.1
