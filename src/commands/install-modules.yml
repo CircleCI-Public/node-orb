@@ -65,6 +65,6 @@ steps:
       condition: << parameters.with-cache >>
       steps:
         - save_cache:
-            key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.cache-key>>" }}
+            key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
             paths:
               - <<parameters.app-dir>>/node_modules
