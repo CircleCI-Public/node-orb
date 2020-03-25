@@ -40,7 +40,7 @@ steps:
       working_directory: <<parameters.app-dir>>
       command: |
         SELECTED_PKG_MANAGER=<<parameters.pkg-manager>>
-        case SELECTED_PKG_MANAGER in
+        case $SELECTED_PKG_MANAGER in
           npm)
             npm run <<parameters.run-command>>
           ;;
