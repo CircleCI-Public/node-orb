@@ -33,7 +33,7 @@ steps:
   - checkout
   - steps: << parameters.setup >>
   - install-modules:
-      working_directory: <<parameters.app-dir>>
+      app-dir: <<parameters.app-dir>>
       pkg-manager: <<parameters.pkg-manager>>
   - run:
       name: Run Node Tests

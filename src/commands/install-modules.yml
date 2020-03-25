@@ -7,6 +7,10 @@ parameters:
     enum: ["npm", "yarn"]
     default: "npm"
     description: Select the default node package manager to use.
+  app-dir:
+    type: string
+    default: "~/project"
+    description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
   override-ci:
     type: boolean
     default: false
@@ -24,11 +28,6 @@ parameters:
     type: string
     default: package.json
     description: If this file is updated a new cache bucket will be created. Recommended to use package.json.
-  dir:
-    type: string
-    default: ~/project/node_modules
-    description: >
-      Filepath to your Node modules
   include-branch-in-cache-key:
     type: boolean
     default: true
@@ -44,6 +43,7 @@ steps:
               - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.cache-key>>" }}
   - run:
       name: Installing Node Modules.
+      working_directory: <<parameters.app-dir>>
       command: |
         case << parameters.pkg-manager >> in
           npm)
@@ -66,4 +66,4 @@ steps:
         - save_cache:
             key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.cache-key>>" }}
             paths:
-              - <<parameters.dir>>
+              - <<parameters.app-dir>>/node_modules
