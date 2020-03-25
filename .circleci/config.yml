@@ -18,7 +18,8 @@ parameters:
 integration-tests: &integration-tests
   [
     integration-test-install-linux,
-    integration-test-install-mac
+    integration-test-install-mac,
+    node-test-job
   ]
 
 jobs:
@@ -95,6 +96,9 @@ workflows:
       # integration tests of your choosing
       - integration-test-install-linux
       - integration-test-install-mac
+      - node/test:
+          name: node-test-job
+          app-dir: "~/project/sample"
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/node
           context: orb-publishing
