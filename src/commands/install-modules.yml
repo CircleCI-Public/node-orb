@@ -40,7 +40,7 @@ steps:
       steps:
         - restore_cache:
             keys:
-              - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.cache-key>>" }}
+              - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
   - run:
       name: Installing Node Modules.
       working_directory: <<parameters.app-dir>>
@@ -60,6 +60,7 @@ steps:
               yarn install --frozen-lockfile
             fi
           ;;
+        esac
   - when:
       condition: << parameters.with-cache >>
       steps:
