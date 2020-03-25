@@ -20,6 +20,10 @@ parameters:
     type: string
     default: "test"
     description: The name of the script within your package.json which will run your tests.
+  app-dir:
+    type: string
+    default: "~/project"
+    description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
 
 executor:
   name: default
@@ -29,9 +33,11 @@ steps:
   - checkout
   - steps: << parameters.setup >>
   - install-modules:
+      working_directory: <<parameters.app-dir>>
       pkg-manager: <<parameters.pkg-manager>>
   - run:
       name: Run Node Tests
+      working_directory: <<parameters.app-dir>>
       command: |
         SELECTED_PKG_MANAGER=<<parameters.pkg-manager>>
         case SELECTED_PKG_MANAGER in
