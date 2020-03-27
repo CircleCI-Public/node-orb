@@ -60,20 +60,6 @@ steps:
 
         # FUNCTIONS
 
-        nvm_check () {
-          if [[ -n "$NVM_DIR" ]]; then
-            echo "nvm (Node.js version manager) is installed; removing it to manually install the specified version of Node.js"
-
-            $SUDO rm -rf "$NVM_DIR"
-
-            perl -i -pe 's|export NVM_DIR=/opt/circleci/.nvm||' ~/.circlerc
-            perl -i -pe 's|source $NVM_DIR/nvm.sh||' ~/.circlerc
-
-            perl -i -pe 's|export NVM_DIR="/opt/circleci/.nvm"||' ~/.bashrc
-            perl -i -pe 's|[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm||' ~/.bashrc
-          fi
-        }
-
         get_node_version () {
           if [[ <<parameters.node-version>> == "" || <<parameters.node-version>> == "latest" || <<parameters.node-version>> == "current" ]]; then
             NODE_ORB_INSTALL_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} \
@@ -87,7 +73,6 @@ steps:
 
         installation_check () {
           if command -v node; then
-            nvm_check
 
             if node --version | grep "$NODE_ORB_INSTALL_VERSION"; then
 
@@ -127,7 +112,6 @@ steps:
         if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
           get_node_version
-          nvm_check
           installation_check
 
           # Configure Security Keys for verification of Download
