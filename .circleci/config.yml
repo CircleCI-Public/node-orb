@@ -19,7 +19,8 @@ integration-tests: &integration-tests
   [
     integration-test-install-linux,
     integration-test-install-mac,
-    node-test-job
+    node-test-job,
+    integration-test-install-linux-latest
   ]
 
 jobs:
@@ -114,6 +115,7 @@ workflows:
       # integration tests of your choosing
       - integration-test-install-linux
       - integration-test-install-mac
+      - integration-test-install-linux-latest
       - node/test:
           name: node-test-job
           app-dir: "~/project/sample"
