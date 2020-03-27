@@ -26,8 +26,8 @@ parameters:
     description: Change the default cache version if you need to clear the cache for any reason.
   cache-key:
     type: string
-    default: package.json
-    description: If this file is updated a new cache bucket will be created. Recommended to use package.json.
+    default: "package-lock.json"
+    description: If this file is updated a new cache bucket will be created. Recommended to use package-lock.json.
   include-branch-in-cache-key:
     type: boolean
     default: true
