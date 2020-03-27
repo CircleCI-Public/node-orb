@@ -7,7 +7,7 @@ usage:
   jobs:
     install-node-example:
       docker:
-        - image: cimg/python:3.8 # This image does not contain NodeJS
+        - image: cimg/base:stable # This image does not contain NodeJS
       steps:
         - checkout
         - node/install:
