@@ -9,7 +9,7 @@ parameters:
     type: string
     default: ""
     description: >
-      The latest version of nodeJS will be installed unless a version is specified. A full version tag must be specified. Example: "13.11.0"
+      The latest (current) version of NodeJS will be installed unless a version is specified. A full version tag must be specified. Example: "13.11.0"
       For a full list of releases, see the following: https://nodejs.org/en/download/releases
 
   node-install-dir:
@@ -75,7 +75,7 @@ steps:
         }
 
         get_node_version () {
-          if [[ <<parameters.node-version>> == "" ]]; then
+          if [[ <<parameters.node-version>> == "" || <<parameters.node-version>> == "latest" || <<parameters.node-version>> == "current" ]]; then
             NODE_ORB_INSTALL_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} \
               "https://github.com/nodejs/node/releases/latest" | sed 's:.*/::' | cut -d 'v' -f 2)
             echo "Latest version of Node.js is $NODE_ORB_INSTALL_VERSION"

@@ -36,6 +36,24 @@ jobs:
           command: |
             if ! node --version | grep -q "13"; then
               echo "Node version 13 not found"
+              exit 1
+            fi
+
+  integration-test-install-linux-latest:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - node/install:
+          node-version: "latest"
+      - run:
+          command: |
+            NODE_ORB_INSTALL_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} \
+              "https://github.com/nodejs/node/releases/latest" | sed 's:.*/::' | cut -d 'v' -f 2)
+            if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
+              echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
+              echo "Installed version: $(node --version)"
+              exit 1
             fi
 
   integration-test-install-mac:
