@@ -4,9 +4,9 @@ description: |
 parameters:
   version:
     type: string
-    default: ""
+    default: "13.11.0"
     description: >
-      The latest (current) version of NodeJS will be installed unless a version is specified. A full version tag must be specified. Example: "13.11.0"
+      A full version tag must be specified. Example: "13.11.0"
       For a full list of releases, see the following: https://nodejs.org/en/download/releases
   pkg-manager:
     type: enum
