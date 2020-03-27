@@ -33,7 +33,7 @@ executor:
 steps:
   - checkout
   - steps: << parameters.setup >>
-  - install-modules:
+  - install-packages:
       app-dir: <<parameters.app-dir>>
       pkg-manager: <<parameters.pkg-manager>>
   - run:

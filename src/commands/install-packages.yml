@@ -1,5 +1,5 @@
 description: >
-  Install your node modules with automated caching and best practices applied.
+  Install your Node packages with automated caching and best practices applied.
 
 parameters:
   pkg-manager:
