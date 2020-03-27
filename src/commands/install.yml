@@ -47,7 +47,7 @@ parameters:
 
 steps:
   - run:
-      name: Installing NodeJS
+      name: Installing NodeJS <<parameters.node-version>>
       command: |
         # PLATFORM CHECK: mac vs. alpine vs. other linux
 

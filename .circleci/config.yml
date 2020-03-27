@@ -48,6 +48,7 @@ jobs:
       - node/install:
           node-version: "latest"
       - run:
+          name: Check that latest NodeJS is installed.
           command: |
             NODE_ORB_INSTALL_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} \
               "https://github.com/nodejs/node/releases/latest" | sed 's:.*/::' | cut -d 'v' -f 2)
