@@ -5,12 +5,16 @@ usage:
   orbs:
     node: circleci/node@x.y # This version number refers to the version of the orb, not the version of NodeJS
   jobs:
-    test:
+    install-node-example:
       docker:
-        - image: cimg/python@3.8 # This image does not contain NodeJS
+        - image: cimg/python:3.8 # This image does not contain NodeJS
       steps:
         - checkout
         - node/install:
             node-version: latest
             install-yarn: true # Set to true if you would like to install Yarn. NPM will install automatically.
         - run: node --version
+  workflows:
+    test_my_app:
+      jobs:
+        - install-node-example
