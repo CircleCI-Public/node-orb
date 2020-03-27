@@ -5,7 +5,7 @@ usage:
   orbs:
     node: circleci/node@x.y # This version number refers to the version of the orb, not the version of NodeJS
   workflows:
-    test-and-deploy:
+    matrix-tests:
       jobs:
         - node/test:
             version: "13.11.0" # Set your node version via the "version" parameter for each testing job.
