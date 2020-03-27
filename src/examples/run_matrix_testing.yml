@@ -1,0 +1,15 @@
+description: |
+  Easily test your application against multiple versions of NodeJS in just a few lines.
+usage:
+  version: 2.1
+  orbs:
+    node: circleci/node@x.y # This version number refers to the version of the orb, not the version of NodeJS
+  workflows:
+    matrix-tests:
+      jobs:
+        - node/test:
+            version: "13.11.0" # Set your node version via the "version" parameter for each testing job.
+        - node/test:
+            version: "12.16.0"
+        - node/test:
+            version: "10.19.0"

@@ -1,0 +1,70 @@
+description: >
+  Install your Node packages with automated caching and best practices applied.
+
+parameters:
+  pkg-manager:
+    type: enum
+    enum: ["npm", "yarn"]
+    default: "npm"
+    description: Select the default node package manager to use.
+  app-dir:
+    type: string
+    default: "~/project"
+    description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
+  override-ci:
+    type: boolean
+    default: false
+    description: |
+      By default, modules will be installed with "npm ci" or "yarn install --frozen-lockfile", this override will use the standard "install" command.
+  with-cache:
+    type: boolean
+    default: true
+    description: Enable automatic caching of your node dependancies for increased speed.
+  cache-version:
+    type: string
+    default: v1
+    description: Change the default cache version if you need to clear the cache for any reason.
+  cache-key:
+    type: string
+    default: "package-lock.json"
+    description: If this file is updated a new cache bucket will be created. Recommended to use package-lock.json.
+  include-branch-in-cache-key:
+    type: boolean
+    default: true
+    description: >
+      If true, this cache bucket will only apply to jobs within the same branch.
+
+steps:
+  - when:
+      condition: << parameters.with-cache >>
+      steps:
+        - restore_cache:
+            keys:
+              - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+  - run:
+      name: Installing Node Modules.
+      working_directory: <<parameters.app-dir>>
+      command: |
+        case << parameters.pkg-manager >> in
+          npm)
+            if [[ << parameters.override-ci >> ]]; then
+              npm install
+            else
+              npm ci
+            fi
+          ;;
+          yarn)
+            if [[ << parameters.override-ci >> ]]; then
+              yarn install
+            else
+              yarn install --frozen-lockfile
+            fi
+          ;;
+        esac
+  - when:
+      condition: << parameters.with-cache >>
+      steps:
+        - save_cache:
+            key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+            paths:
+              - <<parameters.app-dir>>/node_modules

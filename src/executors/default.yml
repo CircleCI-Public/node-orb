@@ -1,14 +1,14 @@
-description: >
-  CircleCI's Node convenience image:
-  https://hub.docker.com/r/circleci/node
+description: |
+  Select the version of NodeJS to use. Uses CircleCI's highly cached convenience images built for CI.
+  Any available tag from this list can be used: https://hub.docker.com/r/cimg/node/tags
 
 parameters:
   tag:
     type: string
-    default: "latest"
+    default: "13.11"
     description: >
-      Pick a specific circleci/node image variant:
-      https://hub.docker.com/r/circleci/node/tags
+      Pick a specific cimg/node image version tag:
+      https://hub.docker.com/r/cimg/node
 
 docker:
-  - image: circleci/node:<<parameters.tag>>
+  - image: cimg/node:<<parameters.tag>>

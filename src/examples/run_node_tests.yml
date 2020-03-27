@@ -1,0 +1,19 @@
+description: |
+  Drop-in solution to automatically test your NodeJS applications. This job will automatically download your code into any version node environment, install your dependencies with caching enabled, and execute your testing script.
+  This example shows how easily with two orbs you can test your Node application and automatically deploy to Heroku when successful, and on the master branch.
+usage:
+  version: 2.1
+  orbs:
+    node: circleci/node@x.y # This version number refers to the version of the orb, not the version of NodeJS
+    heroku: circleci/heroku@x.y
+  workflows:
+    test-and-deploy:
+      jobs:
+        - node/test
+        - heroku/deploy-via-git:
+            requires:
+              - node/test
+            filters:
+              branches:
+                only:
+                  - master

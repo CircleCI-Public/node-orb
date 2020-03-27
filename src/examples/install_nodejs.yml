@@ -1,0 +1,20 @@
+description: |
+  Download and install any version of NodeJS. Optionally installs Yarn with a parameter. For production pipelines, we highly recommend installing NodeJS into your Docker image, or utilizing one of our Node convenience images. You may use the default executor of this orb for a Node execution evironment as well.
+usage:
+  version: 2.1
+  orbs:
+    node: circleci/node@x.y # This version number refers to the version of the orb, not the version of NodeJS
+  jobs:
+    install-node-example:
+      docker:
+        - image: cimg/base:stable # This image does not contain NodeJS
+      steps:
+        - checkout
+        - node/install:
+            node-version: latest
+            install-yarn: true # Set to true if you would like to install Yarn. NPM will install automatically.
+        - run: node --version
+  workflows:
+    test_my_app:
+      jobs:
+        - install-node-example

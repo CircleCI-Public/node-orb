@@ -1,48 +1,51 @@
 description: |
-  Install npm dependencies then run tests
+  Simple drop-in job to test your NodeJS application automatically.
 
 parameters:
-  tag:
+  version:
     type: string
-    default: "latest"
+    default: "13.11.0"
     description: >
-      Pick a specific circleci/node image variant:
-      https://hub.docker.com/r/circleci/node/tags
-  test-command:
-    type: string
-    default: "npm test"
-    description: >
-      The command to be used for running tests
-  test-results-path:
-    type: string
-    default: ""
-    description: >
-      Folder container junit test results files to be saved
-  before-tests:
+      A full version tag must be specified. Example: "13.11.0"
+      For a full list of releases, see the following: https://nodejs.org/en/download/releases
+  pkg-manager:
+    type: enum
+    enum: ["npm", "yarn"]
+    default: "npm"
+    description: Select the default node package manager to use.
+  setup:
     type: steps
+    description: Provide any optitonal steps you would like to run prior to installing the node dependencies. This is a good place to install global modules.
     default: []
-    description: >
-      Run extra steps before the tests
-  after-tests:
-    type: steps
-    default: []
-    description: >
-      Run extra steps after the tests
+  run-command:
+    type: string
+    default: "test"
+    description: The name of the script within your package.json which will run your tests.
+  app-dir:
+    type: string
+    default: "~/project"
+    description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
 
 executor:
   name: default
-  tag: << parameters.tag >>
+  tag: << parameters.version >>
 
 steps:
   - checkout
-  - npm-ci
-  - steps: << parameters.before-tests >>
-  - run: << parameters.test-command >>
-  - steps: << parameters.after-tests >>
-  - when:
-      condition: << parameters.test-results-path >>
-      steps:
-        - store_artifacts:
-            path: << parameters.test-results-path >>
-        - store_test_results:
-            path: << parameters.test-results-path >>
+  - steps: << parameters.setup >>
+  - install-packages:
+      app-dir: <<parameters.app-dir>>
+      pkg-manager: <<parameters.pkg-manager>>
+  - run:
+      name: Run Node Tests
+      working_directory: <<parameters.app-dir>>
+      command: |
+        SELECTED_PKG_MANAGER=<<parameters.pkg-manager>>
+        case $SELECTED_PKG_MANAGER in
+          npm)
+            npm run <<parameters.run-command>>
+          ;;
+          yarn)
+            yarn <<parameters.run-command>>
+          ;;
+        esac
