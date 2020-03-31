@@ -45,7 +45,7 @@ steps:
       name: Installing Node Modules.
       working_directory: <<parameters.app-dir>>
       command: |
-        if [ ! -f "<<parameters.app-dir>>/package.json" ]; then
+        if [ ! -f "package.json" ]; then
           echo
           echo "---"
           echo "Unable to find your package.json file. Did you forget to set the app-dir parameter?"
