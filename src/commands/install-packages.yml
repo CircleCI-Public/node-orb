@@ -19,7 +19,7 @@ parameters:
   with-cache:
     type: boolean
     default: true
-    description: Enable automatic caching of your node dependancies for increased speed.
+    description: Enable automatic caching of your node dependencies for increased speed.
   cache-version:
     type: string
     default: v1
