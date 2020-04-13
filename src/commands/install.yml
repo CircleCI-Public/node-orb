@@ -9,7 +9,8 @@ parameters:
     type: string
     default: ''
     description: >
-      The latest (current) version of NodeJS will be installed unless a version is specified. A full version tag must be specified. Example: "13.11.0"
+      You may specify a full version tag ("13.11.0"), "latest", "current", "lts", or "stable".
+      The latest (current) version of NodeJS will be installed by default.
       For a full list of releases, see the following: https://nodejs.org/en/download/releases
 
   node-install-dir:
