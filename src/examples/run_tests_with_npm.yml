@@ -12,7 +12,7 @@ usage:
       steps:
         - checkout
         - node/install-packages
-        - npm run test
+        - run: npm run test
   workflows:
     test_my_app:
       jobs:
