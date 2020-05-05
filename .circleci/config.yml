@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   node: circleci/node@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@9.0
+  orb-tools: circleci/orb-tools@9.1
 
 # Pipeline parameters
 parameters:
@@ -17,11 +17,19 @@ parameters:
 
 integration-tests: &integration-tests
   [
-    integration-test-install-linux,
-    integration-test-install-mac,
+    integration-test-install-specified-version,
+    integration-test-install-lts
     node-test-job,
-    integration-test-install-linux-latest
+    integration-test-install-latest
   ]
+
+executors:
+  linux:
+    docker:
+      - image: cimg/base:stable
+  macos:
+    macos:
+      xcode: 11.4
 
 commands:
   install-nvm:
@@ -36,9 +44,11 @@ commands:
 
 jobs:
 # Install NodeJS into a non-node container.
-  integration-test-install-linux:
-    docker:
-      - image: cimg/base:stable
+  integration-test-install-specified-version:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - node/install:
@@ -51,9 +61,11 @@ jobs:
               exit 1
             fi
 
-  integration-test-install-linux-latest:
-    docker:
-      - image: cimg/base:stable
+  integration-test-install-latest:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - node/install:
@@ -70,9 +82,11 @@ jobs:
               exit 1
             fi
 
-  integration-test-install-linux-lts:
-    docker:
-      - image: cimg/base:stable
+  integration-test-install-lts:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - node/install:
@@ -89,20 +103,6 @@ jobs:
               exit 1
             fi
 
-  integration-test-install-mac:
-    macos:
-      xcode: 11.4.0
-    steps:
-      - checkout
-      - node/install:
-          node-version: "13.11.0"
-          install-yarn: true # Test the install of YARN
-      - run:
-          command: |
-            if ! node --version | grep -q "13"; then
-              echo "Node version 13 not found"
-            fi
-
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
@@ -114,6 +114,12 @@ workflows:
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack
 
+      - approve_for_testing:
+          type: approval
+          requires:
+            - orb-tools/pack
+            - orb-tools/lint
+
       # release dev version of orb, for testing & possible publishing.
       # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
       # requires a CircleCI API token to be stored as CIRCLE_TOKEN (default)
@@ -124,8 +130,7 @@ workflows:
           orb-name: circleci/node
           context: orb-publishing
           requires:
-            - orb-tools/pack
-            - orb-tools/lint
+            - approve_for_testing
 
       # trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb
@@ -145,10 +150,18 @@ workflows:
       # your integration test jobs go here: essentially, run all your orb's
       # jobs and commands to ensure they behave as expected. or, run other
       # integration tests of your choosing
-      - integration-test-install-linux
-      - integration-test-install-mac
-      - integration-test-install-linux-latest
-      - integration-test-install-linux-lts
+      - integration-test-install-specified-version:
+          matrix:
+            parameters:
+              os: [linux, macos]
+      - integration-test-install-latest:
+          matrix:
+            parameters:
+              os: [linux, macos]
+      - integration-test-install-lts:
+          matrix:
+            parameters:
+              os: [linux, macos]
       - node/test:
           name: node-test-job
           app-dir: "~/project/sample"
