@@ -18,7 +18,7 @@ parameters:
 integration-tests: &integration-tests
   [
     integration-test-install-specified-version,
-    integration-test-install-lts
+    integration-test-install-lts,
     node-test-job,
     integration-test-install-latest
   ]
