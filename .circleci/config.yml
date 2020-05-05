@@ -23,6 +23,17 @@ integration-tests: &integration-tests
     integration-test-install-linux-latest
   ]
 
+commands:
+  install-nvm:
+    steps:
+      - run:
+          name: Install nvm
+          command: |
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+            NVM_DIR="$HOME/.nvm"
+            echo "export NVM_DIR=\"$HOME/.nvm\"" >> $BASH_ENV
+            echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
+
 jobs:
 # Install NodeJS into a non-node container.
   integration-test-install-linux:
@@ -47,14 +58,34 @@ jobs:
       - checkout
       - node/install:
           node-version: "latest"
+      - install-nvm
       - run:
           name: Check that latest NodeJS is installed.
           command: |
-            NODE_ORB_INSTALL_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} \
-              "https://github.com/nodejs/node/releases/latest" | sed 's:.*/::' | cut -d 'v' -f 2)
+            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | awk '{print $1}')
+            echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
+            echo "Installed version: $(node --version)"
             if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
-              echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
-              echo "Installed version: $(node --version)"
+              echo "Error: Installed version is different from the latest version."
+              exit 1
+            fi
+
+  integration-test-install-linux-lts:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - node/install:
+          node-version: "lts"
+      - install-nvm
+      - run:
+          name: Check that the latest LTS version of NodeJS is installed.
+          command: |
+            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | grep 'Latest LTS' | tail -n1 | awk '{print $1}')
+            echo "Latest Node LTS version = $NODE_ORB_INSTALL_VERSION"
+            echo "Installed version: $(node --version)"
+            if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
+              echo "Error: Installed version is different from the latest LTS version."
               exit 1
             fi
 
@@ -117,6 +148,7 @@ workflows:
       - integration-test-install-linux
       - integration-test-install-mac
       - integration-test-install-linux-latest
+      - integration-test-install-linux-lts
       - node/test:
           name: node-test-job
           app-dir: "~/project/sample"
