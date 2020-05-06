@@ -71,7 +71,7 @@ steps:
             echo "Latest version of Node.js is $NODE_ORB_INSTALL_VERSION"
           elif [[ <<parameters.node-version>> == "lts" || <<parameters.node-version>> == "stable" ]]; then
             # Codename is last field, first one with a name is newest lts
-            NODE_ORB_INSTALL_VERSION=$(get_node_index | grep -E "\t[a-zA-Z]+\$" | awk "NR<=1" | cut -f 1 | grep -E -o '[^v].*')
+            NODE_ORB_INSTALL_VERSION=$(get_node_index | grep -E "[[:space:]][a-zA-Z]+\$" | awk "NR<=1" | cut -f 1 | grep -E -o '[^v].*')
             echo "Latest LTS version of Node.js is $NODE_ORB_INSTALL_VERSION"
           else
             NODE_ORB_INSTALL_VERSION="<<parameters.node-version>>"
