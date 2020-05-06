@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   node: circleci/node@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@9.0
+  orb-tools: circleci/orb-tools@9.1
 
 # Pipeline parameters
 parameters:
@@ -17,17 +17,38 @@ parameters:
 
 integration-tests: &integration-tests
   [
-    integration-test-install-linux,
-    integration-test-install-mac,
+    integration-test-install-specified-version,
+    integration-test-install-lts,
     node-test-job,
-    integration-test-install-linux-latest
+    integration-test-install-latest
   ]
+
+executors:
+  linux:
+    docker:
+      - image: cimg/base:stable
+  macos:
+    macos:
+      xcode: 11.4
+
+commands:
+  install-nvm:
+    steps:
+      - run:
+          name: Install nvm
+          command: |
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+            NVM_DIR="$HOME/.nvm"
+            echo "export NVM_DIR=\"$HOME/.nvm\"" >> $BASH_ENV
+            echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
 
 jobs:
 # Install NodeJS into a non-node container.
-  integration-test-install-linux:
-    docker:
-      - image: cimg/base:stable
+  integration-test-install-specified-version:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - node/install:
@@ -40,36 +61,46 @@ jobs:
               exit 1
             fi
 
-  integration-test-install-linux-latest:
-    docker:
-      - image: cimg/base:stable
+  integration-test-install-latest:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - node/install:
           node-version: "latest"
+      - install-nvm
       - run:
           name: Check that latest NodeJS is installed.
           command: |
-            NODE_ORB_INSTALL_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} \
-              "https://github.com/nodejs/node/releases/latest" | sed 's:.*/::' | cut -d 'v' -f 2)
+            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | awk '{print $1}')
+            echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
+            echo "Installed version: $(node --version)"
             if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
-              echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
-              echo "Installed version: $(node --version)"
+              echo "Error: Installed version is different from the latest version."
               exit 1
             fi
 
-  integration-test-install-mac:
-    macos:
-      xcode: 11.4.0
+  integration-test-install-lts:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
     steps:
       - checkout
       - node/install:
-          node-version: "13.11.0"
-          install-yarn: true # Test the install of YARN
+          node-version: "lts"
+      - install-nvm
       - run:
+          name: Check that the latest LTS version of NodeJS is installed.
           command: |
-            if ! node --version | grep -q "13"; then
-              echo "Node version 13 not found"
+            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | grep 'Latest LTS' | tail -n1 | awk '{print $1}')
+            echo "Latest Node LTS version = $NODE_ORB_INSTALL_VERSION"
+            echo "Installed version: $(node --version)"
+            if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
+              echo "Error: Installed version is different from the latest LTS version."
+              exit 1
             fi
 
 
@@ -83,6 +114,12 @@ workflows:
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack
 
+      - approve_for_testing:
+          type: approval
+          requires:
+            - orb-tools/pack
+            - orb-tools/lint
+
       # release dev version of orb, for testing & possible publishing.
       # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
       # requires a CircleCI API token to be stored as CIRCLE_TOKEN (default)
@@ -93,8 +130,7 @@ workflows:
           orb-name: circleci/node
           context: orb-publishing
           requires:
-            - orb-tools/pack
-            - orb-tools/lint
+            - approve_for_testing
 
       # trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb
@@ -114,9 +150,18 @@ workflows:
       # your integration test jobs go here: essentially, run all your orb's
       # jobs and commands to ensure they behave as expected. or, run other
       # integration tests of your choosing
-      - integration-test-install-linux
-      - integration-test-install-mac
-      - integration-test-install-linux-latest
+      - integration-test-install-specified-version:
+          matrix:
+            parameters:
+              os: [linux, macos]
+      - integration-test-install-latest:
+          matrix:
+            parameters:
+              os: [linux, macos]
+      - integration-test-install-lts:
+          matrix:
+            parameters:
+              os: [linux, macos]
       - node/test:
           name: node-test-job
           app-dir: "~/project/sample"
