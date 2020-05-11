@@ -68,7 +68,7 @@ steps:
             fi
           ;;
           yarn)
-            if [[ "<< parameters.override-ci >> == "true" ]]; then
+            if [[ "<< parameters.override-ci >>" == "true" ]]; then
               yarn install
             else
               yarn install --frozen-lockfile
