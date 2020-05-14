@@ -7,6 +7,6 @@ usage:
   workflows:
     test-and-deploy:
       jobs:
-        - node/test
+        - node/test:
             pkg-manager: yarn
             cache-key: "yarn.lock"
