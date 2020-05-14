@@ -92,4 +92,4 @@ steps:
         - save_cache:
             key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
             paths:
-              - <<parameters.cache_path>
+              - <<parameters.cache_path>>
