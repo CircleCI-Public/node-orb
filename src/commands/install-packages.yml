@@ -22,6 +22,9 @@ parameters:
       Supply a custom package installation command, with any additional flags needed.
     type: string
     default: ""
+  cache_path:
+    description: |
+      By default, this orb will utilize 'npm ci' and cache the '$HOME/.npm' directory. Override which path to cache with this parameter.
   with-cache:
     type: boolean
     default: true
@@ -75,7 +78,7 @@ steps:
           ;;
           yarn)
             if [[ "<< parameters.override-ci >>" == "true" ]]; then
-              << parameters.override-ci-command>>
+              yarn install
             else
               yarn install --frozen-lockfile
             fi
@@ -87,4 +90,4 @@ steps:
         - save_cache:
             key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
             paths:
-              - <<parameters.app-dir>>/node_modules
+              - <<parameters.cache_path>
