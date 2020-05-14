@@ -61,14 +61,14 @@ steps:
         fi
         case << parameters.pkg-manager >> in
           npm)
-            if [[ << parameters.override-ci >> ]]; then
+            if [[ "<< parameters.override-ci >>" == "true" ]]; then
               npm install
             else
               npm ci
             fi
           ;;
           yarn)
-            if [[ << parameters.override-ci >> ]]; then
+            if [[ "<< parameters.override-ci >>" == "true" ]]; then
               yarn install
             else
               yarn install --frozen-lockfile
