@@ -76,22 +76,23 @@ steps:
               if [[ -z "<< parameters.override-ci-command >>" ]]; then
                 echo "override-ci selected but no override-ci-command found"
                 exit 1
-              elif
+              else
                 << parameters.override-ci-command >>
               fi
-            elif
+            else
               npm ci
             fi
           ;;
           yarn)
             if [[ "<< parameters.override-ci >>" == "true" ]]; then
-              if [[ "<< parameters.override-ci-command >>" == "" ]]; then
+              if [[ -z "<< parameters.override-ci-command >>" ]]; then
                 echo "override-ci selected but no override-ci-command found"
                 exit 1
-              elif
+              else
+                echo "Running override package installation command:"
                 << parameters.override-ci-command >>
               fi
-            elif
+            else
               yarn install --frozen-lockfile
             fi
           ;;
