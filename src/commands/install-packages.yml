@@ -73,14 +73,24 @@ steps:
         case << parameters.pkg-manager >> in
           npm)
             if [[ "<< parameters.override-ci >>" == "true" ]]; then
-              << parameters.override-ci-command>>
+              if [[ "<< parameters.override-ci-command >>" == "" ]]; then
+                echo "override-ci selected but no override-ci-command found"
+                exit 1
+              else
+                << parameters.override-ci-command >>
+              fi
             else
               npm ci
             fi
           ;;
           yarn)
             if [[ "<< parameters.override-ci >>" == "true" ]]; then
-              yarn install
+              if [[ "<< parameters.override-ci-command >>" == "" ]]; then
+                echo "override-ci selected but no override-ci-command found"
+                exit 1
+              else
+                << parameters.override-ci-command >>
+              fi
             else
               yarn install --frozen-lockfile
             fi
