@@ -25,6 +25,8 @@ parameters:
   cache_path:
     description: |
       By default, this orb will utilize 'npm ci' and cache the '$HOME/.npm' directory. Override which path to cache with this parameter.
+    type: string
+    default: $HOME/.npm
   with-cache:
     type: boolean
     default: true
