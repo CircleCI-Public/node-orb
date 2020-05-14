@@ -1,0 +1,22 @@
+description: |
+  Utilize the YARN package manager utilizing the Node orb.
+usage:
+  version: 2.1
+  orbs:
+    node: circleci/node:x.y # This version number refers to the version of the orb, not the version of NodeJS
+  jobs:
+    test:
+      executor:
+        name: node/default
+        tag: "13" # You could specify the node version via the docker image.
+      steps:
+        - checkout
+        - node/install-packages:
+          cache-key: yarn.lock
+          pkg-manager: yarn
+        - run:
+            command: yarn test
+  workflows:
+    test_my_app:
+      jobs:
+        - test

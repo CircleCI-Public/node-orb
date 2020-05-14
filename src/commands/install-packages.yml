@@ -16,6 +16,12 @@ parameters:
     default: false
     description: |
       By default, modules will be installed with "npm ci" or "yarn install --frozen-lockfile", this override will use the standard "install" command.
+  override-ci-command:
+    # In the next major release, the boolean is not required. Adding a new param now in favor of triggering a major change.
+    description: |
+      Supply a custom package installation command, with any additional flags needed.
+    type: string
+    default: ""
   with-cache:
     type: boolean
     default: true
@@ -62,14 +68,14 @@ steps:
         case << parameters.pkg-manager >> in
           npm)
             if [[ "<< parameters.override-ci >>" == "true" ]]; then
-              npm install
+              << parameters.override-ci-command>>
             else
               npm ci
             fi
           ;;
           yarn)
             if [[ "<< parameters.override-ci >>" == "true" ]]; then
-              yarn install
+              << parameters.override-ci-command>>
             else
               yarn install --frozen-lockfile
             fi
