@@ -1,0 +1,12 @@
+description: |
+  Drop-in solution to automatically test your NodeJS applications. This job will automatically download your code into any version node environment, install your dependencies using yarn with caching enabled, and execute your testing script.
+usage:
+  version: 2.1
+  orbs:
+    node: circleci/node@x.y # This version number refers to the version of the orb, not the version of NodeJS
+  workflows:
+    test-and-deploy:
+      jobs:
+        - node/test
+            pkg-manager: yarn
+            cache-key: "yarn.lock"
