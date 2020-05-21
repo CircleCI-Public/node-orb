@@ -11,14 +11,9 @@ parameters:
     type: string
     default: "~/project"
     description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
-  override-ci:
-    type: boolean
-    default: false
-    description: |
-      By default, modules will be installed with "npm ci" or "yarn install --frozen-lockfile", this override will use the standard "install" command.
   override-ci-command:
-    # In the next major release, the boolean is not required. Adding a new param now in favor of triggering a major change.
     description: |
+      By default, packages will be installed with "npm ci" or "yarn install --frozen-lockfile", this override will use the standard "install" command.
       Supply a custom package installation command, with any additional flags needed.
     type: string
     default: ""
@@ -72,27 +67,17 @@ steps:
         fi
         case << parameters.pkg-manager >> in
           npm)
-            if [[ "<< parameters.override-ci >>" == "true" ]]; then
-              if [[ -z "<< parameters.override-ci-command >>" ]]; then
-                echo "override-ci selected but no override-ci-command found"
-                exit 1
-              else
-                echo "Running override package installation command:"
-                << parameters.override-ci-command >>
-              fi
+            if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
+              echo "Running override package installation command:"
+              << parameters.override-ci-command >>
             else
               npm ci
             fi
           ;;
           yarn)
-            if [[ "<< parameters.override-ci >>" == "true" ]]; then
-              if [[ -z "<< parameters.override-ci-command >>" ]]; then
-                echo "override-ci selected but no override-ci-command found"
-                exit 1
-              else
-                echo "Running override package installation command:"
-                << parameters.override-ci-command >>
-              fi
+            if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
+              echo "Running override package installation command:"
+              << parameters.override-ci-command >>
             else
               yarn install --frozen-lockfile
             fi

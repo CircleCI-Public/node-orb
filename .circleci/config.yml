@@ -109,7 +109,6 @@ jobs:
     steps:
       - checkout
       - node/install-packages:
-          override-ci: true
           override-ci-command: npm install
           cache-path: ~/project/node_modules
           cache-version: override-v1
