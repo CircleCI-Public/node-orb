@@ -1,7 +1,9 @@
-description: >
+description: |
   Install custom versions of NodeJS, and optionally NPM/Yarn, in any
   execution environment (Docker/Linux, macOS, machine) that does not have
-  it preinstalled
+  it preinstalled. 
+
+  Recommendation: It is highly recommended to utilize an environment such as Docker with Node preinstalled.
 
 parameters:
   # node
