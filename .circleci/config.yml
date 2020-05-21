@@ -114,7 +114,7 @@ jobs:
           cache-path: ~/project/node_modules
           cache-version: override-v1
           app-dir: "~/project/sample"
-      - run: npm run test
+      - run: cd ~/project/sample && npm run test
 
 
 workflows:
