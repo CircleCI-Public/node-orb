@@ -12,8 +12,9 @@ usage:
       steps:
         - checkout
         - node/install-packages:
-            cache-key: yarn.lock
             pkg-manager: yarn
+            cache-key: yarn.lock
+            cache-path: ~/project/node_modules
         - run:
             command: yarn test
   workflows:
