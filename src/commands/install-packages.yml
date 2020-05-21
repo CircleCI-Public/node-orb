@@ -13,7 +13,7 @@ parameters:
     description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
   override-ci-command:
     description: |
-      By default, packages will be installed with "npm ci" or "yarn install --frozen-lockfile", this override will use the standard "install" command.
+      By default, packages will be installed with "npm ci" or "yarn install --frozen-lockfile".
       Supply a custom package installation command, with any additional flags needed.
     type: string
     default: ""
@@ -76,8 +76,8 @@ steps:
           ;;
           yarn)
             if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
-              echo "Running override package installation command:"
-              << parameters.override-ci-command >>
+                echo "Running override package installation command:"
+                << parameters.override-ci-command >>
             else
               yarn install --frozen-lockfile
             fi
