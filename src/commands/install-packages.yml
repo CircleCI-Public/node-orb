@@ -105,7 +105,7 @@ steps:
                         key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
                         paths:
                           - $HOME/.npm
-  
+
   - when: # Install packages based on YARN
       condition:
         equal: [yarn, << parameters.pkg-manager >>]
