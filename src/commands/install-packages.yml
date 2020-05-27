@@ -32,8 +32,8 @@ parameters:
     description: Change the default cache version if you need to clear the cache for any reason.
   cache-key:
     type: string
-    default: "package-lock.json"
-    description: If this file is updated a new cache bucket will be created. Recommended to use package-lock.json.
+    default: ""
+    description: Defaults to "package-lock.json" for NPM and "yarn.lock" for YARN.
   include-branch-in-cache-key:
     type: boolean
     default: true
@@ -41,12 +41,6 @@ parameters:
       If true, this cache bucket will only apply to jobs within the same branch.
 
 steps:
-  - when:
-      condition: << parameters.with-cache >>
-      steps:
-        - restore_cache:
-            keys:
-              - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
   - run:
       name: Checking for package.json.
       working_directory: <<parameters.app-dir>>
@@ -69,6 +63,21 @@ steps:
       condition:
         equal: [npm, << parameters.pkg-manager >>]
       steps:
+        - when: # Restore cache for NPM
+            condition: << parameters.with-cache >>
+            steps:
+              - unless: # default package-lock.json
+                  condition: << parameters.with-cache >>
+                  steps:
+                    - restore_cache:
+                        keys:
+                          - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/package-lock.json" }}
+              - when: # Custom cache key
+                  condition: << parameters.with-cache >>
+                  steps:
+                    - restore_cache:
+                        keys:
+                          - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
         - run:
             name: Installing NPM packages
             working_directory: <<parameters.app-dir>>
@@ -100,6 +109,21 @@ steps:
       condition:
         equal: [yarn, << parameters.pkg-manager >>]
       steps:
+        - when: # Restore cache for NPM
+            condition: << parameters.with-cache >>
+            steps:
+              - unless: # default yarn.lock
+                  condition: << parameters.with-cache >>
+                  steps:
+                    - restore_cache:
+                        keys:
+                          - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/yarn.lock" }}
+              - when: # Custom cache key
+                  condition: << parameters.with-cache >>
+                  steps:
+                    - restore_cache:
+                        keys:
+                          - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
         - run:
             name: Installing YARN packages
             working_directory: <<parameters.app-dir>>
