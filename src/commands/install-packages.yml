@@ -71,6 +71,7 @@ steps:
       steps:
         - run:
             name: Installing NPM packages
+            working_directory: <<parameters.app-dir>>
             command: |
               if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
                 echo "Running override package installation command:"
@@ -101,6 +102,7 @@ steps:
       steps:
         - run:
             name: Installing YARN packages
+            working_directory: <<parameters.app-dir>>
             command: |
               if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
                 echo "Running override package installation command:"
