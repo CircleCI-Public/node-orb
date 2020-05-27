@@ -13,7 +13,6 @@ usage:
         - checkout
         - node/install-packages:
             pkg-manager: yarn
-            cache-key: yarn.lock
             cache-path: ~/project/node_modules
         - run:
             command: yarn test

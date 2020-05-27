@@ -82,7 +82,7 @@ steps:
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/package-lock.json" }}
                         paths:
                           - <<parameters.cache-path>>
               - unless: # npm ci cache path
@@ -120,7 +120,7 @@ steps:
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/yarn.lock" }}
                         paths:
                           - <<parameters.cache-path>>
               - unless: # use node modules
