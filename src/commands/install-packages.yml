@@ -7,6 +7,10 @@ parameters:
     enum: ["npm", "yarn"]
     default: "npm"
     description: Select the default node package manager to use.
+  with-cache:
+    type: boolean
+    default: true
+    description: Cache your node packages automatically for faster install times.
   app-dir:
     type: string
     default: "~/project"
@@ -21,11 +25,7 @@ parameters:
     description: |
       By default, this orb will utilize 'npm ci' and cache the '$HOME/.npm' directory. Override which path to cache with this parameter.
     type: string
-    default: $HOME/.npm
-  with-cache:
-    type: boolean
-    default: true
-    description: Enable automatic caching of your node dependencies for increased speed.
+    default: ""
   cache-version:
     type: string
     default: v1
@@ -48,7 +48,7 @@ steps:
             keys:
               - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
   - run:
-      name: Installing Node Modules.
+      name: Checking for package.json.
       working_directory: <<parameters.app-dir>>
       command: |
         if [ ! -f "package.json" ]; then
@@ -65,28 +65,63 @@ steps:
           ls
           exit 1
         fi
-        case << parameters.pkg-manager >> in
-          npm)
-            if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
-              echo "Running override package installation command:"
-              << parameters.override-ci-command >>
-            else
-              npm ci
-            fi
-          ;;
-          yarn)
-            if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
+  - when: # Install packages based on NPM
+      condition:
+        - equal: [npm, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: Installing NPM packages
+            command: |
+              if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
                 echo "Running override package installation command:"
                 << parameters.override-ci-command >>
-            else
-              yarn install --frozen-lockfile
-            fi
-          ;;
-        esac
-  - when:
-      condition: << parameters.with-cache >>
+              else
+                npm ci
+              fi
+        - when: # cache enabled, save cache
+            condition: << parameters.with-cache >>
+            steps:
+              - when: # custom cache path selected
+                  condition: << parameters.cache-path >>
+                  steps:
+                    - save_cache:
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+                        paths:
+                          - <<parameters.cache-path>>
+              - unless: # npm ci cache path
+                  condition: << parameters.cache-path >>
+                  steps:
+                    - save_cache:
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+                        paths:
+                          - $HOME/.npm
+  - when: # Install packages based on YARN
+      condition:
+        - equal: [yarn, << parameters.pkg-manager >>]
       steps:
-        - save_cache:
-            key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
-            paths:
-              - <<parameters.cache-path>>
+        - run:
+            name: Installing YARN packages
+            command: |
+              if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
+                echo "Running override package installation command:"
+                << parameters.override-ci-command >>
+              else
+                yarn install --frozen-lockfile
+              fi
+        - when: # cache enabled, save cache
+            condition: << parameters.with-cache >>
+            steps:
+              - when: # custom cache path selected
+                  condition: << parameters.cache-path >>
+                  steps:
+                    - save_cache:
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+                        paths:
+                          - <<parameters.cache-path>>
+              - unless: # use node modules
+                  condition: << parameters.cache-path >>
+                  steps:
+                    - save_cache:
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+                        paths:
+                          - <<parameters.app-dir>>/node_modules
