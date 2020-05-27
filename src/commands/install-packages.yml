@@ -67,7 +67,7 @@ steps:
         fi
   - when: # Install packages based on NPM
       condition:
-        - equal: [npm, << parameters.pkg-manager >>]
+        equal: [npm, << parameters.pkg-manager >>]
       steps:
         - run:
             name: Installing NPM packages
@@ -98,7 +98,7 @@ steps:
                           - $HOME/.npm
   - when: # Install packages based on YARN
       condition:
-        - equal: [yarn, << parameters.pkg-manager >>]
+        equal: [yarn, << parameters.pkg-manager >>]
       steps:
         - run:
             name: Installing YARN packages

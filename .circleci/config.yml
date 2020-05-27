@@ -21,7 +21,8 @@ integration-tests: &integration-tests
     integration-test-install-lts,
     node-test-job,
     integration-test-install-latest,
-    integration-test-override-ci
+    integration-test-override-ci,
+    integration-test-yarn
   ]
 
 executors:
@@ -114,6 +115,15 @@ jobs:
           cache-version: override-v1
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && npm run test
+  integration-test-yarn:
+      executor: node/default
+      steps:
+        - checkout
+        - node/install-packages:
+            pkg-manager: yarn
+            cache-version: yarn-v1
+            app-dir: "~/project/sample"
+        - run: cd ~/project/sample && yarn test
 
 
 workflows:
@@ -178,6 +188,7 @@ workflows:
           name: node-test-job
           app-dir: "~/project/sample"
       - integration-test-override-ci
+      - integration-test-yarn
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/node
           context: orb-publishing
