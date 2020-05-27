@@ -105,21 +105,22 @@ steps:
                         key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
                         paths:
                           - $HOME/.npm
+  
   - when: # Install packages based on YARN
       condition:
         equal: [yarn, << parameters.pkg-manager >>]
       steps:
-        - when: # Restore cache for NPM
+        - when: # Restore cache for YARN
             condition: << parameters.with-cache >>
             steps:
               - unless: # default yarn.lock
-                  condition: << parameters.with-cache >>
+                  condition: << parameters.cache-key >>
                   steps:
                     - restore_cache:
                         keys:
                           - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/yarn.lock" }}
               - when: # Custom cache key
-                  condition: << parameters.with-cache >>
+                  condition: << parameters.cache-key >>
                   steps:
                     - restore_cache:
                         keys:
@@ -138,12 +139,12 @@ steps:
             condition: << parameters.with-cache >>
             steps:
               - when: # custom cache path selected
-                  condition: << parameters.cache-path >>
-                  steps:
-                    - save_cache:
-                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
-                        paths:
-                          - <<parameters.cache-path>>
+                condition: << parameters.cache-path >>
+                steps:
+                  - save_cache:
+                      key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+                      paths:
+                        - <<parameters.cache-path>>
               - unless: # use node modules
                   condition: << parameters.cache-path >>
                   steps:
