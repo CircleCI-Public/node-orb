@@ -30,10 +30,6 @@ parameters:
     type: string
     default: v1
     description: Change the default cache version if you need to clear the cache for any reason.
-  cache-key:
-    type: string
-    default: ""
-    description: Defaults to "package-lock.json" for NPM and "yarn.lock" for YARN.
   include-branch-in-cache-key:
     type: boolean
     default: true
@@ -66,18 +62,9 @@ steps:
         - when: # Restore cache for NPM
             condition: << parameters.with-cache >>
             steps:
-              - unless: # default package-lock.json
-                  condition: << parameters.with-cache >>
-                  steps:
-                    - restore_cache:
-                        keys:
-                          - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/package-lock.json" }}
-              - when: # Custom cache key
-                  condition: << parameters.with-cache >>
-                  steps:
-                    - restore_cache:
-                        keys:
-                          - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+              - restore_cache:
+                  keys:
+                    - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/package-lock.json" }}
         - run:
             name: Installing NPM packages
             working_directory: <<parameters.app-dir>>
@@ -113,18 +100,9 @@ steps:
         - when: # Restore cache for YARN
             condition: << parameters.with-cache >>
             steps:
-              - unless: # default yarn.lock
-                  condition: << parameters.cache-key >>
-                  steps:
-                    - restore_cache:
-                        keys:
-                          - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/yarn.lock" }}
-              - when: # Custom cache key
-                  condition: << parameters.cache-key >>
-                  steps:
-                    - restore_cache:
-                        keys:
-                          - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+             - restore_cache:
+                keys:
+                  - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/yarn.lock" }}
         - run:
             name: Installing YARN packages
             working_directory: <<parameters.app-dir>>
