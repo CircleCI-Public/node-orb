@@ -139,12 +139,12 @@ steps:
             condition: << parameters.with-cache >>
             steps:
               - when: # custom cache path selected
-                condition: << parameters.cache-path >>
-                steps:
-                  - save_cache:
-                      key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
-                      paths:
-                        - <<parameters.cache-path>>
+                  condition: << parameters.cache-path >>
+                  steps:
+                    - save_cache:
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.cache-key>>" }}
+                        paths:
+                          - <<parameters.cache-path>>
               - unless: # use node modules
                   condition: << parameters.cache-path >>
                   steps:
