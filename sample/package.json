@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node --require dotenv/config' src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "echo Simulated Node Tests"
   },
   "author": "",
   "license": "ISC",
