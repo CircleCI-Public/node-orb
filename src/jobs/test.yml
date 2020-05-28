@@ -36,16 +36,19 @@ steps:
   - install-packages:
       app-dir: <<parameters.app-dir>>
       pkg-manager: <<parameters.pkg-manager>>
-  - run:
-      name: Run Node Tests
-      working_directory: <<parameters.app-dir>>
-      command: |
-        SELECTED_PKG_MANAGER=<<parameters.pkg-manager>>
-        case $SELECTED_PKG_MANAGER in
-          npm)
-            npm run <<parameters.run-command>>
-          ;;
-          yarn)
-            yarn <<parameters.run-command>>
-          ;;
-        esac
+  - when: # Run tests for NPM
+      condition:
+        equal: [npm, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: Run NPM Tests
+            working_directory: <<parameters.app-dir>>
+            command: npm run <<parameters.run-command>>
+  - when: # Run tests for YARN
+      condition:
+        equal: [yarn, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: Run YARN Tests
+            working_directory: <<parameters.app-dir>>
+            command: yarn run <<parameters.run-command>>
