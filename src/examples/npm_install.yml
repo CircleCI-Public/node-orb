@@ -1,5 +1,5 @@
 description: |
-  By default, the "install-packages" command will attempt to utilize "npm ci" the command can however be overwriten to support an alternative package install command such as "npm install".
+  By default, the "install-packages" command will attempt to utilize "npm ci". The command can however be overwriten to support an alternative package install command such as "npm install".
 usage:
   version: 2.1
   orbs:

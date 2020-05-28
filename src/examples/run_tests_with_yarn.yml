@@ -1,5 +1,5 @@
 description: |
-  Utilize the YARN package manager utilizing the Node orb. This overrides the default behavior of "npm ci", therefore the cache location must be selected as well.
+  Utilize the YARN package manager with the CircleCI Node orb. Caching of your Node packages is enabled by default.
 usage:
   version: 2.1
   orbs:
