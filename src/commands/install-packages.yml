@@ -23,7 +23,7 @@ parameters:
     default: ""
   cache-path:
     description: |
-      By default, this orb will utilize 'npm ci' and cache the '$HOME/.npm' directory. Override which path to cache with this parameter.
+      By default, this orb will utilize 'npm ci' and cache the '~/.npm' directory. Override which path to cache with this parameter.
     type: string
     default: ""
   cache-version:
@@ -91,7 +91,7 @@ steps:
                     - save_cache:
                         key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/package-lock.json" }}
                         paths:
-                          - $HOME/.npm
+                          - ~/.npm
 
   - when: # Install packages based on YARN
       condition:
