@@ -112,7 +112,7 @@ jobs:
       - node/install-packages:
           override-ci-command: npm install
           cache-path: ~/project/node_modules
-          cache-version: override-v2
+          cache-version: override-v3
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && npm run test
   integration-test-yarn:
@@ -121,7 +121,7 @@ jobs:
         - checkout
         - node/install-packages:
             pkg-manager: yarn
-            cache-version: yarn-v2
+            cache-version: yarn-v3
             app-dir: "~/project/sample"
         - run: cd ~/project/sample && yarn test
 
@@ -187,7 +187,7 @@ workflows:
       - node/test:
           name: node-test-job
           app-dir: "~/project/sample"
-          cache-version: v2
+          cache-version: v3
       - integration-test-override-ci
       - integration-test-yarn
       - orb-tools/dev-promote-prod-from-commit-subject:

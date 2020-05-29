@@ -1,6 +1,6 @@
 description: |
   How to quickly and easily run your Node.js tests on CircleCI with caching automatically included. This example assumes you are using NPM as your package manager.
-  The "npm ci" command will automatically be applied and the "$HOME/.npm" directory cached.
+  The "npm ci" command will automatically be applied and the "~/.npm" directory cached.
 usage:
   version: 2.1
   orbs:

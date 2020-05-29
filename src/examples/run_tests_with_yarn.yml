@@ -14,7 +14,8 @@ usage:
         - node/install-packages:
             pkg-manager: yarn
         - run:
-            command: yarn test
+            name: Run YARN tests
+            command: yarn run test
   workflows:
     test_my_app:
       jobs:
