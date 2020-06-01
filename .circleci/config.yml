@@ -20,7 +20,9 @@ integration-tests: &integration-tests
     integration-test-install-specified-version,
     integration-test-install-lts,
     node-test-job,
-    integration-test-install-latest
+    integration-test-install-latest,
+    integration-test-override-ci,
+    integration-test-yarn
   ]
 
 executors:
@@ -103,6 +105,26 @@ jobs:
               exit 1
             fi
 
+  integration-test-override-ci:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          override-ci-command: npm install
+          cache-path: ~/project/node_modules
+          cache-version: override-v3
+          app-dir: "~/project/sample"
+      - run: cd ~/project/sample && npm run test
+  integration-test-yarn:
+      executor: node/default
+      steps:
+        - checkout
+        - node/install-packages:
+            pkg-manager: yarn
+            cache-version: yarn-v3
+            app-dir: "~/project/sample"
+        - run: cd ~/project/sample && yarn test
+
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
@@ -165,6 +187,9 @@ workflows:
       - node/test:
           name: node-test-job
           app-dir: "~/project/sample"
+          cache-version: v3
+      - integration-test-override-ci
+      - integration-test-yarn
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/node
           context: orb-publishing

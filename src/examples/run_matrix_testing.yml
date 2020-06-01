@@ -1,5 +1,7 @@
 description: |
-  Easily test your application against multiple versions of NodeJS in just a few lines.
+  Easily test your application against multiple versions of NodeJS in just a few lines. This example uses "Matrix" jobs to call the same node/test job multiple times at once, each eith the Node version we have specified.
+
+  Read more here: https://circleci.com/blog/you-are-what-you-git-how-your-vcs-branching-model-affects-your-delivery-cadence/
 usage:
   version: 2.1
   orbs:
@@ -8,8 +10,6 @@ usage:
     matrix-tests:
       jobs:
         - node/test:
-            version: "13.11.0" # Set your node version via the "version" parameter for each testing job.
-        - node/test:
-            version: "12.16.0"
-        - node/test:
-            version: "10.19.0"
+            matrix:
+              parameters:
+                version: ["13.11.0", "12.16.0", "10.19.0"]

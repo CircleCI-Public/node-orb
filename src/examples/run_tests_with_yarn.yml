@@ -1,6 +1,5 @@
 description: |
-  How to quickly and easily run your Node.js tests on CircleCI with caching automatically included. This example assumes you are using NPM as your package manager.
-  The "npm ci" command will automatically be applied and the "~/.npm" directory cached.
+  Utilize the YARN package manager with the CircleCI Node orb. Caching of your Node packages is enabled by default.
 usage:
   version: 2.1
   orbs:
@@ -12,9 +11,11 @@ usage:
         tag: "13" # You could specify the node version via the docker image.
       steps:
         - checkout
-        - node/install-packages
+        - node/install-packages:
+            pkg-manager: yarn
         - run:
-            command: npm run test
+            name: Run YARN tests
+            command: yarn run test
   workflows:
     test_my_app:
       jobs:
