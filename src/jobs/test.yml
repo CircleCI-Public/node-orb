@@ -29,6 +29,12 @@ parameters:
     type: string
     default: "~/project"
     description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
+  override-ci-command:
+    description: |
+      By default, packages will be installed with "npm ci" or "yarn install --frozen-lockfile".
+      Optionally supply a custom package installation command, with any additional flags needed.
+    type: string
+    default: ""
 
 executor:
   name: default
@@ -41,6 +47,7 @@ steps:
       app-dir: <<parameters.app-dir>>
       pkg-manager: <<parameters.pkg-manager>>
       cache-version: <<parameters.cache-version>>
+      override-ci-command: <<parameters.override-ci-command>>
   - when: # Run tests for NPM
       condition:
         equal: [npm, << parameters.pkg-manager >>]

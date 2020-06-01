@@ -18,7 +18,7 @@ parameters:
   override-ci-command:
     description: |
       By default, packages will be installed with "npm ci" or "yarn install --frozen-lockfile".
-      Supply a custom package installation command, with any additional flags needed.
+      Optionally supply a custom package installation command, with any additional flags needed.
     type: string
     default: ""
   cache-path:
