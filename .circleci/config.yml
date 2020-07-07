@@ -4,6 +4,8 @@ orbs:
   node: circleci/node@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.1
 
+# testing new config validation.
+
 # Pipeline parameters
 parameters:
   # These pipeline parameters are required by the "trigger-integration-tests-workflow"
