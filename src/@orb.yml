@@ -1,7 +1,7 @@
 version: 2.1
 
 description: >
-  Easily install Node.js and its package mangers (npm, yarn). Best of all, install your packages with caching enabled by default.
+  Easily install Node.js and its package managers (npm, yarn). Best of all, install your packages with caching enabled by default.
 
 display:
   source_url: https://github.com/circleci-public/node-orb
