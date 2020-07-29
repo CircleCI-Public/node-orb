@@ -63,7 +63,9 @@ steps:
         echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
   - run:
       name: Install NodeJS <<parameters.node-version>>
-      command: nvm install <<parameters.node-version>> <<#parameters.lts>>--lts<</parameters.lts>>
+      command: nvm install
+        <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>>
+        <<#parameters.lts>> --lts <</parameters.lts>>
 
   - when:
       condition: <<parameters.install-npm>>
