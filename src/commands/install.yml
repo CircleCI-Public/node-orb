@@ -62,7 +62,7 @@ steps:
         echo "export NVM_DIR=\"$HOME/.nvm\"" >> $BASH_ENV
         echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
   - run:
-      name: Install NodeJS <<parameters.node-version>>
+      name: Install NodeJS <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> LTS <</parameters.lts>>
       command: nvm install
         <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>>
         <<#parameters.lts>> --lts <</parameters.lts>>
