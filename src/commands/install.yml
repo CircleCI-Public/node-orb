@@ -11,9 +11,14 @@ parameters:
     type: string
     default: 'node'
     description: >
-      You may specify a full version tag ("13.11.0"), "latest", "current", "lts", or "stable".
+      Specificy the full version tag to install. To install the latest LTS version, set `lts` to true.
       The latest (current) version of NodeJS will be installed by default.
       For a full list of releases, see the following: https://nodejs.org/en/download/releases
+
+  lts:
+    type: boolean
+    default: false
+    description: Install the latest LTS version by default.
 
   node-install-dir:
     type: string
@@ -53,9 +58,10 @@ steps:
       name: Installing NodeJS <<parameters.node-version>> via NVM
       command: |
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-        nvm install <<parameters.node-version>>
+        NVM_DIR="$HOME/.nvm"
+        echo "export NVM_DIR=\"$HOME/.nvm\"" >> $BASH_ENV
+        echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
+        nvm install <<parameters.node-version>> <<#parameters.lts>>--lts<</parameters.lts>>
 
   - when:
       condition: <<parameters.install-npm>>
