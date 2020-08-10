@@ -9,11 +9,16 @@ parameters:
   # node
   node-version:
     type: string
-    default: ''
+    default: 'node'
     description: >
-      You may specify a full version tag ("13.11.0"), "latest", "current", "lts", or "stable".
+      Specificy the full version tag to install. To install the latest LTS version, set `lts` to true.
       The latest (current) version of NodeJS will be installed by default.
       For a full list of releases, see the following: https://nodejs.org/en/download/releases
+
+  lts:
+    type: boolean
+    default: false
+    description: Install the latest LTS version by default.
 
   node-install-dir:
     type: string
@@ -50,160 +55,15 @@ parameters:
 
 steps:
   - run:
-      name: Installing NodeJS <<parameters.node-version>>
+      name: Install NodeJS <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> LTS <</parameters.lts>>
       command: |
-        # PLATFORM CHECK: mac vs. alpine vs. other linux
-
-        SYS_ENV_PLATFORM=linux
-        if uname -a | grep Darwin; then
-          SYS_ENV_PLATFORM=darwin
-        elif cat /etc/issue | grep Alpine; then
-          SYS_ENV_PLATFORM=alpine
-        fi
-
-        # FUNCTIONS
-
-        get_node_index () {
-          curl -Ls 'https://nodejs.org/dist/index.tab' | tail -n +2 | cut -f 1,3,10
-        }
-
-        get_node_version () {
-          if [[ <<parameters.node-version>> == "" || <<parameters.node-version>> == "latest" || <<parameters.node-version>> == "current" ]]; then
-            NODE_ORB_INSTALL_VERSION=$(get_node_index | awk "NR<=1" | cut -f 1 | grep -E -o '[^v].*')
-            echo "Latest version of Node.js is $NODE_ORB_INSTALL_VERSION"
-          elif [[ <<parameters.node-version>> == "lts" || <<parameters.node-version>> == "stable" ]]; then
-            # Codename is last field, first one with a name is newest lts
-            NODE_ORB_INSTALL_VERSION=$(get_node_index | grep -E "[[:space:]][a-zA-Z]+\$" | awk "NR<=1" | cut -f 1 | grep -E -o '[^v].*')
-            echo "Latest LTS version of Node.js is $NODE_ORB_INSTALL_VERSION"
-          else
-            NODE_ORB_INSTALL_VERSION="<<parameters.node-version>>"
-            echo "Selected version of Node.js is $NODE_ORB_INSTALL_VERSION"
-          fi
-        }
-
-        installation_check () {
-          if command -v node; then
-
-            if node --version | grep "$NODE_ORB_INSTALL_VERSION"; then
-
-              echo "Node.js $NODE_ORB_INSTALL_VERSION is already installed"
-              exit 0
-            else
-              echo "A different version of Node.js is installed ($(node --version)); removing it"
-
-              $SUDO rm -rf "$(command -v node)"
-              $SUDO rm -rf "$(command -v node | sed -E 's|node||')/nodejs"
-
-              $SUDO rm -rf "$(command -v npm)"
-
-              $SUDO rm -rf \
-                /usr/local/lib/node_modules \
-                /usr/local/include/node_modules \
-                /opt/local/lib/node_modules
-
-            fi
-          fi
-        }
-
-        # Install logic per platform
-
-        case $SYS_ENV_PLATFORM in
-          alpine)
-            echo "Install for alpine, or remove"
-          ;;
-          darwin)
-            if ! command -v gpg; then
-              HOMEBREW_NO_AUTO_UPDATE=1 brew install gnupg
-              HOMEBREW_NO_AUTO_UPDATE=1 brew install coreutils
-            fi
-          ;;
-        esac
-
-        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
-
-          get_node_version
-          installation_check
-
-          # Configure Security Keys for verification of Download
-
-          $SUDO curl \
-            --silent --show-error --location --fail --retry 3 \
-            https://raw.githubusercontent.com/nodejs/node/master/README.md | \
-            grep -E '[A-Z0-9]{40}' | \
-            sed -E 's/gpg --keyserver pool.sks-keyservers.net --recv-keys //g' | \
-            sed -E 's/(`|\$ )//g' > \
-            NODEJS_TRUSTED_RELEASE_KEYS
-
-          cat > KEYSERVERS \<< EOM
-          hkp://p80.pool.sks-keyservers.net:80
-          hkp://ipv4.pool.sks-keyservers.net
-          hkp://pgp.mit.edu:80
-          hkps://ha.pool.sks-keyservers.net
-          hkp://keyserver.ubuntu.com:80
-        EOM
-
-          echo "Importing Node.js trusted release keys..."
-          # https://stackoverflow.com/a/26217767
-          while read key; do
-            for keyserver in $(cat KEYSERVERS); do
-              tempName=$(mktemp)
-              gpg --status-fd 1 \
-                --keyserver "$keyserver" --keyserver-options "timeout=1" \
-                --recv-keys "$key" 1> "$tempName" 2>/dev/null || true
-              if [[ $(grep "^\[GNUPG\:\] IMPORT_OK "[[:digit:]]*" "$key"$" $tempName && \
-                grep "^\[GNUPG\:\] IMPORT_RES 1" $tempName) ]]; then
-                echo "Success! Imported $key from $keyserver"
-                break
-              else
-                continue
-              fi
-            done
-          done < NODEJS_TRUSTED_RELEASE_KEYS
-
-          $SUDO rm -f NODEJS_TRUSTED_RELEASE_KEYS KEYSERVERS
-
-          # Download binary
-          echo Node binary downloaded
-          echo "Downloading: https://nodejs.org/download/release/v$NODE_ORB_INSTALL_VERSION/node-v$NODE_ORB_INSTALL_VERSION-$SYS_ENV_PLATFORM-x64.tar.gz"
-          $SUDO curl -O \
-            --silent --show-error --location --fail --retry 3 \
-            "https://nodejs.org/download/release/v$NODE_ORB_INSTALL_VERSION/node-v$NODE_ORB_INSTALL_VERSION-$SYS_ENV_PLATFORM-x64.tar.gz"
-
-          # Download SHASUMS256 and sig
-          echo Fetching SHASUM256 verification
-          curl -O --silent --show-error --location --fail --retry 3 https://nodejs.org/dist/v$NODE_ORB_INSTALL_VERSION/SHASUMS256.txt
-          curl -O --silent --show-error --location --fail --retry 3 https://nodejs.org/dist/v$NODE_ORB_INSTALL_VERSION/SHASUMS256.txt.sig
-
-          # Verify checksum file sig
-          echo Verifing SHASUM256
-          gpg --verify SHASUMS256.txt.sig SHASUMS256.txt
-
-          # Verify checksum of binary
-          echo Verifing binary checksum
-          grep node-v$NODE_ORB_INSTALL_VERSION-$SYS_ENV_PLATFORM-x64.tar.gz SHASUMS256.txt | sha256sum -c -
-
-          # Install Binary
-          echo Installing Node binary
-          $SUDO tar -xzf "node-v$NODE_ORB_INSTALL_VERSION-$SYS_ENV_PLATFORM-x64.tar.gz" \
-            -C <<parameters.node-install-dir>> \
-            --strip-components=1 --no-same-owner > /dev/null 2>&1
-
-          # Remove tar.gz
-          echo Cleaning up installation file
-          $SUDO rm -f "node-v$NODE_ORB_INSTALL_VERSION-$SYS_ENV_PLATFORM-x64.tar.gz"
-
-          if [[ ! -e <<parameters.node-install-dir>>/bin/nodejs ]]; then
-            $SUDO ln -s <<parameters.node-install-dir>>/bin/node <<parameters.node-install-dir>>/bin/nodejs
-          fi
-
-        # test/verify version
-
-        if node --version | grep "$VERSION" > /dev/null; then
-          echo "Node.js $(node --version) has been installed to $(which node)"
-        else
-          echo "Something went wrong; the specified version of Node.js could not be installed"
-          exit 1
-        fi
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+        NVM_DIR="$HOME/.nvm"
+        echo "export NVM_DIR=\"$HOME/.nvm\"" >> $BASH_ENV
+        echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
+        source $BASH_ENV
+        nvm install \
+        <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> --lts <</parameters.lts>>
 
   - when:
       condition: <<parameters.install-npm>>

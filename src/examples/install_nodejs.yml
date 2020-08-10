@@ -13,7 +13,6 @@ usage:
       steps:
         - checkout
         - node/install:
-            node-version: latest
             install-yarn: true # Set to true if you would like to install Yarn. NPM will install automatically.
         - run: node --version
   workflows:

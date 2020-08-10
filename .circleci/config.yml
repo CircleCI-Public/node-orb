@@ -33,17 +33,6 @@ executors:
     macos:
       xcode: 11.4
 
-commands:
-  install-nvm:
-    steps:
-      - run:
-          name: Install nvm
-          command: |
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-            NVM_DIR="$HOME/.nvm"
-            echo "export NVM_DIR=\"$HOME/.nvm\"" >> $BASH_ENV
-            echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
-
 jobs:
 # Install NodeJS into a non-node container.
   integration-test-install-specified-version:
@@ -70,13 +59,11 @@ jobs:
     executor: <<parameters.os>>
     steps:
       - checkout
-      - node/install:
-          node-version: "latest"
-      - install-nvm
+      - node/install
       - run:
           name: Check that latest NodeJS is installed.
           command: |
-            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | awk '{print $1}')
+            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | awk '{print $2}')
             echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
             echo "Installed version: $(node --version)"
             if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
@@ -92,12 +79,11 @@ jobs:
     steps:
       - checkout
       - node/install:
-          node-version: "lts"
-      - install-nvm
+          lts: true
       - run:
           name: Check that the latest LTS version of NodeJS is installed.
           command: |
-            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | grep 'Latest LTS' | tail -n1 | awk '{print $1}')
+            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | grep 'Latest LTS' | tail -n1 | awk '{print $2}')
             echo "Latest Node LTS version = $NODE_ORB_INSTALL_VERSION"
             echo "Installed version: $(node --version)"
             if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
