@@ -13,7 +13,7 @@ parameters:
     description: Cache your node packages automatically for faster install times.
   app-dir:
     type: string
-    default: "$CIRCLE_WORKING_DIRECTORY"
+    default: "."
     description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
   override-ci-command:
     description: |
