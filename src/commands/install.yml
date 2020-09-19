@@ -11,7 +11,7 @@ parameters:
     type: string
     default: 'node'
     description: >
-      Specificy the full version tag to install. To install the latest LTS version, set `lts` to true.
+      Specify the full version tag to install. To install the latest LTS version, set `lts` to true.
       The latest (current) version of NodeJS will be installed by default.
       For a full list of releases, see the following: https://nodejs.org/en/download/releases
 
