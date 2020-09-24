@@ -9,7 +9,7 @@ usage:
     test:
       executor:
         name: node/default
-        tag: "13" # You could specify the node version via the docker image.
+        tag: "13.14" # You could specify the node version via the docker image.
       steps:
         - checkout
         - node/install-packages
