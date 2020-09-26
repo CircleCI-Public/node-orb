@@ -35,6 +35,10 @@ parameters:
       Optionally supply a custom package installation command, with any additional flags needed.
     type: string
     default: ""
+  run-step-name:
+    description: Title of the run step to be shown in the CircleCI UI
+    type: string
+    default: Run <<parameters.pkg-manager>> tests
 
 executor:
   name: default
@@ -53,7 +57,7 @@ steps:
         equal: [npm, << parameters.pkg-manager >>]
       steps:
         - run:
-            name: Run NPM Tests
+            name: <<parameters.run-step-name>>
             working_directory: <<parameters.app-dir>>
             command: npm run <<parameters.run-command>>
   - when: # Run tests for YARN
@@ -61,6 +65,6 @@ steps:
         equal: [yarn, << parameters.pkg-manager >>]
       steps:
         - run:
-            name: Run YARN Tests
+            name: <<parameters.run-step-name>>
             working_directory: <<parameters.app-dir>>
             command: yarn run <<parameters.run-command>>
