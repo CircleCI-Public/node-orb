@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   node: circleci/node@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.1
+  windows: circleci/windows@2.4.0
 
 # Pipeline parameters
 parameters:
@@ -32,6 +33,7 @@ executors:
   macos:
     macos:
       xcode: 11.4
+  windows: &windows_executor win/default
 
 jobs:
 # Install NodeJS into a non-node container.
@@ -42,16 +44,30 @@ jobs:
     executor: <<parameters.os>>
     steps:
       - checkout
-      - node/install:
-          node-version: "13.11.0"
-          install-yarn: true # Test the install of YARN
-          yarn-version: "1.22.5"
-      - run:
-          command: |
-            if ! node --version | grep -q "13"; then
-              echo "Node version 13 not found"
-              exit 1
-            fi
+      - unless:
+          condition: &is_windows_executor
+            equal: [<<parameters.os>>, *windows_executor]
+          steps:
+            - node/install: &install_specified_version_install
+                node-version: "13.11.0"
+                install-yarn: true # Test the install of YARN
+                yarn-version: "1.22.5"
+            - run: &install_specified_version_test
+                command: |
+                  if ! node --version | grep -q "13"; then
+                    echo "Node version 13 not found"
+                    exit 1
+                  fi
+                shell: bash.exe
+      - when:
+          condition: *is_windows_executor
+          steps:
+            - node/install:
+                <<: *install_specified_version_install
+                windows: true
+            - run:
+                <<: *install_specified_version_test
+                shell: bash.exe
 
   integration-test-install-latest:
     parameters:
@@ -60,17 +76,28 @@ jobs:
     executor: <<parameters.os>>
     steps:
       - checkout
-      - node/install
-      - run:
-          name: Check that latest NodeJS is installed.
-          command: |
-            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | awk '{print $2}')
-            echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
-            echo "Installed version: $(node --version)"
-            if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
-              echo "Error: Installed version is different from the latest version."
-              exit 1
-            fi
+      - unless:
+          condition: *is_windows_executor
+          steps:
+            - node/install
+            - run: &install_latest_test
+                name: Check that latest NodeJS is installed.
+                command: |
+                  NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | awk '{print $2}')
+                  echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
+                  echo "Installed version: $(node --version)"
+                  if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
+                    echo "Error: Installed version is different from the latest version."
+                    exit 1
+                  fi
+      - when:
+          condition: *is_windows_executor
+          steps:
+            - node/install:
+                windows: true
+            - run:
+                <<: *install_latest_test
+                shell: bash.exe
 
   integration-test-install-lts:
     parameters:
@@ -162,11 +189,11 @@ workflows:
       - integration-test-install-specified-version:
           matrix:
             parameters:
-              os: [linux, macos]
+              os: [linux, macos, windows]
       - integration-test-install-latest:
           matrix:
             parameters:
-              os: [linux, macos]
+              os: [linux, macos, windows]
       - integration-test-install-lts:
           matrix:
             parameters:

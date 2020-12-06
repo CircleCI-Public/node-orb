@@ -7,6 +7,10 @@ parameters:
     enum: ["npm", "yarn"]
     default: "npm"
     description: Select the default node package manager to use.
+  windows:
+    type: boolean
+    default: false
+    description: Whether to run with Windows support or not
   with-cache:
     type: boolean
     default: true
@@ -37,24 +41,30 @@ parameters:
       If true, this cache bucket will only apply to jobs within the same branch.
 
 steps:
-  - run:
-      name: Checking for package.json.
-      working_directory: <<parameters.app-dir>>
-      command: |
-        if [ ! -f "package.json" ]; then
-          echo
-          echo "---"
-          echo "Unable to find your package.json file. Did you forget to set the app-dir parameter?"
-          echo "---"
-          echo
-          echo "Current directory: $(pwd)"
-          echo
-          echo
-          echo "List directory: "
-          echo
-          ls
-          exit 1
-        fi
+  - unless: << parameters.windows >>
+    steps:
+    - run: &check_package_json
+        name: Checking for package.json
+        command: |
+          if [ ! -f "package.json" ]; then
+            echo
+            echo "---"
+            echo "Unable to find your package.json file. Did you forget to set the app-dir parameter?"
+            echo "---"
+            echo
+            echo "Current directory: $(pwd)"
+            echo
+            echo
+            echo "List directory: "
+            echo
+            ls
+            exit 1
+          fi
+  - when: << parameters.windows >>
+    steps:
+      - run:
+        <<: *check_package_json
+        shell: bash.exe
   - when: # Install packages based on NPM
       condition:
         equal: [npm, << parameters.pkg-manager >>]
@@ -65,16 +75,19 @@ steps:
               - restore_cache:
                   keys:
                     - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/package-lock.json" }}
-        - run:
-            name: Installing NPM packages
-            working_directory: <<parameters.app-dir>>
-            command: |
-              if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
-                echo "Running override package installation command:"
-                << parameters.override-ci-command >>
-              else
-                npm ci
-              fi
+        - when: << parameters.override-ci-command >>
+          steps:
+            - run: &install_npm_packages
+                name: Installing NPM packages
+                working_directory: <<parameters.app-dir>>
+                command: |
+                    echo "Running override package installation command:"
+                    << parameters.override-ci-command >>
+        - when: << parameters.override-ci-command >>
+          steps:
+            - run:
+                <<: *install_npm_packages
+                command: npm ci
         - when: # cache enabled, save cache
             condition: << parameters.with-cache >>
             steps:
@@ -103,16 +116,18 @@ steps:
              - restore_cache:
                 keys:
                   - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/yarn.lock" }}
-        - run:
-            name: Installing YARN packages
-            working_directory: <<parameters.app-dir>>
-            command: |
-              if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
-                echo "Running override package installation command:"
-                << parameters.override-ci-command >>
-              else
-                yarn install --frozen-lockfile
-              fi
+        - unless:
+            condition: << parameters.override-ci-command >>
+            steps:
+              - run: &install_yarn_packages
+                name: Installing YARN packages
+                command: yarn install --frozen-lockfile
+        - when:
+            condition: << parameters.override-ci-command >>
+            steps:
+              - run:
+                  <<: *install_npm_packages
+                  command: << parameters.override-ci-command >>
         - when: # cache enabled, save cache
             condition: << parameters.with-cache >>
             steps:

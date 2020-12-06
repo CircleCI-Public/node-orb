@@ -6,6 +6,11 @@ description: |
   Recommendation: It is highly recommended to utilize an environment such as Docker with Node preinstalled.
 
 parameters:
+  windows:
+    type: boolean
+    default: false
+    description: >
+      Whether job is running in a windows executor
   # node
   node-version:
     type: string
@@ -54,16 +59,17 @@ parameters:
       https://github.com/yarnpkg/yarn/releases
 
 steps:
+  - unless:
+    # NVM is already installed on windows
+    condition: <<parameters.windows>>
+    steps:
+      - run:
+        name: Install NVM
+        command: <<include(scripts/install-nvm)>>
   - run:
       name: Install NodeJS <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> LTS <</parameters.lts>>
       command: |
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-        NVM_DIR="$HOME/.nvm"
-        echo "export NVM_DIR=\"$HOME/.nvm\"" >> $BASH_ENV
-        echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
-        source $BASH_ENV
-        nvm install \
-        <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> --lts <</parameters.lts>>
+        nvm install <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> --lts <</parameters.lts>>
 
   - when:
       condition: <<parameters.install-npm>>

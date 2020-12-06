@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# FUNCTIONS
+get_yarn_version () {
+  if [[ $YARN_VERSION == "" ]]; then
+    YARN_ORB_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} \
+      "https://github.com/yarnpkg/yarn/releases/latest" | sed 's:.*/::' | cut -d 'v' -f 2 | cut -d 'v' -f 2)
+    echo "Latest version of Yarn is $YARN_ORB_VERSION"
+  else
+    YARN_ORB_VERSION=$YARN_VERSION
+
+    echo "Selected version of Yarn is $YARN_ORB_VERSION"
+  fi
+}
+
+get_yarn_version
+
+echo "Verifying YARN install"
+if yarn --version | grep "$YARN_ORB_VERSION" > /dev/null 2>&1; then
+  echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+else
+  echo "Something went wrong; the specified version of Yarn could not be installed"
+  exit 1
+fi
