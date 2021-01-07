@@ -15,4 +15,4 @@ steps:
       name: Install Yarn
       environment:
         NODE_PARAM_YARN_VERSION: <<parameters.version>>
-      command: <<import(scripts/install-yarn.sh)>>
+      command: <<include(scripts/install-yarn.sh)>>

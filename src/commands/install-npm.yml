@@ -16,4 +16,4 @@ steps:
       name: Install NPM
       environment:
         NODE_PARAM_NPM_VERSION: <<parameters.version>>
-      command: <<import(scripts/install-npm.sh)>>
+      command: <<include(scripts/install-npm.sh)>>
