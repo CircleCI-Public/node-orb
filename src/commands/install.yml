@@ -56,14 +56,10 @@ parameters:
 steps:
   - run:
       name: Install NodeJS <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> LTS <</parameters.lts>>
-      command: |
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-        NVM_DIR="$HOME/.nvm"
-        echo "export NVM_DIR=\"$HOME/.nvm\"" >> $BASH_ENV
-        echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
-        source $BASH_ENV
-        nvm install \
-        <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> --lts <</parameters.lts>>
+      environment:
+        NODE_PARAM_LTS: <<parameters.lts>>
+        NODE_PARAM_VERSION: <<parameters.node-version>>
+      command: <<include(scripts/install-nvm.sh)>>
 
   - when:
       condition: <<parameters.install-npm>>
