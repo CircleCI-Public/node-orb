@@ -45,7 +45,6 @@ jobs:
       - node/install:
           node-version: "13.11.0"
           install-yarn: true # Test the install of YARN
-          yarn-version: "1.22.5"
       - run:
           command: |
             if ! node --version | grep -q "13"; then
