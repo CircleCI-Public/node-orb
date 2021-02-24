@@ -35,11 +35,6 @@ parameters:
     default: true
     description: >
       If true, this cache bucket will only apply to jobs within the same branch.
-  lockfile:
-    type: enum
-    default: "package-lock.json"
-    enum: ["package-lock.json", "yarn.lock", "npm-shrinkwrap.json"]
-    description: Lockfile for npm or yarn to use to lock depedency versions.
 
 steps:
   - run:
@@ -63,9 +58,19 @@ steps:
   - when:
       condition: << parameters.with-cache >>
       steps:
+        - run:
+            name: Determine lockfile
+            command: |
+              if [ -f "<<parameters.app-dir>>/package-lock.json" ]; then
+                cp package-lock.json /tmp/node-project-lockfile
+              elif [ -f "<<parameters.app-dir>>/npm-shrinkwrap.json" ]; then
+                cp npm-shrinkwrap.json /tmp/node-project-lockfile
+              elif [ -f "<<parameters.app-dir>>/yarn.lock" ]; then
+                cp yarn.lock /tmp/node-project-lockfile
+              fi
         - restore_cache:
             keys:
-              - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.lockfile>>" }}
+              - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}
 
   - when: # Install packages based on NPM
       condition:
@@ -88,14 +93,14 @@ steps:
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.lockfile>>" }}
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.cache-path>>
               - unless: # npm ci cache path
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/<<parameters.lockfile>>" }}
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - ~/.npm
 
@@ -120,13 +125,13 @@ steps:
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/yarn.lock" }}
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.cache-path>>
               - unless: # use node modules
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/yarn.lock" }}
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.app-dir>>/node_modules
