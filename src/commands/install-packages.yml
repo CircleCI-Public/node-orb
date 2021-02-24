@@ -59,15 +59,16 @@ steps:
       condition: << parameters.with-cache >>
       steps:
         - run:
+            working_directory: <<parameters.app-dir>>
             name: Determine lockfile
             command: |
-              if [ -f "<<parameters.app-dir>>/package-lock.json" ]; then
+              if [ -f "package-lock.json" ]; then
                 echo "Found package-lock.json file, assuming lockfile"
                 cp package-lock.json /tmp/node-project-lockfile
-              elif [ -f "<<parameters.app-dir>>/npm-shrinkwrap.json" ]; then
+              elif [ -f "npm-shrinkwrap.json" ]; then
                 echo "Found npm-shrinkwrap.json file, assuming lockfile"
                 cp npm-shrinkwrap.json /tmp/node-project-lockfile
-              elif [ -f "<<parameters.app-dir>>/yarn.lock" ]; then
+              elif [ -f "yarn.lock" ]; then
                 echo "Found yarn.lock file, assuming lockfile"
                 cp yarn.lock /tmp/node-project-lockfile
               fi
