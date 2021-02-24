@@ -55,16 +55,31 @@ steps:
           ls
           exit 1
         fi
+  - when:
+      condition: << parameters.with-cache >>
+      steps:
+        - run:
+            working_directory: <<parameters.app-dir>>
+            name: Determine lockfile
+            command: |
+              if [ -f "package-lock.json" ]; then
+                echo "Found package-lock.json file, assuming lockfile"
+                cp package-lock.json /tmp/node-project-lockfile
+              elif [ -f "npm-shrinkwrap.json" ]; then
+                echo "Found npm-shrinkwrap.json file, assuming lockfile"
+                cp npm-shrinkwrap.json /tmp/node-project-lockfile
+              elif [ -f "yarn.lock" ]; then
+                echo "Found yarn.lock file, assuming lockfile"
+                cp yarn.lock /tmp/node-project-lockfile
+              fi
+        - restore_cache:
+            keys:
+              - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}
+
   - when: # Install packages based on NPM
       condition:
         equal: [npm, << parameters.pkg-manager >>]
       steps:
-        - when: # Restore cache for NPM
-            condition: << parameters.with-cache >>
-            steps:
-              - restore_cache:
-                  keys:
-                    - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/package-lock.json" }}
         - run:
             name: Installing NPM packages
             working_directory: <<parameters.app-dir>>
@@ -82,14 +97,14 @@ steps:
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/package-lock.json" }}
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.cache-path>>
               - unless: # npm ci cache path
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/package-lock.json" }}
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - ~/.npm
 
@@ -97,12 +112,6 @@ steps:
       condition:
         equal: [yarn, << parameters.pkg-manager >>]
       steps:
-        - when: # Restore cache for YARN
-            condition: << parameters.with-cache >>
-            steps:
-             - restore_cache:
-                keys:
-                  - node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/yarn.lock" }}
         - run:
             name: Installing YARN packages
             working_directory: <<parameters.app-dir>>
@@ -120,13 +129,13 @@ steps:
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/yarn.lock" }}
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.cache-path>>
               - unless: # use node modules
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "<<parameters.app-dir>>/yarn.lock" }}
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.app-dir>>/node_modules
