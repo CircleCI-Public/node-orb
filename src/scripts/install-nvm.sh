@@ -12,4 +12,6 @@ if [ "$NODE_PARAM_LTS" = "1" ]; then
     nvm install --lts
 else
     nvm install "$NODE_PARAM_VERSION"
+    nvm alias default "$NODE_PARAM_VERSION"
+    echo 'nvm use default &>/dev/null' >> $BASH_ENV
 fi
