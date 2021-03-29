@@ -26,9 +26,12 @@ integration-tests: &integration-tests
   ]
 
 executors:
-  linux:
+  docker:
     docker:
       - image: cimg/base:stable
+  linux:
+    machine:
+      image: ubuntu-2004:202101-01
   macos:
     macos:
       xcode: 11.4
@@ -162,15 +165,15 @@ workflows:
       - integration-test-install-specified-version:
           matrix:
             parameters:
-              os: [linux, macos]
+              os: [docker, linux, macos]
       - integration-test-install-latest:
           matrix:
             parameters:
-              os: [linux, macos]
+              os: [docker, linux, macos]
       - integration-test-install-lts:
           matrix:
             parameters:
-              os: [linux, macos]
+              os: [docker, linux, macos]
       - node/test:
           name: node-test-job
           app-dir: "~/project/sample"
