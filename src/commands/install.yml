@@ -1,5 +1,5 @@
 description: |
-  Install custom versions of NodeJS, and optionally NPM/Yarn, in any
+  Install custom versions of Node.js, and optionally NPM/Yarn, in any
   execution environment (Docker/Linux, macOS, machine) that does not have
   it preinstalled.
 
@@ -9,10 +9,10 @@ parameters:
   # node
   node-version:
     type: string
-    default: 'node'
+    default: "node"
     description: >
       Specify the full version tag to install. To install the latest LTS version, set `lts` to true.
-      The latest (current) version of NodeJS will be installed by default.
+      The latest (current) version of Node.js will be installed by default.
       For a full list of releases, see the following: https://nodejs.org/en/download/releases
 
   lts:
@@ -47,7 +47,7 @@ parameters:
 
   yarn-version:
     type: string
-    default: ''
+    default: ""
     description: >
       Pick a version of Yarn to install (if no version is specified,
       the latest stable version will be installed):
@@ -55,7 +55,7 @@ parameters:
 
 steps:
   - run:
-      name: Install NodeJS <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> LTS <</parameters.lts>>
+      name: Install Node.js <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> LTS <</parameters.lts>>
       environment:
         NODE_PARAM_LTS: <<parameters.lts>>
         NODE_PARAM_VERSION: <<parameters.node-version>>

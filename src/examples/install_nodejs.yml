@@ -1,15 +1,15 @@
 description: |
-  Download and install any version of NodeJS. Optionally installs Yarn with a parameter. You may use the default executor of this orb for a Node execution environment as well.
+  Download and install any version of Node.js. Optionally installs Yarn with a parameter. You may use the default executor of this orb for a Node execution environment as well.
 
   Recommendation: It is highly recommended to utilize an environment such as Docker with Node preinstalled.
 usage:
   version: 2.1
   orbs:
-    node: circleci/node@x.y # This version number refers to the version of the orb, not the version of NodeJS
+    node: circleci/node@x.y # This version number refers to the version of the orb, not the version of Node.js
   jobs:
     install-node-example:
       docker:
-        - image: cimg/base:stable # This image does not contain NodeJS
+        - image: cimg/base:stable # This image does not contain Node.js
       steps:
         - checkout
         - node/install:
