@@ -4,7 +4,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    node: circleci/node@x.y # This version number refers to the version of the orb, not the version of NodeJS
+    node: circleci/node@x.y # This version number refers to the version of the orb, not the version of Node.js
     heroku: circleci/heroku@x.y
   workflows:
     test-and-deploy:

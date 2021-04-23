@@ -15,14 +15,14 @@ parameters:
     type: string
     default: "dev:alpha"
 
-integration-tests: &integration-tests
-  [
+integration-tests:
+  &integration-tests [
     integration-test-install-specified-version,
     integration-test-install-lts,
     node-test-job,
     integration-test-install-latest,
     integration-test-override-ci,
-    integration-test-yarn
+    integration-test-yarn,
   ]
 
 executors:
@@ -34,7 +34,7 @@ executors:
       xcode: 11.4
 
 jobs:
-# Install NodeJS into a non-node container.
+  # Install Node.js into a non-node container.
   integration-test-install-specified-version:
     parameters:
       os:
@@ -62,7 +62,7 @@ jobs:
       - checkout
       - node/install
       - run:
-          name: Check that latest NodeJS is installed.
+          name: Check that latest Node.js is installed.
           command: |
             NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | awk '{print $2}')
             echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
@@ -82,7 +82,7 @@ jobs:
       - node/install:
           lts: true
       - run:
-          name: Check that the latest LTS version of NodeJS is installed.
+          name: Check that the latest LTS version of Node.js is installed.
           command: |
             NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | grep 'Latest LTS' | tail -n1 | awk '{print $2}')
             echo "Latest Node LTS version = $NODE_ORB_INSTALL_VERSION"
@@ -103,15 +103,14 @@ jobs:
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && npm run test
   integration-test-yarn:
-      executor: node/default
-      steps:
-        - checkout
-        - node/install-packages:
-            pkg-manager: yarn
-            cache-version: yarn-v3
-            app-dir: "~/project/sample"
-        - run: cd ~/project/sample && yarn test
-
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+          cache-version: yarn-v3
+          app-dir: "~/project/sample"
+      - run: cd ~/project/sample && yarn test
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.

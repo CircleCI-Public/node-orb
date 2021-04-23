@@ -1,5 +1,5 @@
 description: |
-  Simple drop-in job to test your NodeJS application automatically.
+  Simple drop-in job to test your Node.js application automatically.
 
 parameters:
   version:
