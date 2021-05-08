@@ -4,7 +4,7 @@ description: >
 parameters:
   pkg-manager:
     type: enum
-    enum: ["npm", "yarn"]
+    enum: ["npm", "yarn", "yarn-berry"]
     default: "npm"
     description: Select the default node package manager to use.
   with-cache:
@@ -17,7 +17,7 @@ parameters:
     description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
   override-ci-command:
     description: |
-      By default, packages will be installed with "npm ci" or "yarn install --frozen-lockfile".
+      By default, packages will be installed with "npm ci", "yarn install --frozen-lockfile" or "yarn install --immutable".
       Optionally supply a custom package installation command, with any additional flags needed.
     type: string
     default: ""
@@ -139,3 +139,35 @@ steps:
                         key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}-{{ arch }}
                         paths:
                           - <<parameters.app-dir>>/node_modules
+                          
+- when: # Install packages based on YARN
+      condition:
+        equal: [yarn-berry, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: Installing YARN packages
+            working_directory: <<parameters.app-dir>>
+            command: |
+              if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
+                echo "Running override package installation command:"
+                << parameters.override-ci-command >>
+              else
+                yarn install --immutable
+              fi
+        - when: # cache enabled, save cache
+            condition: << parameters.with-cache >>
+            steps:
+              - when: # custom cache path selected
+                  condition: << parameters.cache-path >>
+                  steps:
+                    - save_cache:
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}-{{ arch }}
+                        paths:
+                          - <<parameters.cache-path>>
+              - unless: # use node modules
+                  condition: << parameters.cache-path >>
+                  steps:
+                    - save_cache:
+                        key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}-{{ arch }}
+                        paths:
+                          - <<parameters.app-dir>>/.yarn/cache
