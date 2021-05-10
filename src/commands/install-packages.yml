@@ -139,8 +139,8 @@ steps:
                         key: node-deps-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile" }}-{{ arch }}
                         paths:
                           - <<parameters.app-dir>>/node_modules
-                          
-- when: # Install packages based on YARN
+
+  - when: # Install packages based on YARN
       condition:
         equal: [yarn-berry, << parameters.pkg-manager >>]
       steps:
