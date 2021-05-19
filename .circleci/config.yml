@@ -23,6 +23,7 @@ integration-tests:
     integration-test-install-latest,
     integration-test-override-ci,
     integration-test-yarn,
+    integration-test-yarn-berry,
   ]
 
 executors:
@@ -111,6 +112,15 @@ jobs:
           cache-version: yarn-v3
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && yarn test
+  integration-test-yarn-berry:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+          cache-version: yarn-berry-v1
+          app-dir: "~/project/sample"
+      - run: cd ~/project/sample && yarn test
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
@@ -176,6 +186,7 @@ workflows:
           cache-version: v3
       - integration-test-override-ci
       - integration-test-yarn
+      - integration-test-yarn-berry
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/node
           context: orb-publishing
