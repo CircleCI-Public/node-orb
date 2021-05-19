@@ -10,7 +10,7 @@ parameters:
       For a full list of releases, see the following: https://nodejs.org/en/download/releases
   pkg-manager:
     type: enum
-    enum: ["npm", "yarn"]
+    enum: ["npm", "yarn", "yarn-berry"]
     default: "npm"
     description: Select the default node package manager to use.
   cache-version:
@@ -62,5 +62,13 @@ steps:
       steps:
         - run:
             name: Run YARN Tests
+            working_directory: <<parameters.app-dir>>
+            command: yarn run <<parameters.run-command>>
+  - when: # Run tests for YARN 2.x
+      condition:
+        equal: [yarn-berry, << parameters.pkg-manager >>]
+      steps:
+        - run:
+            name: Run YARN 2.x Tests
             working_directory: <<parameters.app-dir>>
             command: yarn run <<parameters.run-command>>
