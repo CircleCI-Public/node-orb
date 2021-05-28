@@ -75,8 +75,8 @@ steps:
               cp package.json /tmp/node-project-package.json
         - restore_cache:
             keys:
-              - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json"}}-{{ checksum "/tmp/node-project-lockfile" }}
-              - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json"}}-
+              - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
+              - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json" }}-
               - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-
               - node-deps-{{ arch }}-<<parameters.cache-version>>-
 
@@ -101,14 +101,14 @@ steps:
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json"}}-{{ checksum "/tmp/node-project-lockfile" }}
+                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.cache-path>>
               - unless: # npm ci cache path
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json"}}-{{ checksum "/tmp/node-project-lockfile" }}
+                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - ~/.npm
 
@@ -133,14 +133,14 @@ steps:
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json"}}-{{ checksum "/tmp/node-project-lockfile" }}
+                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.cache-path>>
               - unless: # use node modules
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json"}}-{{ checksum "/tmp/node-project-lockfile" }}
+                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.app-dir>>/node_modules
 
@@ -165,13 +165,13 @@ steps:
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json"}}-{{ checksum "/tmp/node-project-lockfile" }}
+                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.cache-path>>
               - unless: # use node modules
                   condition: << parameters.cache-path >>
                   steps:
                     - save_cache:
-                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json"}}-{{ checksum "/tmp/node-project-lockfile" }}
+                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>-{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.app-dir>>/.yarn/cache
