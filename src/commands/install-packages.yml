@@ -65,15 +65,15 @@ steps:
             command: |
               if [ -f "package-lock.json" ]; then
                 echo "Found package-lock.json file, assuming lockfile"
-                cp package-lock.json /tmp/node-project-lockfile
+                ln package-lock.json /tmp/node-project-lockfile
               elif [ -f "npm-shrinkwrap.json" ]; then
                 echo "Found npm-shrinkwrap.json file, assuming lockfile"
-                cp npm-shrinkwrap.json /tmp/node-project-lockfile
+                ln npm-shrinkwrap.json /tmp/node-project-lockfile
               elif [ -f "yarn.lock" ]; then
                 echo "Found yarn.lock file, assuming lockfile"
-                cp yarn.lock /tmp/node-project-lockfile
+                ln yarn.lock /tmp/node-project-lockfile
               fi
-              cp package.json /tmp/node-project-package.json
+              ln package.json /tmp/node-project-package.json
         - restore_cache:
             keys:
               - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
