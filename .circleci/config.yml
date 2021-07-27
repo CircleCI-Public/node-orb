@@ -184,6 +184,16 @@ workflows:
           name: node-test-job
           app-dir: "~/project/sample"
           cache-version: v3
+      - node/run:
+          name: node-run-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          npm-run: build
+      - node/run:
+          name: node-run-job
+          app-dir: "~/project/sample"
+          cache-version: v5
+          yarn-run: test
       - integration-test-override-ci
       - integration-test-yarn
       - integration-test-yarn-berry
