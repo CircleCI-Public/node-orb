@@ -39,7 +39,7 @@ parameters:
 
 steps:
   - run:
-      name: Checking for package.json.
+      name: Checking for package.json
       working_directory: <<parameters.app-dir>>
       command: |
         if [ ! -f "package.json" ]; then
