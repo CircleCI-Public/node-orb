@@ -1,5 +1,5 @@
 description: |
-  Drop-in solution to automatically run custom npm commands for your Node.js applications. 
+  Drop-in solution to automatically run custom npm commands for your Node.js applications.
   This job will automatically download your code into any version node environment, install your dependencies with caching enabled, and execute your custom npm script.
 usage:
   version: 2.1
