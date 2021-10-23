@@ -9,10 +9,10 @@ parameters:
   # node
   node-version:
     type: string
-    default: "node"
+    default: ""
     description: >
       Specify the full version tag to install. To install the latest LTS version, set `lts` to true.
-      The latest (current) version of Node.js will be installed by default.
+      If unspecified, the version listed in .nvmrc will be installed. If no .nvmrc file exists the latest (current) version of Node.js will be installed by default.
       For a full list of releases, see the following: https://nodejs.org/en/download/releases
 
   lts:
