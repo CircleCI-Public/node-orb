@@ -19,8 +19,7 @@ elif [ -f ".nvmrc" ]; then
     nvm install "$NVMRC_SPECIFIED_VERSION"
     nvm alias default "$NVMRC_SPECIFIED_VERSION"
 else
-    nvm install "node" 
-    nvm alias default "node"
+    nvm install "node"
 fi
 
 echo 'nvm use default &>/dev/null' >> $BASH_ENV
