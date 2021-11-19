@@ -44,10 +44,11 @@ parameters:
   test-results-for:
     default: other
     type: enum
-    enum: ["jest", "other"]
+    enum: ["jest", "mocha", "other"]
     description: |
       Testing framework your project uses.
-      If this is set to jest, test results will be automatically produced. The jest-junit package is required as a dev dependency. See https://github.com/jest-community/jest-junit for more information.
+      If this is set to jest or mocha, test results will be automatically produced. When using jest, the jest-junit package is required as a dev dependency. See https://github.com/jest-community/jest-junit for more information.
+      When using mocha, the mocha-junit-reporter and mocha-multi packages are required as dev dependency. See https://github.com/michaelleeallen/mocha-junit-reporter and https://github.com/glenjamin/mocha-multi for more information.
 
 executor:
   name: default
@@ -85,6 +86,20 @@ steps:
             name: Run NPM Tests
             working_directory: <<parameters.app-dir>>
             command: npm run <<parameters.run-command>> -- --reporters=default --reporters=jest-junit
+  - when: # Run tests for NPM, with mocha test results
+      condition:
+        and:
+          - equal: [npm, << parameters.pkg-manager >>]
+          - equal: [mocha, << parameters.test-results-for >>]
+      steps:
+        - run:
+            name: Check for test reporter
+            working_directory: <<parameters.app-dir>>
+            command: npm list mocha-junit-reporter mocha-multi || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `npm install --save-dev mocha-junit-reporter mocha-multi`" && exit 1)
+        - run:
+            name: Run NPM Tests
+            working_directory: <<parameters.app-dir>>
+            command: npm run <<parameters.run-command>> -- --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
   - when: # Run tests for YARN, without test results
       condition:
         and:
@@ -109,6 +124,20 @@ steps:
             name: Run YARN Tests
             working_directory: <<parameters.app-dir>>
             command: yarn run <<parameters.run-command>> --reporters=default --reporters=jest-junit
+  - when: # Run tests for YARN, with mocha test results
+      condition:
+        and:
+          - equal: [yarn, << parameters.pkg-manager >>]
+          - equal: [mocha, << parameters.test-results-for >>]
+      steps:
+        - run:
+            name: Check for test reporter
+            working_directory: <<parameters.app-dir>>
+            command: yarn list --pattern "mocha-junit-reporter|mocha-multi" | grep "mocha-junit-reporter@\|mocha-multi@" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `yarn add --dev mocha-junit-reporter mocha-multi`" && exit 1)
+        - run:
+            name: Run YARN Tests
+            working_directory: <<parameters.app-dir>>
+            command: yarn run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
   - when: # Run tests for YARN 2.x, without test results
       condition:
         and:
@@ -129,12 +158,26 @@ steps:
             name: Run YARN 2.x Tests
             working_directory: <<parameters.app-dir>>
             command: yarn run <<parameters.run-command>> --reporters=default --reporters=jest-junit
+  - when: # Run tests for YARN 2.x, with mocha test results
+      condition:
+        and:
+          - equal: [yarn-berry, << parameters.pkg-manager >>]
+          - equal: [mocha, << parameters.test-results-for >>]
+      steps:
+        - run:
+            name: Check for test reporter
+            working_directory: <<parameters.app-dir>>
+            command: yarn list --pattern "mocha-junit-reporter|mocha-multi" | grep "mocha-junit-reporter@\|mocha-multi@" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `yarn add --dev mocha-junit-reporter mocha-multi`" && exit 1)
+        - run:
+            name: Run YARN 2.x Tests
+            working_directory: <<parameters.app-dir>>
+            command: yarn run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
   - when: # upload test results if a path was given
       condition: << parameters.test-results-path >>
       steps:
         store_test_results:
           path: << parameters.test-results-path >>
-  - when: # upload test results from default location if jest was automatically configured
+  - when: # upload test results if jest was automatically configured and test-results-path is not specified
       condition:
         and:
           - equal: [jest, << parameters.test-results-for >>]
@@ -142,3 +185,11 @@ steps:
       steps:
         store_test_results:
           path: <<parameters.app-dir>>/junit.xml
+  - when: # upload test results if mocha was automatically configured and test-results-path is not specified
+      condition:
+        and:
+          - equal: [mocha, << parameters.test-results-for >>]
+          - equal: ["", << parameters.test-results-path >>]
+      steps:
+        store_test_results:
+          path: <<parameters.app-dir>>/test-results.xml

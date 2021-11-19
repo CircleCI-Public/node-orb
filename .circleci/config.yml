@@ -168,6 +168,12 @@ jobs:
       - check-uploaded-test-results:
           job-name: node-test-results-file-job
           expected-tests: 1
+      - check-uploaded-test-results:
+          job-name: node-npm-mocha-test-job
+          expected-tests: 1
+      - check-uploaded-test-results:
+          job-name: node-yarn-mocha-test-job
+          expected-tests: 1
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
@@ -240,6 +246,29 @@ workflows:
           pkg-manager: yarn
           version: "14.15"
       - node/test:
+          name: node-npm-mocha-test-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: mocha
+          run-command: testmocha
+      - node/test:
+          name: node-yarn-mocha-test-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: mocha
+          pkg-manager: yarn
+          run-command: testmocha
+          version: "14.15"
+      - node/test:
+          name: node-yarn-mocha-with-test-result-path-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: mocha
+          pkg-manager: yarn
+          run-command: testmocha
+          version: "14.15"
+          test-results-path: sample/test-results.xml
+      - node/test:
           name: node-test-results-file-job
           app-dir: "~/project/sample"
           cache-version: v4
@@ -253,6 +282,8 @@ workflows:
           requires:
             - node-npm-test-job
             - node-yarn-test-job
+            - node-npm-mocha-test-job
+            - node-yarn-mocha-test-job
             - node-test-results-file-job
       - node/run:
           name: node-run-job
