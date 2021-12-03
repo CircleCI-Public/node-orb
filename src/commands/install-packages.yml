@@ -175,3 +175,9 @@ steps:
                         key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
                           - <<parameters.app-dir>>/.yarn/cache
+  - when:
+      condition: << parameters.with-cache >>
+      steps:
+        - run:
+            name: "Remove temporary links"
+            command: rm /tmp/node-project-lockfile /tmp/node-project-package.json
