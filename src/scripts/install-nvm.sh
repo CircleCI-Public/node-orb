@@ -8,7 +8,7 @@ else
     source $BASH_ENV;
 fi
 
-if [ "$NODE_PARAM_LTS" = "1" ]; then
+if [ "$NODE_PARAM_VERSION" = "lts" ]; then
     nvm install --lts
     nvm alias default lts/*
 elif [ -n "$NODE_PARAM_VERSION" ]; then

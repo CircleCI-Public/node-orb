@@ -94,6 +94,25 @@ jobs:
               exit 1
             fi
 
+  integration-test-unspecified-version:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
+    steps:
+      - checkout
+      - node/install
+
+  integration-test-use-nvmrc-version:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
+    steps:
+      - checkout
+      - run: echo '16.13' > .nvmrc
+      - node/install
+
   integration-test-install-lts:
     parameters:
       os:
@@ -102,9 +121,9 @@ jobs:
     steps:
       - checkout
       - node/install:
-          lts: true
+          node-version: "lts"
       - run:
-          name: Check that the latest LTS version of Node.js is installed.
+          name: Check that the latest LTS versiion of Node.js is installed.
           command: |
             NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | grep 'Latest LTS' | tail -n1 | awk '{print $2}')
             echo "Latest Node LTS version = $NODE_ORB_INSTALL_VERSION"
@@ -127,7 +146,7 @@ jobs:
   integration-test-yarn:
     executor:
       name: node/default
-      tag: "14.15"
+      tag: "16.13"
     steps:
       - checkout
       - node/install-packages:
@@ -138,7 +157,7 @@ jobs:
   integration-test-yarn-berry:
     executor:
       name: node/default
-      tag: "14.15"
+      tag: "16.13"
     steps:
       - checkout
       - node/install-packages:
@@ -150,7 +169,7 @@ jobs:
   check-test-results-uploaded:
     executor:
       name: node/default
-      tag: "14.15"
+      tag: "16.13"
     steps:
       - jq/install
       - run:
@@ -239,7 +258,7 @@ workflows:
           cache-version: v4
           test-results-for: jest
           pkg-manager: yarn
-          version: "14.15"
+          version: "16.13"
       - node/test:
           name: node-npm-mocha-test-job
           app-dir: "~/project/sample"
@@ -253,7 +272,7 @@ workflows:
           test-results-for: mocha
           pkg-manager: yarn
           run-command: testmocha
-          version: "14.15"
+          version: "16.13"
       - node/test:
           name: node-yarn-mocha-with-test-result-path-job
           app-dir: "~/project/sample"
@@ -261,13 +280,13 @@ workflows:
           test-results-for: mocha
           pkg-manager: yarn
           run-command: testmocha
-          version: "14.15"
+          version: "16.13"
           test-results-path: sample/test-results.xml
       - node/test:
           name: node-test-results-file-job
           app-dir: "~/project/sample"
           cache-version: v4
-          version: "14.15"
+          version: "16.13"
           test-results-path: sample/other-junit.xml
       - node/test:
           name: node-test-no-junit
