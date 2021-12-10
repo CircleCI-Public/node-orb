@@ -26,19 +26,6 @@ parameters:
     description: >
       Where should Node.js be installed?
 
-  # npm
-  install-npm:
-    type: boolean
-    default: true
-    description: Install NPM?
-
-  npm-version:
-    type: string
-    default: latest
-    description: >
-      Pick a version of NPM to install:
-      https://nodejs.org/en/download/releases
-
   # yarn
   install-yarn:
     type: boolean
@@ -60,12 +47,6 @@ steps:
         NODE_PARAM_LTS: <<parameters.lts>>
         NODE_PARAM_VERSION: <<parameters.node-version>>
       command: <<include(scripts/install-nvm.sh)>>
-
-  - when:
-      condition: <<parameters.install-npm>>
-      steps:
-        - install-npm:
-            version: <<parameters.npm-version>>
 
   - when:
       condition: <<parameters.install-yarn>>

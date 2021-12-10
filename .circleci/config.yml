@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   node: circleci/node@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@10.0.3
+  jq: circleci/jq@2.2.0
 
 # Pipeline parameters
 parameters:
@@ -19,7 +20,10 @@ integration-tests:
   &integration-tests [
     integration-test-install-specified-version,
     integration-test-install-lts,
-    node-test-job,
+    node-npm-test-job,
+    node-yarn-test-job,
+    node-test-results-file-job,
+    node-test-no-junit,
     integration-test-install-latest,
     integration-test-override-ci,
     integration-test-yarn,
@@ -32,7 +36,24 @@ executors:
       - image: cimg/base:stable
   macos:
     macos:
-      xcode: 11.4
+      xcode: 12.5.1
+
+commands:
+  check-uploaded-test-results:
+    parameters:
+      job-name:
+        type: string
+      expected-tests:
+        type: integer
+    steps:
+      - run:
+          name: check for << parameters.job-name >> test results
+          command: |
+            export TEST_JOB_NUMBER=$(jq '.items[] | select(.name == "<< parameters.job-name >>") | .job_number' workflow.json)
+            curl --request GET \
+                 --url https://circleci.com/api/v2/project/gh/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$TEST_JOB_NUMBER/tests \
+                 --header 'authorization: Basic $CIRCLE_TOKEN' \
+            | jq '.items | length | if . != << parameters.expected-tests >> then halt_error else . end'
 
 jobs:
   # Install Node.js into a non-node container.
@@ -104,7 +125,9 @@ jobs:
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && npm run test
   integration-test-yarn:
-    executor: node/default
+    executor:
+      name: node/default
+      tag: "14.15"
     steps:
       - checkout
       - node/install-packages:
@@ -113,7 +136,9 @@ jobs:
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && yarn test
   integration-test-yarn-berry:
-    executor: node/default
+    executor:
+      name: node/default
+      tag: "14.15"
     steps:
       - checkout
       - node/install-packages:
@@ -121,6 +146,34 @@ jobs:
           cache-version: yarn-berry-v1
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && yarn test
+
+  check-test-results-uploaded:
+    executor:
+      name: node/default
+      tag: "14.15"
+    steps:
+      - jq/install
+      - run:
+          name: fetch workflow
+          command: |
+            curl --request GET \
+                 --url https://circleci.com/api/v2/workflow/$CIRCLE_WORKFLOW_ID/job \
+                 --header 'authorization: Basic $CIRCLE_TOKEN' > workflow.json
+      - check-uploaded-test-results:
+          job-name: node-npm-test-job
+          expected-tests: 1
+      - check-uploaded-test-results:
+          job-name: node-yarn-test-job
+          expected-tests: 1
+      - check-uploaded-test-results:
+          job-name: node-test-results-file-job
+          expected-tests: 1
+      - check-uploaded-test-results:
+          job-name: node-npm-mocha-test-job
+          expected-tests: 1
+      - check-uploaded-test-results:
+          job-name: node-yarn-mocha-test-job
+          expected-tests: 1
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
@@ -132,12 +185,6 @@ workflows:
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack
 
-      - approve_for_testing:
-          type: approval
-          requires:
-            - orb-tools/pack
-            - orb-tools/lint
-
       # release dev version of orb, for testing & possible publishing.
       # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
       # requires a CircleCI API token to be stored as CIRCLE_TOKEN (default)
@@ -148,7 +195,8 @@ workflows:
           orb-name: circleci/node
           context: orb-publisher
           requires:
-            - approve_for_testing
+            - orb-tools/pack
+            - orb-tools/lint
 
       # trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb
@@ -181,9 +229,57 @@ workflows:
             parameters:
               os: [linux, macos]
       - node/test:
-          name: node-test-job
+          name: node-npm-test-job
           app-dir: "~/project/sample"
-          cache-version: v3
+          cache-version: v4
+          test-results-for: jest
+      - node/test:
+          name: node-yarn-test-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: jest
+          pkg-manager: yarn
+          version: "14.15"
+      - node/test:
+          name: node-npm-mocha-test-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: mocha
+          run-command: testmocha
+      - node/test:
+          name: node-yarn-mocha-test-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: mocha
+          pkg-manager: yarn
+          run-command: testmocha
+          version: "14.15"
+      - node/test:
+          name: node-yarn-mocha-with-test-result-path-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: mocha
+          pkg-manager: yarn
+          run-command: testmocha
+          version: "14.15"
+          test-results-path: sample/test-results.xml
+      - node/test:
+          name: node-test-results-file-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          version: "14.15"
+          test-results-path: sample/other-junit.xml
+      - node/test:
+          name: node-test-no-junit
+          app-dir: "~/project/sample"
+          cache-version: v4
+      - check-test-results-uploaded:
+          requires:
+            - node-npm-test-job
+            - node-yarn-test-job
+            - node-npm-mocha-test-job
+            - node-yarn-mocha-test-job
+            - node-test-results-file-job
       - node/run:
           name: node-run-job
           app-dir: "~/project/sample"
