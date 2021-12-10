@@ -1,0 +1,736 @@
+version: 2.1
+description: |
+    Easily install Node.js and its package managers (npm, yarn). Best of all, install your packages with caching enabled by default. Supports Linux x86_64, MacOS, and Arm64 V8.
+display:
+    home_url: https://nodejs.org/
+    source_url: https://github.com/circleci-public/node-orb
+commands:
+    install:
+        description: |
+            Install custom versions of Node.js, and optionally NPM/Yarn, in any
+            execution environment (Docker/Linux, macOS, machine) that does not have
+            it preinstalled.
+
+            Recommendation: It is highly recommended to utilize an environment such as Docker with Node preinstalled.
+        parameters:
+            install-npm:
+                default: true
+                description: Install NPM?
+                type: boolean
+            install-yarn:
+                default: false
+                description: Install Yarn?
+                type: boolean
+            lts:
+                default: false
+                description: Install the latest LTS version by default.
+                type: boolean
+            node-install-dir:
+                default: /usr/local
+                description: |
+                    Where should Node.js be installed?
+                type: string
+            node-version:
+                default: node
+                description: |
+                    Specify the full version tag to install. To install the latest LTS version, set `lts` to true. The latest (current) version of Node.js will be installed by default. For a full list of releases, see the following: https://nodejs.org/en/download/releases
+                type: string
+            npm-version:
+                default: latest
+                description: |
+                    Pick a version of NPM to install: https://nodejs.org/en/download/releases
+                type: string
+            yarn-version:
+                default: ""
+                description: |
+                    Pick a version of Yarn to install (if no version is specified, the latest stable version will be installed): https://github.com/yarnpkg/yarn/releases
+                type: string
+        steps:
+            - run:
+                command: |
+                    # Only install nvm if it's not already installed
+                    if command -v nvm &> /dev/null; then
+                        echo "nvm is already installed. Skipping nvm install.";
+                    else
+                        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash;
+                        echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV;
+                        echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use' >> $BASH_ENV;
+                        source $BASH_ENV;
+                    fi
+
+                    if [ "$NODE_PARAM_LTS" = "1" ]; then
+                        nvm install --lts
+                        nvm alias default lts/*
+                    else
+                        nvm install "$NODE_PARAM_VERSION"
+                        nvm alias default "$NODE_PARAM_VERSION"
+                    fi
+
+                    echo 'nvm use default &>/dev/null' >> $BASH_ENV
+                environment:
+                    NODE_PARAM_LTS: <<parameters.lts>>
+                    NODE_PARAM_VERSION: <<parameters.node-version>>
+                name: Install Node.js <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> LTS <</parameters.lts>>
+            - when:
+                condition: <<parameters.install-npm>>
+                steps:
+                    - install-npm:
+                        version: <<parameters.npm-version>>
+            - when:
+                condition: <<parameters.install-yarn>>
+                steps:
+                    - install-yarn:
+                        version: <<parameters.yarn-version>>
+    install-npm:
+        description: |
+            Install/upgrade the NPM package manager to a custom version. Requires an existing installation of Node.js; if none exists, use this orb's `install` command.
+        parameters:
+            version:
+                default: latest
+                description: |
+                    Pick a version of NPM to install: https://nodejs.org/en/download/releases
+                type: string
+        steps:
+            - run:
+                command: |
+                    if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+                    # FUNCTIONS
+                    get_npm_version () {
+                        if [[ "$NODE_PARAM_NPM_VERSION" == latest ]]; then
+                        NPM_ORB_VERSION="$(npm view npm | sed -E 's|.*-||g' | grep latest | \
+                            perl -pe 's/.*: //g' | perl -pe "s/'|,//g")"
+
+                        echo "Latest version of NPM is $NPM_ORB_VERSION"
+                        else
+                        NPM_ORB_VERSION="$NODE_PARAM_NPM_VERSION"
+
+                        echo "Selected version of NPM is $NPM_ORB_VERSION"
+                        fi
+                    }
+
+                    installation_check () {
+                        if command -v npm > /dev/null 2>&1; then
+                        if npm -v | grep "$NPM_ORB_VERSION" > /dev/null 2>&1; then
+                            echo "NPM $NPM_ORB_VERSION is already installed"
+                            exit 0
+                        fi
+                        fi
+                    }
+
+                    get_npm_version
+                    installation_check
+
+                    if [ "$NODE_PARAM_NPM_VERSION" = latest ]; then
+                    $SUDO npm install -g npm@latest > /dev/null 2>&1 || \
+                        npm install -g npm@latest > /dev/null 2>&1
+                    else
+                    $SUDO npm install -g "npm@$NPM_ORB_VERSION" > /dev/null 2>&1 || \
+                        npm install -g "npm@$NPM_ORB_VERSION" > /dev/null 2>&1
+                    fi
+
+                    # test/verify version
+                    if npm -v | grep "$NPM_ORB_VERSION" > /dev/null 2>&1; then
+                    echo "Success! NPM $(npm -v) has been installed to $(which npm)"
+                    else
+                    echo "Something went wrong; the specified version of NPM could not be installed"
+                    exit 1
+                    fi
+                environment:
+                    NODE_PARAM_NPM_VERSION: <<parameters.version>>
+                name: Install NPM
+    install-packages:
+        description: |
+            Install your Node packages with automated caching and best practices applied. Requires lock file.
+        parameters:
+            app-dir:
+                default: .
+                description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
+                type: string
+            cache-path:
+                default: ""
+                description: |
+                    By default, this orb will utilize 'npm ci' and cache the '~/.npm' directory. Override which path to cache with this parameter.
+                type: string
+            cache-version:
+                default: v1
+                description: Change the default cache version if you need to clear the cache for any reason.
+                type: string
+            include-branch-in-cache-key:
+                default: true
+                description: |
+                    If true, this cache bucket will only apply to jobs within the same branch.
+                type: boolean
+            override-ci-command:
+                default: ""
+                description: |
+                    By default, packages will be installed with "npm ci", "yarn install --frozen-lockfile" or "yarn install --immutable".
+                    Optionally supply a custom package installation command, with any additional flags needed.
+                type: string
+            pkg-manager:
+                default: npm
+                description: Select the default node package manager to use. NPM v5+ Required.
+                enum:
+                    - npm
+                    - yarn
+                    - yarn-berry
+                type: enum
+            with-cache:
+                default: true
+                description: Cache your node packages automatically for faster install times.
+                type: boolean
+        steps:
+            - run:
+                command: |
+                    if [ ! -f "package.json" ]; then
+                      echo
+                      echo "---"
+                      echo "Unable to find your package.json file. Did you forget to set the app-dir parameter?"
+                      echo "---"
+                      echo
+                      echo "Current directory: $(pwd)"
+                      echo
+                      echo
+                      echo "List directory: "
+                      echo
+                      ls
+                      exit 1
+                    fi
+                name: Checking for package.json
+                working_directory: <<parameters.app-dir>>
+            - when:
+                condition: << parameters.with-cache >>
+                steps:
+                    - run:
+                        command: |
+                            if [ -f "package-lock.json" ]; then
+                              echo "Found package-lock.json file, assuming lockfile"
+                              ln package-lock.json /tmp/node-project-lockfile
+                            elif [ -f "npm-shrinkwrap.json" ]; then
+                              echo "Found npm-shrinkwrap.json file, assuming lockfile"
+                              ln npm-shrinkwrap.json /tmp/node-project-lockfile
+                            elif [ -f "yarn.lock" ]; then
+                              echo "Found yarn.lock file, assuming lockfile"
+                              ln yarn.lock /tmp/node-project-lockfile
+                            fi
+                            ln package.json /tmp/node-project-package.json
+                        name: Determine lockfile
+                        working_directory: <<parameters.app-dir>>
+                    - restore_cache:
+                        keys:
+                            - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
+                            - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-
+                            - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>
+            - when:
+                condition:
+                    equal:
+                        - npm
+                        - << parameters.pkg-manager >>
+                steps:
+                    - run:
+                        command: |
+                            if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
+                              echo "Running override package installation command:"
+                              << parameters.override-ci-command >>
+                            else
+                              npm ci
+                            fi
+                        name: Installing NPM packages
+                        working_directory: <<parameters.app-dir>>
+                    - when:
+                        condition: << parameters.with-cache >>
+                        steps:
+                            - when:
+                                condition: << parameters.cache-path >>
+                                steps:
+                                    - save_cache:
+                                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
+                                        paths:
+                                            - <<parameters.cache-path>>
+                            - unless:
+                                condition: << parameters.cache-path >>
+                                steps:
+                                    - save_cache:
+                                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
+                                        paths:
+                                            - ~/.npm
+            - when:
+                condition:
+                    equal:
+                        - yarn
+                        - << parameters.pkg-manager >>
+                steps:
+                    - run:
+                        command: |
+                            if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
+                              echo "Running override package installation command:"
+                              << parameters.override-ci-command >>
+                            else
+                              yarn install --frozen-lockfile
+                            fi
+                        name: Installing YARN packages
+                        working_directory: <<parameters.app-dir>>
+                    - when:
+                        condition: << parameters.with-cache >>
+                        steps:
+                            - when:
+                                condition: << parameters.cache-path >>
+                                steps:
+                                    - save_cache:
+                                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
+                                        paths:
+                                            - <<parameters.cache-path>>
+                            - unless:
+                                condition: << parameters.cache-path >>
+                                steps:
+                                    - save_cache:
+                                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
+                                        paths:
+                                            - <<parameters.app-dir>>/node_modules
+            - when:
+                condition:
+                    equal:
+                        - yarn-berry
+                        - << parameters.pkg-manager >>
+                steps:
+                    - run:
+                        command: |
+                            if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
+                              echo "Running override package installation command:"
+                              << parameters.override-ci-command >>
+                            else
+                              yarn install --immutable
+                            fi
+                        name: Installing YARN packages
+                        working_directory: <<parameters.app-dir>>
+                    - when:
+                        condition: << parameters.with-cache >>
+                        steps:
+                            - when:
+                                condition: << parameters.cache-path >>
+                                steps:
+                                    - save_cache:
+                                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
+                                        paths:
+                                            - <<parameters.cache-path>>
+                            - unless:
+                                condition: << parameters.cache-path >>
+                                steps:
+                                    - save_cache:
+                                        key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
+                                        paths:
+                                            - <<parameters.app-dir>>/.yarn/cache
+            - when:
+                condition: << parameters.with-cache >>
+                steps:
+                    - run:
+                        command: rm /tmp/node-project-lockfile /tmp/node-project-package.json
+                        name: Remove temporary links
+    install-yarn:
+        description: |
+            Install a custom version of the Yarn package manager
+        parameters:
+            version:
+                default: ""
+                description: |
+                    Pick a version of Yarn to install (if no version is specified, the latest stable version will be installed): https://github.com/yarnpkg/yarn/releases
+                type: string
+        steps:
+            - run:
+                command: |
+                    if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+                    # FUNCTIONS
+                    get_yarn_version () {
+                        if [[ "$NODE_PARAM_YARN_VERSION" == "" ]]; then
+                        YARN_ORB_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} \
+                            "https://github.com/yarnpkg/yarn/releases/latest" | sed 's:.*/::' | cut -d 'v' -f 2 | cut -d 'v' -f 2)
+                        echo "Latest version of Yarn is $YARN_ORB_VERSION"
+                        else
+                        YARN_ORB_VERSION="$NODE_PARAM_YARN_VERSION"
+
+                        echo "Selected version of Yarn is $YARN_ORB_VERSION"
+                        fi
+                    }
+
+                    installation_check () {
+                        echo "Checking if YARN is already installed..."
+                        if command -v yarn > /dev/null 2>&1; then
+                        if yarn --version | grep "$YARN_ORB_VERSION" > /dev/null 2>&1; then
+                            echo "Yarn $YARN_ORB_VERSION is already installed"
+                            exit 0
+                        else
+                            echo "A different version of Yarn is installed ($(yarn --version)); removing it"
+
+                            if uname -a | grep Darwin > /dev/null 2>&1; then
+                            brew uninstall yarn > /dev/null 2>&1
+                            elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
+                            apk del yarn > /dev/null 2>&1
+                            elif cat /etc/issue | grep Debian > /dev/null 2>&1; then
+                            $SUDO apt-get remove yarn > /dev/null 2>&1 && \
+                                $SUDO apt-get purge yarn > /dev/null 2>&1
+                            elif cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
+                            $SUDO apt-get remove yarn > /dev/null 2>&1 && \
+                                $SUDO apt-get purge yarn > /dev/null 2>&1
+                            elif command -v yum > /dev/null 2>&1; then
+                            yum remove yarn > /dev/null 2>&1
+                            fi
+
+                            $SUDO rm -rf "$HOME/.yarn" > /dev/null 2>&1
+                            $SUDO rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg > /dev/null 2>&1
+                        fi
+                        fi
+                    }
+
+                    get_yarn_version
+                    installation_check
+
+                    # install yarn
+                    echo "Installing YARN v$YARN_ORB_VERSION"
+                    curl -L -o yarn.tar.gz --silent "https://yarnpkg.com/downloads/$YARN_ORB_VERSION/yarn-v$YARN_ORB_VERSION.tar.gz"
+
+                    $SUDO tar -xzf yarn.tar.gz && rm yarn.tar.gz
+
+                    $SUDO mkdir -p /opt/yarn
+                    $SUDO mv yarn-v${YARN_ORB_VERSION}/* /opt/yarn
+
+                    $SUDO rm -rf "yarn-v${YARN_ORB_VERSION}"
+
+                    $SUDO chmod 777 "/opt/yarn"
+
+                    $SUDO ln -s /opt/yarn/bin/yarn /usr/local/bin/yarn
+                    $SUDO ln -s /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg
+                    $SUDO ln -s /opt/yarn/bin/yarn.js /usr/local/bin/yarn.js
+
+                    $SUDO mkdir -p ~/.config
+
+                    if uname -a | grep Darwin; then
+                        $SUDO chown -R "$USER:$GROUP" ~/.config
+                        $SUDO chown -R "$USER:$GROUP" /opt/yarn
+                    else
+                        $SUDO chown -R "$(whoami):$(whoami)" /opt/yarn
+                        $SUDO chown -R "$(whoami):$(whoami)" ~/.config
+                    fi
+
+                    # test/verify version
+                    echo "Verifying YARN install"
+                    if yarn --version | grep "$YARN_ORB_VERSION" > /dev/null 2>&1; then
+                        echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+                    else
+                        echo "Something went wrong; the specified version of Yarn could not be installed"
+                        exit 1
+                    fi
+                environment:
+                    NODE_PARAM_YARN_VERSION: <<parameters.version>>
+                name: Install Yarn
+executors:
+    default:
+        description: |
+            Select the version of Node.js to use. Uses CircleCI's highly cached convenience images built for CI.
+            Any available tag from this list can be used: https://hub.docker.com/r/cimg/node/tags
+        docker:
+            - image: cimg/node:<<parameters.tag>>
+        parameters:
+            tag:
+                default: "13.11"
+                description: |
+                    Pick a specific cimg/node image version tag: https://hub.docker.com/r/cimg/node
+                type: string
+jobs:
+    run:
+        description: |
+            Simple drop-in job to run commands for your Node.js application automatically.
+        executor:
+            name: default
+            tag: << parameters.version >>
+        parameters:
+            app-dir:
+                default: ~/project
+                description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
+                type: string
+            cache-version:
+                default: v1
+                description: Change the default cache version if you need to clear the cache for any reason.
+                type: string
+            npm-run:
+                default: ""
+                description: The name of the script within your package.json which you would like to run.
+                type: string
+            override-ci-command:
+                default: ""
+                description: |
+                    By default, packages will be installed with "npm ci" or "yarn install --frozen-lockfile".
+                    Optionally supply a custom package installation command, with any additional flags needed.
+                type: string
+            pkg-manager:
+                default: npm
+                description: Select the default node package manager to use.
+                enum:
+                    - npm
+                    - yarn
+                    - yarn-berry
+                type: enum
+            setup:
+                default: []
+                description: Provide any optional steps you would like to run prior to installing the node dependencies. This is a good place to install global modules.
+                type: steps
+            version:
+                default: 13.11.0
+                description: |
+                    A full version tag must be specified. Example: "13.11.0" For a full list of releases, see the following: https://nodejs.org/en/download/releases
+                type: string
+            yarn-run:
+                default: ""
+                description: The name of the script within your package.json which you would like to run.
+                type: string
+        steps:
+            - checkout
+            - steps: << parameters.setup >>
+            - install-packages:
+                app-dir: <<parameters.app-dir>>
+                cache-version: <<parameters.cache-version>>
+                override-ci-command: <<parameters.override-ci-command>>
+                pkg-manager: <<parameters.pkg-manager>>
+            - run:
+                command: |
+                    if [[ "npm" == "<<parameters.pkg-manager>>" ]]; then
+                      npm run <<parameters.npm-run>>
+                    else
+                      yarn run <<parameters.yarn-run>>
+                    fi
+                name: Run <<parameters.pkg-manager>> <<parameters.npm-run>>
+                working_directory: <<parameters.app-dir>>
+    test:
+        description: |
+            Simple drop-in job to test your Node.js application automatically.
+        executor:
+            name: default
+            tag: << parameters.version >>
+        parameters:
+            app-dir:
+                default: ~/project
+                description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
+                type: string
+            cache-version:
+                default: v1
+                description: Change the default cache version if you need to clear the cache for any reason.
+                type: string
+            override-ci-command:
+                default: ""
+                description: |
+                    By default, packages will be installed with "npm ci" or "yarn install --frozen-lockfile".
+                    Optionally supply a custom package installation command, with any additional flags needed.
+                type: string
+            pkg-manager:
+                default: npm
+                description: Select the default node package manager to use.
+                enum:
+                    - npm
+                    - yarn
+                    - yarn-berry
+                type: enum
+            run-command:
+                default: test
+                description: The name of the script within your package.json which will run your tests.
+                type: string
+            setup:
+                default: []
+                description: Provide any optional steps you would like to run prior to installing the node dependencies. This is a good place to install global modules.
+                type: steps
+            version:
+                default: 13.11.0
+                description: |
+                    A full version tag must be specified. Example: "13.11.0" For a full list of releases, see the following: https://nodejs.org/en/download/releases
+                type: string
+        steps:
+            - checkout
+            - steps: << parameters.setup >>
+            - install-packages:
+                app-dir: <<parameters.app-dir>>
+                cache-version: <<parameters.cache-version>>
+                override-ci-command: <<parameters.override-ci-command>>
+                pkg-manager: <<parameters.pkg-manager>>
+            - when:
+                condition:
+                    equal:
+                        - npm
+                        - << parameters.pkg-manager >>
+                steps:
+                    - run:
+                        command: npm run <<parameters.run-command>>
+                        name: Run NPM Tests
+                        working_directory: <<parameters.app-dir>>
+            - when:
+                condition:
+                    equal:
+                        - yarn
+                        - << parameters.pkg-manager >>
+                steps:
+                    - run:
+                        command: yarn run <<parameters.run-command>>
+                        name: Run YARN Tests
+                        working_directory: <<parameters.app-dir>>
+            - when:
+                condition:
+                    equal:
+                        - yarn-berry
+                        - << parameters.pkg-manager >>
+                steps:
+                    - run:
+                        command: yarn run <<parameters.run-command>>
+                        name: Run YARN 2.x Tests
+                        working_directory: <<parameters.app-dir>>
+examples:
+    install_nodejs:
+        description: |
+            Download and install any version of Node.js. Optionally installs Yarn with a parameter. You may use the default executor of this orb for a Node execution environment as well.
+
+            Recommendation: It is highly recommended to utilize an environment such as Docker with Node preinstalled.
+        usage:
+            version: "2.1"
+            orbs:
+                node: circleci/node@x.y
+            jobs:
+                install-node-example:
+                    docker:
+                        - image: cimg/base:stable
+                    steps:
+                        - checkout
+                        - node/install:
+                            install-yarn: true
+                        - run: node --version
+            workflows:
+                test_my_app:
+                    jobs:
+                        - install-node-example
+    node_npm_run:
+        description: |
+            Drop-in solution to automatically run custom npm commands for your Node.js applications.
+            This job will automatically download your code into any version node environment, install your dependencies with caching enabled, and execute your custom npm script.
+        usage:
+            version: "2.1"
+            orbs:
+                node: circleci/node@x.y
+            workflows:
+                run-npm-command:
+                    jobs:
+                        - node/run:
+                            npm-run: build
+    node_test_and_deploy:
+        description: |
+            Drop-in solution to automatically test your Node.js applications. This job will automatically download your code into any version node environment, install your dependencies with caching enabled, and execute your testing script.
+            This example shows how easily with two orbs you can test your Node application and automatically deploy to Heroku when successful, and on the master branch.
+        usage:
+            version: "2.1"
+            orbs:
+                heroku: circleci/heroku@x.y
+                node: circleci/node@x.y
+            workflows:
+                test-and-deploy:
+                    jobs:
+                        - node/test
+                        - heroku/deploy-via-git:
+                            filters:
+                                branches:
+                                    only:
+                                        - master
+                            requires:
+                                - node/test
+    node_yarn_run:
+        description: |
+            Drop-in solution to automatically run custom yarn commands for your Node.js applications.
+            This job will automatically download your code into any version node environment, install your dependencies with caching enabled, and execute your custom yarn script.
+        usage:
+            version: "2.1"
+            orbs:
+                node: circleci/node@x.y
+            workflows:
+                run-npm-command:
+                    jobs:
+                        - node/run:
+                            yarn-run: build
+    npm_install:
+        description: |
+            By default, the "install-packages" command will attempt to utilize "npm ci". The command can however be overwriten to support an alternative package install command such as "npm install".
+        usage:
+            version: "2.1"
+            orbs:
+                node: circleci/node@x.y
+            jobs:
+                test:
+                    executor: node/default
+                    steps:
+                        - checkout
+                        - node/install-packages:
+                            cache-path: ~/project/node_modules
+                            override-ci-command: npm install
+                        - run: npm run test
+            workflows:
+                test_my_app:
+                    jobs:
+                        - test
+    run_matrix_testing:
+        description: |
+            Easily test your application against multiple versions of Node.js in just a few lines. This example uses "Matrix" jobs to call the same node/test job multiple times at once, each eith the Node version we have specified.
+
+            Read more here: https://circleci.com/blog/you-are-what-you-git-how-your-vcs-branching-model-affects-your-delivery-cadence/
+        usage:
+            version: "2.1"
+            orbs:
+                node: circleci/node@x.y
+            workflows:
+                matrix-tests:
+                    jobs:
+                        - node/test:
+                            matrix:
+                                parameters:
+                                    version:
+                                        - 13.11.0
+                                        - 12.16.0
+                                        - 10.19.0
+    run_tests_with_npm:
+        description: |
+            How to quickly and easily run your Node.js tests on CircleCI with caching automatically included. This example assumes you are using NPM as your package manager.
+            The "npm ci" command will automatically be applied and the "~/.npm" directory cached.
+        usage:
+            version: "2.1"
+            orbs:
+                node: circleci/node@x.y
+            jobs:
+                test:
+                    executor:
+                        name: node/default
+                        tag: "13.14"
+                    steps:
+                        - checkout
+                        - node/install-packages
+                        - run:
+                            command: npm run test
+            workflows:
+                test_my_app:
+                    jobs:
+                        - test
+    run_tests_with_yarn:
+        description: |
+            Utilize the YARN package manager with the CircleCI Node orb. Caching of your Node packages is enabled by default.
+        usage:
+            version: "2.1"
+            orbs:
+                node: circleci/node@x.y
+            jobs:
+                test:
+                    executor:
+                        name: node/default
+                        tag: "13"
+                    steps:
+                        - checkout
+                        - node/install-packages:
+                            pkg-manager: yarn
+                        - run:
+                            command: yarn run test
+                            name: Run YARN tests
+            workflows:
+                test_my_app:
+                    jobs:
+                        - test
+
