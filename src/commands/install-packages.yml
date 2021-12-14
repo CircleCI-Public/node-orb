@@ -27,9 +27,15 @@ parameters:
       By default, this orb will utilize 'npm ci' and cache the '~/.npm' directory. Override which path to cache with this parameter.
     type: string
     default: ""
+  cache-only-lockfile:
+    type: boolean
+    default: true
+    description: |
+      If true, package.json will be ignored in the cache key. Useful for projects where package.json changes do not always invalidate dependencies.
+      Note: package.json will still be the final fallback key incase a project is not configured with a lock file.
   cache-version:
     type: string
-    default: v1
+    default: "v1"
     description: Change the default cache version if you need to clear the cache for any reason.
   include-branch-in-cache-key:
     type: boolean
@@ -74,10 +80,11 @@ steps:
                 ln yarn.lock /tmp/node-project-lockfile
               fi
               ln package.json /tmp/node-project-package.json
-        - restore_cache:
+        - restore_cache: # Include branch and package.json checksum if defined. Prioritize lock-file as it is a more definitive version of dependency cache.
             keys:
-              - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
-              - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-
+              - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<^parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-package.json" }}-<</parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-lockfile" }}
+              - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-lockfile.json" }}
+              - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}
               - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>
 
   - when: # Install packages based on NPM
