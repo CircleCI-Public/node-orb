@@ -206,7 +206,7 @@ workflows:
       - orb-tools/pack
       - shellcheck/check:
           dir: ./src/scripts
-          exclude: SC2148
+          exclude: SC2148,SC2016
 
       # release dev version of orb, for testing & possible publishing.
       # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
@@ -220,6 +220,7 @@ workflows:
           requires:
             - orb-tools/pack
             - orb-tools/lint
+            - shellcheck/check
 
       # trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb

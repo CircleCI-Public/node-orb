@@ -3,7 +3,7 @@ if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 # FUNCTIONS
 get_yarn_version () {
     if [[ "$NODE_PARAM_YARN_VERSION" == "" ]]; then
-    YARN_ORB_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} \
+    YARN_ORB_VERSION=$(curl -Ls -o /dev/null -w "%{url_effective}" \
         "https://github.com/yarnpkg/yarn/releases/latest" | sed 's:.*/::' | cut -d 'v' -f 2 | cut -d 'v' -f 2)
     echo "Latest version of Yarn is $YARN_ORB_VERSION"
     else
@@ -24,12 +24,12 @@ installation_check () {
 
         if uname -a | grep Darwin > /dev/null 2>&1; then
         brew uninstall yarn > /dev/null 2>&1
-        elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
+        elif grep Alpine /etc/issue > /dev/null 2>&1; then
         apk del yarn > /dev/null 2>&1
-        elif cat /etc/issue | grep Debian > /dev/null 2>&1; then
+        elif grep Debian /etc/issue > /dev/null 2>&1; then
         $SUDO apt-get remove yarn > /dev/null 2>&1 && \
             $SUDO apt-get purge yarn > /dev/null 2>&1
-        elif cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
+        elif grep Ubuntu /etc/issue > /dev/null 2>&1; then
         $SUDO apt-get remove yarn > /dev/null 2>&1 && \
             $SUDO apt-get purge yarn > /dev/null 2>&1
         elif command -v yum > /dev/null 2>&1; then
@@ -52,7 +52,7 @@ curl -L -o yarn.tar.gz --silent "https://yarnpkg.com/downloads/$YARN_ORB_VERSION
 $SUDO tar -xzf yarn.tar.gz && rm yarn.tar.gz
 
 $SUDO mkdir -p /opt/yarn
-$SUDO mv yarn-v${YARN_ORB_VERSION}/* /opt/yarn
+$SUDO mv yarn-v"${YARN_ORB_VERSION}"/* /opt/yarn
 
 $SUDO rm -rf "yarn-v${YARN_ORB_VERSION}"
 
