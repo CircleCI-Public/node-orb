@@ -13,7 +13,8 @@ usage:
       steps:
         - checkout
         - node/install:
-            install-yarn: true # Set to true if you would like to install Yarn. NPM will install automatically.
+            install-yarn: true # Set to true if you would like to install Yarn. NPM comes prepackaged with node
+            node-version: "16.13" # Specify the node version to install
         - run: node --version
   workflows:
     test_my_app:

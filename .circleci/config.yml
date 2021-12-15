@@ -123,7 +123,7 @@ jobs:
       - node/install:
           node-version: "lts"
       - run:
-          name: Check that the latest LTS versiion of Node.js is installed.
+          name: Check that the latest LTS version of Node.js is installed.
           command: |
             NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | grep 'Latest LTS' | tail -n1 | awk '{print $2}')
             echo "Latest Node LTS version = $NODE_ORB_INSTALL_VERSION"

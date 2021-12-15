@@ -47,39 +47,16 @@ steps:
   - run:
       name: Checking for package.json
       working_directory: <<parameters.app-dir>>
-      command: |
-        if [ ! -f "package.json" ]; then
-          echo
-          echo "---"
-          echo "Unable to find your package.json file. Did you forget to set the app-dir parameter?"
-          echo "---"
-          echo
-          echo "Current directory: $(pwd)"
-          echo
-          echo
-          echo "List directory: "
-          echo
-          ls
-          exit 1
-        fi
+      command: <<include(scripts/packages/find-package.sh)>>
+       
   - when:
       condition: << parameters.with-cache >>
       steps:
         - run:
             working_directory: <<parameters.app-dir>>
             name: Determine lockfile
-            command: |
-              if [ -f "package-lock.json" ]; then
-                echo "Found package-lock.json file, assuming lockfile"
-                ln package-lock.json /tmp/node-project-lockfile
-              elif [ -f "npm-shrinkwrap.json" ]; then
-                echo "Found npm-shrinkwrap.json file, assuming lockfile"
-                ln npm-shrinkwrap.json /tmp/node-project-lockfile
-              elif [ -f "yarn.lock" ]; then
-                echo "Found yarn.lock file, assuming lockfile"
-                ln yarn.lock /tmp/node-project-lockfile
-              fi
-              ln package.json /tmp/node-project-package.json
+            command: <<include(scripts/packages/determine-lockfile.sh)>>
+              
         - restore_cache: # Include branch and package.json checksum if defined. Prioritize lock-file as it is a more definitive version of dependency cache.
             keys:
               - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<^parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-package.json" }}-<</parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-lockfile" }}
@@ -93,13 +70,11 @@ steps:
         - run:
             name: Installing NPM packages
             working_directory: <<parameters.app-dir>>
-            command: |
-              if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
-                echo "Running override package installation command:"
-                << parameters.override-ci-command >>
-              else
-                npm ci
-              fi
+            environment:
+              PARAM_CACHE_PATH: << parameters.cache-path >>
+              PARAM_OVERRIDE_COMMAND: << parameters.override-ci-command >>
+            command: <<include(scripts/packages/npm-install.sh)>>
+
         - when: # cache enabled, save cache
             condition: << parameters.with-cache >>
             steps:
@@ -109,7 +84,7 @@ steps:
                     - save_cache:
                         key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
                         paths:
-                          - <<parameters.cache-path>>
+                          - << parameters.cache-path >>
               - unless: # npm ci cache path
                   condition: << parameters.cache-path >>
                   steps:
@@ -125,13 +100,11 @@ steps:
         - run:
             name: Installing YARN packages
             working_directory: <<parameters.app-dir>>
-            command: |
-              if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
-                echo "Running override package installation command:"
-                << parameters.override-ci-command >>
-              else
-                yarn install --frozen-lockfile
-              fi
+            environment:
+              YARN_CACHE_FOLDER: << parameters.cache-path >>
+              PARAM_OVERRIDE_COMMAND: << parameters.override-ci-command >>
+            command: <<include(scripts/packages/yarn-v1-install.sh)>>
+             
         - when: # cache enabled, save cache
             condition: << parameters.with-cache >>
             steps:
@@ -147,7 +120,7 @@ steps:
                   steps:
                     - save_cache:
                         key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>>{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
-                        paths:
+                        paths: # yarn v1 cache is slow, so it is faster to use node
                           - <<parameters.app-dir>>/node_modules
 
   - when: # Install packages based on YARN
@@ -157,13 +130,10 @@ steps:
         - run:
             name: Installing YARN packages
             working_directory: <<parameters.app-dir>>
-            command: |
-              if [[ ! -z "<< parameters.override-ci-command >>" ]]; then
-                echo "Running override package installation command:"
-                << parameters.override-ci-command >>
-              else
-                yarn install --immutable
-              fi
+            environment:
+              PARAM_CACHE_PATH: << parameters.cache-path >>
+              PARAM_OVERRIDE_COMMAND: << parameters.override-ci-command >>
+            command: <<include(scripts/packages/yarn-berry-install.sh)>>
         - when: # cache enabled, save cache
             condition: << parameters.with-cache >>
             steps:
