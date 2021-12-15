@@ -48,7 +48,7 @@ steps:
       name: Checking for package.json
       working_directory: <<parameters.app-dir>>
       command: <<include(scripts/packages/find-package.sh)>>
-       
+
   - when:
       condition: << parameters.with-cache >>
       steps:
@@ -56,7 +56,7 @@ steps:
             working_directory: <<parameters.app-dir>>
             name: Determine lockfile
             command: <<include(scripts/packages/determine-lockfile.sh)>>
-              
+
         - restore_cache: # Include branch and package.json checksum if defined. Prioritize lock-file as it is a more definitive version of dependency cache.
             keys:
               - node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<^parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-package.json" }}-<</parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-lockfile" }}
@@ -104,7 +104,7 @@ steps:
               YARN_CACHE_FOLDER: << parameters.cache-path >>
               PARAM_OVERRIDE_COMMAND: << parameters.override-ci-command >>
             command: <<include(scripts/packages/yarn-v1-install.sh)>>
-             
+
         - when: # cache enabled, save cache
             condition: << parameters.with-cache >>
             steps:

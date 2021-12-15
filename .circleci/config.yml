@@ -2,8 +2,9 @@ version: 2.1
 
 orbs:
   node: circleci/node@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@10.0.3
-  jq: circleci/jq@2.2.0
+  orb-tools: circleci/orb-tools@10.0
+  shellcheck: circleci/shellcheck@2.2
+  jq: circleci/jq@2.2
 
 # Pipeline parameters
 parameters:
@@ -65,13 +66,13 @@ jobs:
     steps:
       - checkout
       - node/install:
-          node-version: "13.11.0"
+          node-version: "16.13"
           install-yarn: true # Test the install of YARN
           yarn-version: "1.22.5"
       - run:
           command: |
-            if ! node --version | grep -q "13"; then
-              echo "Node version 13 not found"
+            if ! node --version | grep -q "16"; then
+              echo "Node version 16 not found"
               exit 1
             fi
 
@@ -203,6 +204,9 @@ workflows:
       # pack your orb YAML files to a single orb.yml
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack
+      - shellcheck/check:
+          dir: ./src/scripts
+          exclude: SC2148
 
       # release dev version of orb, for testing & possible publishing.
       # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
