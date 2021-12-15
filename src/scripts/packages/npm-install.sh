@@ -1,7 +1,7 @@
 
 # Configure npm cache path if provided
 if [[ ! -z "$PARAM_CACHE_PATH" ]]; then
-    npm config set cache $PARAM_CACHE_PATH --global
+    npm config set cache $PARAM_CACHE_PATH
 fi
 
 # Run override ci command if provided, otherwise run default npm install
