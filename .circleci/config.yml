@@ -256,11 +256,6 @@ workflows:
           test-results-for: jest
           pkg-manager: yarn
       - node/test:
-          name: node-npm-jest-test-job
-          app-dir: "~/project/sample"
-          cache-version: v4
-          test-results-for: jest
-      - node/test:
           name: node-npm-mocha-test-job
           app-dir: "~/project/sample"
           cache-version: v4
