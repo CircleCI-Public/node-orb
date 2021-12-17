@@ -6,7 +6,7 @@ else
     
     echo 'export NVM_DIR="$HOME/.nvm"' >> "$BASH_ENV";
     echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use' >> "$BASH_ENV";
-
+    
     # shellcheck source=/dev/null
     source "$BASH_ENV";
 fi
@@ -14,15 +14,17 @@ fi
 if [ "$NODE_PARAM_VERSION" = "lts" ]; then
     nvm install --lts
     nvm alias default lts/*
-elif [ -n "$NODE_PARAM_VERSION" ]; then
+    elif [ -n "$NODE_PARAM_VERSION" ]; then
     nvm install "$NODE_PARAM_VERSION"
     nvm alias default "$NODE_PARAM_VERSION"
-elif [ -f ".nvmrc" ]; then
+    elif [ -f ".nvmrc" ]; then
     NVMRC_SPECIFIED_VERSION=$(<.nvmrc)
     nvm install "$NVMRC_SPECIFIED_VERSION"
     nvm alias default "$NVMRC_SPECIFIED_VERSION"
 else
+    NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+')
     nvm install "node"
+    nvm alias default "$NODE_ORB_INSTALL_VERSION"
 fi
 
 echo 'nvm use default &>/dev/null' >> "$BASH_ENV"
