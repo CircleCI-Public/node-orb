@@ -90,10 +90,8 @@ jobs:
       - run:
           name: Check that latest Node.js is installed.
           command: |
-            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | awk '{print $2}')
-            nvm ls-remote
-            nvm ls-remote | tail -n1
-            nvm ls-remote | tail -n1 | awk '{print $2}'
+            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+')
+
             echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
             echo "Installed version: $(node --version)"
             if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
