@@ -38,6 +38,9 @@ executors:
   macos:
     macos:
       xcode: 13.2.0
+  machine:
+    machine:
+      image: ubuntu-2004:202111-01
 
 commands:
   check-uploaded-test-results:
@@ -243,15 +246,15 @@ workflows:
       - integration-test-install-specified-version:
           matrix:
             parameters:
-              os: [linux, macos]
+              os: [linux, macos, machine]
       - integration-test-install-latest:
           matrix:
             parameters:
-              os: [linux, macos]
+              os: [linux, macos, machine]
       - integration-test-install-lts:
           matrix:
             parameters:
-              os: [linux, macos]
+              os: [linux, macos, machine]
       - node/test:
           name: node-npm-test-job
           app-dir: "~/project/sample"
