@@ -92,7 +92,7 @@ jobs:
           command: |
             NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | awk '{print $2}')
             nvm ls-remote
-            nvm ls-remote | tail -n1  
+            nvm ls-remote | tail -n1
             nvm ls-remote | tail -n1 | awk '{print $2}'
             echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
             echo "Installed version: $(node --version)"
