@@ -150,6 +150,7 @@ steps:
             environment:
               PARAM_CACHE_PATH: << parameters.cache-path >>
               PARAM_OVERRIDE_COMMAND: << parameters.override-ci-command >>
+              PARAM_CHECK_CACHE: << parameters.check-cache >>
             command: <<include(scripts/packages/yarn-berry-install.sh)>>
         - when: # check-cache is set to detect, so cache yarn lock
             condition:
