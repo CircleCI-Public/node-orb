@@ -4,10 +4,9 @@ description: |
 parameters:
   version:
     type: string
-    default: "13.11.0"
+    default: "lts"
     description: >
-      A full version tag must be specified. Example: "13.11.0"
-      For a full list of releases, see the following: https://nodejs.org/en/download/releases
+      Pick a specific cimg/node image version tag: https://hub.docker.com/r/cimg/node
   pkg-manager:
     type: enum
     enum: ["npm", "yarn", "yarn-berry"]
