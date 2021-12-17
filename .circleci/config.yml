@@ -266,6 +266,24 @@ workflows:
           test-results-for: mocha
           run-command: testmocha
       - node/test:
+          name: node-npm-test-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: jest
+      - node/test:
+          name: node-yarn-test-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: jest
+          pkg-manager: yarn
+          version: "16.13"
+      - node/test:
+          name: node-npm-mocha-test-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: mocha
+          run-command: testmocha
+      - node/test:
           name: node-yarn-mocha-test-job
           app-dir: "~/project/sample"
           cache-version: v4
