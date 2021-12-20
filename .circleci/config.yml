@@ -2,8 +2,9 @@ version: 2.1
 
 orbs:
   node: circleci/node@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@10.0.3
-  jq: circleci/jq@2.2.0
+  orb-tools: circleci/orb-tools@10.0
+  shellcheck: circleci/shellcheck@2.2
+  jq: circleci/jq@2.2
 
 # Pipeline parameters
 parameters:
@@ -20,8 +21,8 @@ integration-tests:
   &integration-tests [
     integration-test-install-specified-version,
     integration-test-install-lts,
-    node-npm-test-job,
-    node-yarn-test-job,
+    node-npm-jest-test-job,
+    node-yarn-jest-test-job,
     node-test-results-file-job,
     node-test-no-junit,
     integration-test-install-latest,
@@ -36,7 +37,10 @@ executors:
       - image: cimg/base:stable
   macos:
     macos:
-      xcode: 12.5.1
+      xcode: 13.2.0
+  machine:
+    machine:
+      image: ubuntu-2004:202111-01
 
 commands:
   check-uploaded-test-results:
@@ -65,13 +69,13 @@ jobs:
     steps:
       - checkout
       - node/install:
-          node-version: "13.11.0"
+          node-version: "16.13"
           install-yarn: true # Test the install of YARN
           yarn-version: "1.22.5"
       - run:
           command: |
-            if ! node --version | grep -q "13"; then
-              echo "Node version 13 not found"
+            if ! node --version | grep -q "16"; then
+              echo "Node version 16 not found"
               exit 1
             fi
 
@@ -82,17 +86,29 @@ jobs:
     executor: <<parameters.os>>
     steps:
       - checkout
-      - node/install
+      - node/install:
+          node-version: "latest"
       - run:
           name: Check that latest Node.js is installed.
           command: |
-            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | awk '{print $2}')
+            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+')
+
             echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
             echo "Installed version: $(node --version)"
             if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
               echo "Error: Installed version is different from the latest version."
               exit 1
             fi
+
+  integration-test-use-nvmrc-version:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
+    steps:
+      - checkout
+      - run: echo '16.13' > .nvmrc
+      - node/install
 
   integration-test-install-lts:
     parameters:
@@ -101,12 +117,11 @@ jobs:
     executor: <<parameters.os>>
     steps:
       - checkout
-      - node/install:
-          lts: true
+      - node/install
       - run:
           name: Check that the latest LTS version of Node.js is installed.
           command: |
-            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | grep 'Latest LTS' | tail -n1 | awk '{print $2}')
+            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | grep 'Latest LTS' | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+')
             echo "Latest Node LTS version = $NODE_ORB_INSTALL_VERSION"
             echo "Installed version: $(node --version)"
             if ! node --version | grep -q "$NODE_ORB_INSTALL_VERSION"; then
@@ -127,7 +142,6 @@ jobs:
   integration-test-yarn:
     executor:
       name: node/default
-      tag: "14.15"
     steps:
       - checkout
       - node/install-packages:
@@ -138,7 +152,6 @@ jobs:
   integration-test-yarn-berry:
     executor:
       name: node/default
-      tag: "14.15"
     steps:
       - checkout
       - node/install-packages:
@@ -150,7 +163,6 @@ jobs:
   check-test-results-uploaded:
     executor:
       name: node/default
-      tag: "14.15"
     steps:
       - jq/install
       - run:
@@ -160,10 +172,10 @@ jobs:
                  --url https://circleci.com/api/v2/workflow/$CIRCLE_WORKFLOW_ID/job \
                  --header 'authorization: Basic $CIRCLE_TOKEN' > workflow.json
       - check-uploaded-test-results:
-          job-name: node-npm-test-job
+          job-name: node-npm-jest-test-job
           expected-tests: 1
       - check-uploaded-test-results:
-          job-name: node-yarn-test-job
+          job-name: node-yarn-jest-test-job
           expected-tests: 1
       - check-uploaded-test-results:
           job-name: node-test-results-file-job
@@ -184,12 +196,9 @@ workflows:
       # pack your orb YAML files to a single orb.yml
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack
-
-      - approve_for_testing:
-          type: approval
-          requires:
-            - orb-tools/pack
-            - orb-tools/lint
+      - shellcheck/check:
+          dir: ./src/scripts
+          exclude: SC2148,SC2016
 
       # release dev version of orb, for testing & possible publishing.
       # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
@@ -201,7 +210,9 @@ workflows:
           orb-name: circleci/node
           context: orb-publisher
           requires:
-            - approve_for_testing
+            - orb-tools/pack
+            - orb-tools/lint
+            - shellcheck/check
 
       # trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb
@@ -224,27 +235,26 @@ workflows:
       - integration-test-install-specified-version:
           matrix:
             parameters:
-              os: [linux, macos]
+              os: [linux, macos, machine]
       - integration-test-install-latest:
           matrix:
             parameters:
-              os: [linux, macos]
+              os: [linux, macos, machine]
       - integration-test-install-lts:
           matrix:
             parameters:
-              os: [linux, macos]
+              os: [linux, macos, machine]
       - node/test:
-          name: node-npm-test-job
+          name: node-npm-jest-test-job
           app-dir: "~/project/sample"
           cache-version: v4
           test-results-for: jest
       - node/test:
-          name: node-yarn-test-job
+          name: node-yarn-jest-test-job
           app-dir: "~/project/sample"
           cache-version: v4
           test-results-for: jest
           pkg-manager: yarn
-          version: "14.15"
       - node/test:
           name: node-npm-mocha-test-job
           app-dir: "~/project/sample"
@@ -258,7 +268,6 @@ workflows:
           test-results-for: mocha
           pkg-manager: yarn
           run-command: testmocha
-          version: "14.15"
       - node/test:
           name: node-yarn-mocha-with-test-result-path-job
           app-dir: "~/project/sample"
@@ -266,13 +275,11 @@ workflows:
           test-results-for: mocha
           pkg-manager: yarn
           run-command: testmocha
-          version: "14.15"
           test-results-path: sample/test-results.xml
       - node/test:
           name: node-test-results-file-job
           app-dir: "~/project/sample"
           cache-version: v4
-          version: "14.15"
           test-results-path: sample/other-junit.xml
       - node/test:
           name: node-test-no-junit
@@ -280,8 +287,8 @@ workflows:
           cache-version: v4
       - check-test-results-uploaded:
           requires:
-            - node-npm-test-job
-            - node-yarn-test-job
+            - node-npm-jest-test-job
+            - node-yarn-jest-test-job
             - node-npm-mocha-test-job
             - node-yarn-mocha-test-job
             - node-test-results-file-job
