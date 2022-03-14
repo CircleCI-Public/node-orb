@@ -1,5 +1,5 @@
 description: |
-  Utilize the YARN package manager with the CircleCI Node orb. Caching of your Node packages is enabled by default.
+  Utilize the YARN v2 package manager + Zero installs with the CircleCI Node orb.
 usage:
   version: 2.1
   orbs:
@@ -12,7 +12,9 @@ usage:
       steps:
         - checkout
         - node/install-packages:
-            pkg-manager: yarn
+            pkg-manager: yarn-berry
+            with-cache: false # Since yarn zero installs cache via git, there is no reason to
+            check-cache: always # Set this to always or detect you are accepting PRs and want the extra security
         - run:
             name: Run YARN tests
             command: yarn run test

@@ -9,35 +9,17 @@ parameters:
   # node
   node-version:
     type: string
-    default: "node"
+    default: ""
     description: >
-      Specify the full version tag to install. To install the latest LTS version, set `lts` to true.
-      The latest (current) version of Node.js will be installed by default.
+      Specify the full version tag to install. To install the latest LTS version, set the version to `lts`.
+      If unspecified, the version listed in .nvmrc will be installed. If no .nvmrc file exists the latest (current) version of Node.js will be installed by default.
       For a full list of releases, see the following: https://nodejs.org/en/download/releases
-
-  lts:
-    type: boolean
-    default: false
-    description: Install the latest LTS version by default.
 
   node-install-dir:
     type: string
     default: /usr/local
     description: >
       Where should Node.js be installed?
-
-  # npm
-  install-npm:
-    type: boolean
-    default: true
-    description: Install NPM?
-
-  npm-version:
-    type: string
-    default: latest
-    description: >
-      Pick a version of NPM to install:
-      https://nodejs.org/en/download/releases
 
   # yarn
   install-yarn:
@@ -55,17 +37,10 @@ parameters:
 
 steps:
   - run:
-      name: Install Node.js <<^parameters.lts>> <<parameters.node-version>> <</parameters.lts>> <<#parameters.lts>> LTS <</parameters.lts>>
+      name: Install Node.js <<parameters.node-version>>
       environment:
-        NODE_PARAM_LTS: <<parameters.lts>>
         NODE_PARAM_VERSION: <<parameters.node-version>>
       command: <<include(scripts/install-nvm.sh)>>
-
-  - when:
-      condition: <<parameters.install-npm>>
-      steps:
-        - install-npm:
-            version: <<parameters.npm-version>>
 
   - when:
       condition: <<parameters.install-yarn>>

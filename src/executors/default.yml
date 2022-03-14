@@ -5,7 +5,7 @@ description: |
 parameters:
   tag:
     type: string
-    default: "13.11"
+    default: "lts"
     description: >
       Pick a specific cimg/node image version tag:
       https://hub.docker.com/r/cimg/node
