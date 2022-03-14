@@ -42,6 +42,9 @@ installation_check () {
     fi
 }
 
+# cd to home so that yarn --version will not use relative installed yarn from .yarn/releases
+cd ~ || echo "Cannot change directory to home directory, yarn version may be mismatched."
+
 get_yarn_version
 installation_check
 
