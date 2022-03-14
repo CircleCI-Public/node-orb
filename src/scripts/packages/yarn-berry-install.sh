@@ -10,10 +10,10 @@ if [[ -n "$PARAM_OVERRIDE_COMMAND" ]]; then
 else
     # If a cache folder is already present, then we use Yarn Zero installs
     # See: https://yarnpkg.com/features/zero-installs
-    if [[ ! -f "$PARAM_CACHE_PATH" ]]; then
+    if [[ -f "$PARAM_CACHE_PATH" ]]; then
         # See: https://yarnpkg.com/features/zero-installs#does-it-have-security-implications
         YARN_LOCKFILE_PATH="/tmp/yarn-zero-lockfile"
-        
+
         if [[ "$PARAM_CHECK_CACHE" == "detect" ]]; then
             if [[ ! -f "$YARN_LOCKFILE_PATH" ]]; then
                 echo "No yarn zero lockfile cached. Enabling check cache this run."
@@ -26,13 +26,13 @@ else
                 echo "No changes detected in lockfile. Skipping check cache this run."
             fi
         fi
-        
+
         if [[ "$PARAM_CHECK_CACHE" == "always" || -n "$ENABLE_CHECK_CACHE" ]]; then
             set -- "$@" --check-cache
         fi
-        
+
         yarn install --immutable --immutable-cache "$@"
-        
+
         if [[ "$PARAM_CHECK_CACHE" == "detect" && -n "$ENABLE_CHECK_CACHE" ]]; then
             cp yarn.lock "$YARN_LOCKFILE_PATH"
         fi
