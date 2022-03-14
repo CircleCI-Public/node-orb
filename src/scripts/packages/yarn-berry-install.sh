@@ -10,7 +10,7 @@ if [[ -n "$PARAM_OVERRIDE_COMMAND" ]]; then
 else
     # If a cache folder is already present, then we use Yarn Zero installs
     # See: https://yarnpkg.com/features/zero-installs
-    if [[ -f "$PARAM_CACHE_PATH" ]]; then
+    if [[ -e "$PARAM_CACHE_PATH" ]]; then
         # See: https://yarnpkg.com/features/zero-installs#does-it-have-security-implications
         YARN_LOCKFILE_PATH="/tmp/yarn-zero-lockfile"
 
