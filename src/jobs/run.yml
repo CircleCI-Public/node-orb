@@ -47,15 +47,15 @@ steps:
     - checkout
     - steps: << parameters.setup >>
     - install-packages:
-          app-dir: << parameters.app-dir >>
-          pkg-manager: << parameters.pkg-manager >>
-          cache-version: << parameters.cache-version >>
-          override-ci-command: << parameters.override-ci-command >>
+          app-dir: <<parameters.app-dir>>
+          pkg-manager: <<parameters.pkg-manager>>
+          cache-version: <<parameters.cache-version>>
+          override-ci-command: <<parameters.override-ci-command>>
     - run:
-          name: Run << parameters.pkg-manager >> << parameters.npm-run >>
-          working_directory: << parameters.app-dir >>
+          name: Run <<parameters.pkg-manager>> <<parameters.npm-run>>
+          working_directory: <<parameters.app-dir>>
           environment:
-              PKG_MANAGER: << parameters.pkg-manager >>
-              NPM_RUN: << parameters.npm-run >>
-              YARN_RUN: << parameters.yarn-run >>
+              PKG_MANAGER: <<parammeters.pkg-manager>>
+              NPM_RUN: <<parameters.npm-run>>
+              YARN_RUN: <<parameters.yarn-run>>
           command: <<include(scripts/packages/run-commands-with.sh)>>

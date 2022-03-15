@@ -57,10 +57,10 @@ steps:
     - checkout
     - steps: << parameters.setup >>
     - install-packages:
-          app-dir: << parameters.app-dir >>
-          pkg-manager: << parameters.pkg-manager >>
-          cache-version: << parameters.cache-version >>
-          override-ci-command: << parameters.override-ci-command >>
+          app-dir: <<parameters.app-dir>>
+          pkg-manager: <<parameters.pkg-manager>>
+          cache-version: <<parameters.cache-version>>
+          override-ci-command: <<parameters.override-ci-command>>
     - when: # Run tests for NPM, without test results
           condition:
               and:
