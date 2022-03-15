@@ -1,49 +1,49 @@
 description: |
-  Install custom versions of Node.js, and optionally NPM/Yarn, in any
-  execution environment (Docker/Linux, macOS, machine) that does not have
-  it preinstalled.
+    Install custom versions of Node.js, and optionally NPM/Yarn, in any
+    execution environment (Docker/Linux, macOS, machine) that does not have
+    it preinstalled.
 
-  Recommendation: It is highly recommended to utilize an environment such as Docker with Node preinstalled.
+    Recommendation: It is highly recommended to utilize an environment such as Docker with Node preinstalled.
 
 parameters:
-  # node
-  node-version:
-    type: string
-    default: ""
-    description: >
-      Specify the full version tag to install. To install the latest version, set the version to `latest`.
-      If unspecified, the version listed in .nvmrc will be installed. If no .nvmrc file exists the active LTS version of Node.js will be installed by default.
-      For a full list of releases, see the following: https://nodejs.org/en/download/releases
+    # node
+    node-version:
+        type: string
+        default: ''
+        description: >
+            Specify the full version tag to install. To install the latest version, set the version to `latest`.
+            If unspecified, the version listed in .nvmrc will be installed. If no .nvmrc file exists the active LTS version of Node.js will be installed by default.
+            For a full list of releases, see the following: https://nodejs.org/en/download/releases
 
-  node-install-dir:
-    type: string
-    default: /usr/local
-    description: >
-      Where should Node.js be installed?
+    node-install-dir:
+        type: string
+        default: /usr/local
+        description: >
+            Where should Node.js be installed?
 
-  # yarn
-  install-yarn:
-    type: boolean
-    default: false
-    description: Install Yarn?
+    # yarn
+    install-yarn:
+        type: boolean
+        default: false
+        description: Install Yarn?
 
-  yarn-version:
-    type: string
-    default: ""
-    description: >
-      Pick a version of Yarn to install (if no version is specified,
-      the latest stable version will be installed):
-      https://github.com/yarnpkg/yarn/releases
+    yarn-version:
+        type: string
+        default: ''
+        description: >
+            Pick a version of Yarn to install (if no version is specified,
+            the latest stable version will be installed):
+            https://github.com/yarnpkg/yarn/releases
 
 steps:
-  - run:
-      name: Install Node.js <<parameters.node-version>>
-      environment:
-        NODE_PARAM_VERSION: <<parameters.node-version>>
-      command: <<include(scripts/install-nvm.sh)>>
+    - run:
+          name: Install Node.js <<parameters.node-version>>
+          environment:
+              NODE_PARAM_VERSION: <<parameters.node-version>>
+          command: <<include(scripts/install-nvm.sh)>>
 
-  - when:
-      condition: <<parameters.install-yarn>>
-      steps:
-        - install-yarn:
-            version: <<parameters.yarn-version>>
+    - when:
+          condition: <<parameters.install-yarn>>
+          steps:
+              - install-yarn:
+                    version: <<parameters.yarn-version>>

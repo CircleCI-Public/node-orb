@@ -1,194 +1,194 @@
 description: |
-  Simple drop-in job to test your Node.js application automatically.
+    Simple drop-in job to test your Node.js application automatically.
 
 parameters:
-  version:
-    type: string
-    default: "lts"
-    description: >
-      Pick a specific cimg/node image version tag: https://hub.docker.com/r/cimg/node
-  pkg-manager:
-    type: enum
-    enum: ["npm", "yarn", "yarn-berry"]
-    default: "npm"
-    description: Select the default node package manager to use.
-  cache-version:
-    type: string
-    default: v1
-    description: Change the default cache version if you need to clear the cache for any reason.
-  setup:
-    type: steps
-    description: Provide any optional steps you would like to run prior to installing the node dependencies. This is a good place to install global modules.
-    default: []
-  run-command:
-    type: string
-    default: "test"
-    description: The name of the script within your package.json which will run your tests.
-  app-dir:
-    type: string
-    default: "~/project"
-    description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
-  override-ci-command:
-    description: |
-      By default, packages will be installed with "npm ci" or "yarn install --frozen-lockfile".
-      Optionally supply a custom package installation command, with any additional flags needed.
-    type: string
-    default: ""
-  test-results-path:
-    type: string
-    default: ""
-    description: |
-      If you use test-results-for, this will be configured automatically.
-      If you configure test results yourself (for example in your node config files) set this to the location that you write them to, and they will be uploaded.
-  test-results-for:
-    default: other
-    type: enum
-    enum: ["jest", "mocha", "other"]
-    description: |
-      Testing framework your project uses.
-      If this is set to jest or mocha, test results will be automatically produced. When using jest, the jest-junit package is required as a dev dependency. See https://github.com/jest-community/jest-junit for more information.
-      When using mocha, the mocha-junit-reporter and mocha-multi packages are required as dev dependency. See https://github.com/michaelleeallen/mocha-junit-reporter and https://github.com/glenjamin/mocha-multi for more information.
+    version:
+        type: string
+        default: 'lts'
+        description: >
+            Pick a specific cimg/node image version tag: https://hub.docker.com/r/cimg/node
+    pkg-manager:
+        type: enum
+        enum: ['npm', 'yarn', 'yarn-berry']
+        default: 'npm'
+        description: Select the default node package manager to use.
+    cache-version:
+        type: string
+        default: v1
+        description: Change the default cache version if you need to clear the cache for any reason.
+    setup:
+        type: steps
+        description: Provide any optional steps you would like to run prior to installing the node dependencies. This is a good place to install global modules.
+        default: []
+    run-command:
+        type: string
+        default: 'test'
+        description: The name of the script within your package.json which will run your tests.
+    app-dir:
+        type: string
+        default: '~/project'
+        description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
+    override-ci-command:
+        description: |
+            By default, packages will be installed with "npm ci" or "yarn install --frozen-lockfile".
+            Optionally supply a custom package installation command, with any additional flags needed.
+        type: string
+        default: ''
+    test-results-path:
+        type: string
+        default: ''
+        description: |
+            If you use test-results-for, this will be configured automatically.
+            If you configure test results yourself (for example in your node config files) set this to the location that you write them to, and they will be uploaded.
+    test-results-for:
+        default: other
+        type: enum
+        enum: ['jest', 'mocha', 'other']
+        description: |
+            Testing framework your project uses.
+            If this is set to jest or mocha, test results will be automatically produced. When using jest, the jest-junit package is required as a dev dependency. See https://github.com/jest-community/jest-junit for more information.
+            When using mocha, the mocha-junit-reporter and mocha-multi packages are required as dev dependency. See https://github.com/michaelleeallen/mocha-junit-reporter and https://github.com/glenjamin/mocha-multi for more information.
 
 executor:
-  name: default
-  tag: << parameters.version >>
+    name: default
+    tag: << parameters.version >>
 
 steps:
-  - checkout
-  - steps: << parameters.setup >>
-  - install-packages:
-      app-dir: <<parameters.app-dir>>
-      pkg-manager: <<parameters.pkg-manager>>
-      cache-version: <<parameters.cache-version>>
-      override-ci-command: <<parameters.override-ci-command>>
-  - when: # Run tests for NPM, without test results
-      condition:
-        and:
-          - equal: [npm, << parameters.pkg-manager >>]
-          - equal: [other, << parameters.test-results-for >>]
-      steps:
-        - run:
-            name: Run NPM Tests
-            working_directory: <<parameters.app-dir>>
-            command: npm run <<parameters.run-command>>
-  - when: # Run tests for NPM, with jest test results
-      condition:
-        and:
-          - equal: [npm, << parameters.pkg-manager >>]
-          - equal: [jest, << parameters.test-results-for >>]
-      steps:
-        - run:
-            name: Check for test reporter
-            working_directory: <<parameters.app-dir>>
-            command: npm list jest-junit || (echo "Add the package jest-junit to the dev dependencies of your project with `npm install --save-dev jest-junit`" && exit 1)
-        - run:
-            name: Run NPM Tests
-            working_directory: <<parameters.app-dir>>
-            command: npm run <<parameters.run-command>> -- --reporters=default --reporters=jest-junit
-  - when: # Run tests for NPM, with mocha test results
-      condition:
-        and:
-          - equal: [npm, << parameters.pkg-manager >>]
-          - equal: [mocha, << parameters.test-results-for >>]
-      steps:
-        - run:
-            name: Check for test reporter
-            working_directory: <<parameters.app-dir>>
-            command: npm list mocha-junit-reporter mocha-multi || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `npm install --save-dev mocha-junit-reporter mocha-multi`" && exit 1)
-        - run:
-            name: Run NPM Tests
-            working_directory: <<parameters.app-dir>>
-            command: npm run <<parameters.run-command>> -- --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
-  - when: # Run tests for YARN, without test results
-      condition:
-        and:
-          - equal: [yarn, << parameters.pkg-manager >>]
-          - equal: [other, << parameters.test-results-for >>]
-      steps:
-        - run:
-            name: Run YARN Tests
-            working_directory: <<parameters.app-dir>>
-            command: yarn run <<parameters.run-command>>
-  - when: # Run tests for YARN, with jest test results
-      condition:
-        and:
-          - equal: [yarn, << parameters.pkg-manager >>]
-          - equal: [jest, << parameters.test-results-for >>]
-      steps:
-        - run:
-            name: Check for test reporter
-            working_directory: <<parameters.app-dir>>
-            command: yarn list --pattern jest-junit | grep " jest-junit@" || (echo "Add the package jest-junit to your projects dev dependencies with `yarn add --dev jest-junit`" && exit 1)
-        - run:
-            name: Run YARN Tests
-            working_directory: <<parameters.app-dir>>
-            command: yarn run <<parameters.run-command>> --reporters=default --reporters=jest-junit
-  - when: # Run tests for YARN, with mocha test results
-      condition:
-        and:
-          - equal: [yarn, << parameters.pkg-manager >>]
-          - equal: [mocha, << parameters.test-results-for >>]
-      steps:
-        - run:
-            name: Check for test reporter
-            working_directory: <<parameters.app-dir>>
-            command: yarn list --pattern "mocha-junit-reporter|mocha-multi" | grep "mocha-junit-reporter@\|mocha-multi@" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `yarn add --dev mocha-junit-reporter mocha-multi`" && exit 1)
-        - run:
-            name: Run YARN Tests
-            working_directory: <<parameters.app-dir>>
-            command: yarn run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
-  - when: # Run tests for YARN 2.x, without test results
-      condition:
-        and:
-          - equal: [yarn-berry, << parameters.pkg-manager >>]
-          - equal: [other, << parameters.test-results-for >>]
-      steps:
-        - run:
-            name: Run YARN 2.x Tests
-            working_directory: <<parameters.app-dir>>
-            command: yarn run <<parameters.run-command>>
-  - when: # Run tests for YARN 2.x, with jest test results
-      condition:
-        and:
-          - equal: [yarn-berry, << parameters.pkg-manager >>]
-          - equal: [jest, << parameters.test-results-for >>]
-      steps:
-        - run:
-            name: Run YARN 2.x Tests
-            working_directory: <<parameters.app-dir>>
-            command: yarn run <<parameters.run-command>> --reporters=default --reporters=jest-junit
-  - when: # Run tests for YARN 2.x, with mocha test results
-      condition:
-        and:
-          - equal: [yarn-berry, << parameters.pkg-manager >>]
-          - equal: [mocha, << parameters.test-results-for >>]
-      steps:
-        - run:
-            name: Check for test reporter
-            working_directory: <<parameters.app-dir>>
-            command: yarn list --pattern "mocha-junit-reporter|mocha-multi" | grep "mocha-junit-reporter@\|mocha-multi@" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `yarn add --dev mocha-junit-reporter mocha-multi`" && exit 1)
-        - run:
-            name: Run YARN 2.x Tests
-            working_directory: <<parameters.app-dir>>
-            command: yarn run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
-  - when: # upload test results if a path was given
-      condition: << parameters.test-results-path >>
-      steps:
-        store_test_results:
-          path: << parameters.test-results-path >>
-  - when: # upload test results if jest was automatically configured and test-results-path is not specified
-      condition:
-        and:
-          - equal: [jest, << parameters.test-results-for >>]
-          - equal: ["", << parameters.test-results-path >>]
-      steps:
-        store_test_results:
-          path: <<parameters.app-dir>>/junit.xml
-  - when: # upload test results if mocha was automatically configured and test-results-path is not specified
-      condition:
-        and:
-          - equal: [mocha, << parameters.test-results-for >>]
-          - equal: ["", << parameters.test-results-path >>]
-      steps:
-        store_test_results:
-          path: <<parameters.app-dir>>/test-results.xml
+    - checkout
+    - steps: << parameters.setup >>
+    - install-packages:
+          app-dir: << parameters.app-dir >>
+          pkg-manager: << parameters.pkg-manager >>
+          cache-version: << parameters.cache-version >>
+          override-ci-command: << parameters.override-ci-command >>
+    - when: # Run tests for NPM, without test results
+          condition:
+              and:
+                  - equal: [npm, << parameters.pkg-manager >>]
+                  - equal: [other, << parameters.test-results-for >>]
+          steps:
+              - run:
+                    name: Run NPM Tests
+                    working_directory: <<parameters.app-dir>>
+                    command: npm run <<parameters.run-command>>
+    - when: # Run tests for NPM, with jest test results
+          condition:
+              and:
+                  - equal: [npm, << parameters.pkg-manager >>]
+                  - equal: [jest, << parameters.test-results-for >>]
+          steps:
+              - run:
+                    name: Check for test reporter
+                    working_directory: <<parameters.app-dir>>
+                    command: npm list jest-junit || (echo "Add the package jest-junit to the dev dependencies of your project with `npm install --save-dev jest-junit`" && exit 1)
+              - run:
+                    name: Run NPM Tests
+                    working_directory: <<parameters.app-dir>>
+                    command: npm run <<parameters.run-command>> -- --reporters=default --reporters=jest-junit
+    - when: # Run tests for NPM, with mocha test results
+          condition:
+              and:
+                  - equal: [npm, << parameters.pkg-manager >>]
+                  - equal: [mocha, << parameters.test-results-for >>]
+          steps:
+              - run:
+                    name: Check for test reporter
+                    working_directory: <<parameters.app-dir>>
+                    command: npm list mocha-junit-reporter mocha-multi || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `npm install --save-dev mocha-junit-reporter mocha-multi`" && exit 1)
+              - run:
+                    name: Run NPM Tests
+                    working_directory: <<parameters.app-dir>>
+                    command: npm run <<parameters.run-command>> -- --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
+    - when: # Run tests for YARN, without test results
+          condition:
+              and:
+                  - equal: [yarn, << parameters.pkg-manager >>]
+                  - equal: [other, << parameters.test-results-for >>]
+          steps:
+              - run:
+                    name: Run YARN Tests
+                    working_directory: <<parameters.app-dir>>
+                    command: yarn run <<parameters.run-command>>
+    - when: # Run tests for YARN, with jest test results
+          condition:
+              and:
+                  - equal: [yarn, << parameters.pkg-manager >>]
+                  - equal: [jest, << parameters.test-results-for >>]
+          steps:
+              - run:
+                    name: Check for test reporter
+                    working_directory: <<parameters.app-dir>>
+                    command: yarn list --pattern jest-junit | grep " jest-junit@" || (echo "Add the package jest-junit to your projects dev dependencies with `yarn add --dev jest-junit`" && exit 1)
+              - run:
+                    name: Run YARN Tests
+                    working_directory: <<parameters.app-dir>>
+                    command: yarn run <<parameters.run-command>> --reporters=default --reporters=jest-junit
+    - when: # Run tests for YARN, with mocha test results
+          condition:
+              and:
+                  - equal: [yarn, << parameters.pkg-manager >>]
+                  - equal: [mocha, << parameters.test-results-for >>]
+          steps:
+              - run:
+                    name: Check for test reporter
+                    working_directory: <<parameters.app-dir>>
+                    command: yarn list --pattern "mocha-junit-reporter|mocha-multi" | grep "mocha-junit-reporter@\|mocha-multi@" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `yarn add --dev mocha-junit-reporter mocha-multi`" && exit 1)
+              - run:
+                    name: Run YARN Tests
+                    working_directory: <<parameters.app-dir>>
+                    command: yarn run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
+    - when: # Run tests for YARN 2.x, without test results
+          condition:
+              and:
+                  - equal: [yarn-berry, << parameters.pkg-manager >>]
+                  - equal: [other, << parameters.test-results-for >>]
+          steps:
+              - run:
+                    name: Run YARN 2.x Tests
+                    working_directory: <<parameters.app-dir>>
+                    command: yarn run <<parameters.run-command>>
+    - when: # Run tests for YARN 2.x, with jest test results
+          condition:
+              and:
+                  - equal: [yarn-berry, << parameters.pkg-manager >>]
+                  - equal: [jest, << parameters.test-results-for >>]
+          steps:
+              - run:
+                    name: Run YARN 2.x Tests
+                    working_directory: <<parameters.app-dir>>
+                    command: yarn run <<parameters.run-command>> --reporters=default --reporters=jest-junit
+    - when: # Run tests for YARN 2.x, with mocha test results
+          condition:
+              and:
+                  - equal: [yarn-berry, << parameters.pkg-manager >>]
+                  - equal: [mocha, << parameters.test-results-for >>]
+          steps:
+              - run:
+                    name: Check for test reporter
+                    working_directory: <<parameters.app-dir>>
+                    command: yarn list --pattern "mocha-junit-reporter|mocha-multi" | grep "mocha-junit-reporter@\|mocha-multi@" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `yarn add --dev mocha-junit-reporter mocha-multi`" && exit 1)
+              - run:
+                    name: Run YARN 2.x Tests
+                    working_directory: <<parameters.app-dir>>
+                    command: yarn run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
+    - when: # upload test results if a path was given
+          condition: << parameters.test-results-path >>
+          steps:
+              store_test_results:
+                  path: << parameters.test-results-path >>
+    - when: # upload test results if jest was automatically configured and test-results-path is not specified
+          condition:
+              and:
+                  - equal: [jest, << parameters.test-results-for >>]
+                  - equal: ['', << parameters.test-results-path >>]
+          steps:
+              store_test_results:
+                  path: <<parameters.app-dir>>/junit.xml
+    - when: # upload test results if mocha was automatically configured and test-results-path is not specified
+          condition:
+              and:
+                  - equal: [mocha, << parameters.test-results-for >>]
+                  - equal: ['', << parameters.test-results-path >>]
+          steps:
+              store_test_results:
+                  path: <<parameters.app-dir>>/test-results.xml

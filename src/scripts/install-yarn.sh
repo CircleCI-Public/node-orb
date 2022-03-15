@@ -78,7 +78,7 @@ fi
 # test/verify version
 echo "Verifying YARN install"
 if yarn --version | grep "$YARN_ORB_VERSION" > /dev/null 2>&1; then
-    echo "Success! Yarn $(yarn --version) has been installed to $(which yarn)"
+    echo "Success! Yarn $(yarn --version) has been installed to $(command -v yarn)"
 else
     echo "Something went wrong; the specified version of Yarn could not be installed"
     exit 1
