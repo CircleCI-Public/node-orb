@@ -55,7 +55,7 @@ steps:
           name: Run <<parameters.pkg-manager>> <<parameters.npm-run>>
           working_directory: <<parameters.app-dir>>
           environment:
-              PKG_MANAGER: <<parameters.pkg-manager>>
-              NPM_RUN: <<parameters.npm-run>>
-              YARN_RUN: <<parameters.yarn-run>>
-          command: <<include(scripts/packages/run-commands-with.sh)>>
+              ORB_PARAM_PKG_MANAGER: <<parameters.pkg-manager>>
+              ORB_PARAM_NPM_RUN: <<parameters.npm-run>>
+              ORB_PARAM_YARN_RUN: <<parameters.yarn-run>>
+          command: <<include(scripts/run-commands-with.sh)>>

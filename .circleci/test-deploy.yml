@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   node: circleci/node@dev:<<pipeline.git.revision>>
-  orb-tools: circleci/orb-tools@11.1
+  orb-tools: circleci/orb-tools@dev:617181cc1afac6625ab7193606db71dfe6498514
   jq: circleci/jq@2.2.0
 commands:
   check-uploaded-test-results:
@@ -281,6 +281,7 @@ workflows:
           name: node-run-yarn-job
           app-dir: "~/project/sample"
           cache-version: v5
+          pkg-manager: yarn
           yarn-run: build
       - integration-test-override-ci:
           filters:
