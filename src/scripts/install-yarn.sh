@@ -3,8 +3,7 @@ if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 # FUNCTIONS
 get_yarn_version () {
     if [[ "$NODE_PARAM_YARN_VERSION" == "" ]]; then
-    YARN_ORB_VERSION=$(curl -Ls -o /dev/null -w "%{url_effective}" \
-        "https://github.com/yarnpkg/yarn/releases/latest" | sed 's:.*/::' | cut -d 'v' -f 2 | cut -d 'v' -f 2)
+    YARN_ORB_VERSION=$(curl -s https://cdn.jsdelivr.net/npm/yarn/package.json | sed -n 's/.*version": "\(.*\)".*/\1/p')
     echo "Latest version of Yarn is $YARN_ORB_VERSION"
     else
     YARN_ORB_VERSION="$NODE_PARAM_YARN_VERSION"
