@@ -187,12 +187,12 @@ workflows:
             parameters:
               os: [linux, macos, machine]
       - integration-test-install-lts:
-        filters:
+          filters:
             tags:
               only: /.*/
-        matrix:
-          parameters:
-            os: [linux, macos, machine]
+          matrix:
+            parameters:
+              os: [linux, macos, machine]
       - node/test:
           filters:
             tags:
