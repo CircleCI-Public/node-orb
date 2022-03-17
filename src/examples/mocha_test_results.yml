@@ -1,12 +1,12 @@
 description: |
-  Run tests with mocha and produce and upload test reports.
-  This assumes that you have configured your project to invoke mocha as your test script and that you have the mocha-junit-reporter and mocha-multi packages in your dev dependencies.
+    Run tests with mocha and produce and upload test reports.
+    This assumes that you have configured your project to invoke mocha as your test script and that you have the mocha-junit-reporter and mocha-multi packages in your dev dependencies.
 usage:
-  version: 2.1
-  orbs:
-    node: circleci/node@x.y # This version number refers to the version of the orb, not the version of Node.js
-  workflows:
-    test:
-      jobs:
-        - node/test:
-            test-results-for: mocha
+    version: 2.1
+    orbs:
+        node: circleci/node@x.y # This version number refers to the version of the orb, not the version of Node.js
+    workflows:
+        test:
+            jobs:
+                - node/test:
+                      test-results-for: mocha

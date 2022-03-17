@@ -1,18 +1,18 @@
 description: >
-  Install a custom version of the Yarn package manager
+    Install a custom version of the Yarn package manager
 
 parameters:
-  version:
-    type: string
-    default: ""
-    description: >
-      Pick a version of Yarn to install (if no version is specified,
-      the latest stable version will be installed):
-      https://github.com/yarnpkg/yarn/releases
+    version:
+        type: string
+        default: ''
+        description: >
+            Pick a version of Yarn to install (if no version is specified,
+            the latest stable version will be installed):
+            https://github.com/yarnpkg/yarn/releases
 
 steps:
-  - run:
-      name: Install Yarn
-      environment:
-        NODE_PARAM_YARN_VERSION: <<parameters.version>>
-      command: <<include(scripts/install-yarn.sh)>>
+    - run:
+          name: Install Yarn
+          environment:
+              NODE_PARAM_YARN_VERSION: <<parameters.version>>
+          command: <<include(scripts/install-yarn.sh)>>

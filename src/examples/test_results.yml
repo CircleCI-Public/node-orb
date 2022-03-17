@@ -1,12 +1,12 @@
 description: |
-  Run tests with jest and produce and upload test reports.
-  This assumes that you have configured your project so that your test script will produce the junit.xml file.
+    Run tests with jest and produce and upload test reports.
+    This assumes that you have configured your project so that your test script will produce the junit.xml file.
 usage:
-  version: 2.1
-  orbs:
-    node: circleci/node@x.y # This version number refers to the version of the orb, not the version of Node.js
-  workflows:
-    test:
-      jobs:
-        - node/test:
-            test-results-path: junit.xml
+    version: 2.1
+    orbs:
+        node: circleci/node@x.y # This version number refers to the version of the orb, not the version of Node.js
+    workflows:
+        test:
+            jobs:
+                - node/test:
+                      test-results-path: junit.xml
