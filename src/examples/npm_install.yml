@@ -9,10 +9,10 @@ usage:
             executor: node/default
             steps:
                 - checkout
+                - run: sudo npm install -g npm@latest
                 - node/install-packages:
                       override-ci-command: npm install
                       cache-path: ~/project/node_modules
-                - run: sudo npm install -g npm@latest
                 - run: npm run test
     workflows:
         test_my_app:
