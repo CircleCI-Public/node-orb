@@ -49,7 +49,7 @@ installation_check
 
 # install yarn
 echo "Installing YARN v$YARN_ORB_VERSION"
-curl -L -o yarn.tar.gz --silent "https://yarnpkg.com/downloads/$YARN_ORB_VERSION/yarn-v$YARN_ORB_VERSION.tar.gz"
+curl --retry 5 -L -o yarn.tar.gz --silent "https://yarnpkg.com/downloads/$YARN_ORB_VERSION/yarn-v$YARN_ORB_VERSION.tar.gz"
 
 $SUDO tar -xzf yarn.tar.gz && rm yarn.tar.gz
 
