@@ -1,5 +1,5 @@
 TARGET_DIR="/tmp"
-if ! [ -z $HOMEDRIVE ]; then
+if [ -n $HOMEDRIVE ]; then
     TARGET_DIR="$HOMEDRIVE\\tmp\\"
 fi
 
