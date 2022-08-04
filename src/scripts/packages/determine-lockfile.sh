@@ -1,6 +1,6 @@
 TARGET_DIR="/tmp"
 if [ -n "$HOMEDRIVE" ]; then
-    TARGET_DIR="$HOMEDRIVE\\tmp\\"
+    TARGET_DIR="$HOMEDRIVE\\tmp"
 fi
 
 # Link corresponding lock file to a temporary file used by cache commands
