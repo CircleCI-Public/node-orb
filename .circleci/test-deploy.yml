@@ -29,7 +29,11 @@ executors:
   machine:
     machine:
       image: ubuntu-2004:202111-01
-
+  windows:
+    machine:
+      image: windows-server-2022-gui:current
+      shell: bash.exe
+    resource_class: windows.medium
 jobs:
   # Install Node.js into a non-node container.
   integration-test-install-specified-version:
@@ -104,6 +108,21 @@ jobs:
     executor: node/default
     steps:
       - checkout
+      - node/install-packages:
+          override-ci-command: npm install
+          cache-path: ~/project/node_modules
+          cache-version: override-v3
+          app-dir: "~/project/sample"
+      - run: cd ~/project/sample && npm run test
+  integration-test-override-ci-windows:
+    executor: windows
+    steps:
+      - checkout
+      - run:
+          name: Install Node.js
+          command: |
+            nvm install lts
+            nvm use lts
       - node/install-packages:
           override-ci-command: npm install
           cache-path: ~/project/node_modules
@@ -284,6 +303,10 @@ workflows:
           pkg-manager: yarn
           yarn-run: build
       - integration-test-override-ci:
+          filters:
+            tags:
+              only: /.*/  
+      - integration-test-override-ci-windows:
           filters:
             tags:
               only: /.*/  
