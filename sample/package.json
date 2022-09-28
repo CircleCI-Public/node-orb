@@ -22,7 +22,7 @@
     "jest-junit": "^13.0.0",
     "mocha-junit-reporter": "2.0.2",
     "mocha-multi": "1.1.5",
-    "nodemon": "^2.0.15",
+    "nodemon": "^2.0.20",
     "ts-node": "^10.4.0",
     "tslint": "^6.1.1",
     "typescript": "^4.5.4"
