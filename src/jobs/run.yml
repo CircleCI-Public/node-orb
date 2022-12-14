@@ -38,10 +38,23 @@ parameters:
             Optionally supply a custom package installation command, with any additional flags needed.
         type: string
         default: ''
+    resource_class:
+        default: large
+        description: Configure the executor resource class
+        enum:
+        - small
+        - medium
+        - medium+
+        - large
+        - xlarge
+        - 2xlarge
+        - 2xlarge+
+        type: enum
 
 executor:
     name: default
     tag: << parameters.version >>
+    resource_class: << parameters.resource_class >>
 
 steps:
     - checkout

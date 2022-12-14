@@ -9,6 +9,19 @@ parameters:
         description: >
             Pick a specific cimg/node image version tag:
             https://hub.docker.com/r/cimg/node
+    resource_class:
+        default: large
+        description: Configure the executor resource class
+        enum:
+        - small
+        - medium
+        - medium+
+        - large
+        - xlarge
+        - 2xlarge
+        - 2xlarge+
+        type: enum
 
 docker:
     - image: cimg/node:<<parameters.tag>>
+resource_class: << parameters.resource_class >>
