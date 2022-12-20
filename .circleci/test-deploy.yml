@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   node: circleci/node@dev:<<pipeline.git.revision>>
-  orb-tools: circleci/orb-tools@11.1.2
+  orb-tools: circleci/orb-tools@11.5
   jq: circleci/jq@2.2.0
 commands:
   check-uploaded-test-results:
