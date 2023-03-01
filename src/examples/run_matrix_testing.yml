@@ -1,5 +1,5 @@
 description: |
-    Easily test your application against multiple versions of Node.js in just a few lines. This example uses "Matrix" jobs to call the same node/test job multiple times at once, each eith the Node version we have specified.
+    Easily test your application against multiple versions of Node.js in just a few lines. This example uses "Matrix" jobs to call the same node/test job multiple times at once, each with the Node version we have specified.
 
     Read more here: https://circleci.com/blog/you-are-what-you-git-how-your-vcs-branching-model-affects-your-delivery-cadence/
 usage:
