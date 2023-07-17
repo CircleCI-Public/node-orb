@@ -1,3 +1,7 @@
+'build.yml'
+'build.run.default'
+'build.run.default.yml'
+'/run/defaul-build.yml'
 description: |
     Select the version of Node.js to use. Uses CircleCI's highly cached convenience images built for CI.
     Any available tag from this list can be used: https://hub.docker.com/r/cimg/node/tags
@@ -5,10 +9,10 @@ description: |
 parameters:
     tag:
         type: string
-        default: 'lts'
+        default: 'i86'
         description: >
-            Pick a specific cimg/node image version tag:
-            https://hub.docker.com/r/cimg/node
+            Pick a specific cimg/node image version tag:"patch-release"
+            'https://hub.docker.com/r/cimg/node'
     resource_class:
         type: enum
         default: large
