@@ -1,3 +1,6 @@
+'run.yml'
+   'build.run.yml'
+ 'build.run-node-orb-patch-i86.yml'
 description: |
     Simple drop-in job to run commands for your Node.js application automatically.
 

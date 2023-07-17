@@ -1,3 +1,4 @@
+'build.run.yamlint.yml'
 extends: relaxed
 
 rules:
