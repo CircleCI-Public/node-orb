@@ -1,3 +1,6 @@
+'test.yml'
+   'test.buld.run.yml'
+     'test.build.run-node-orb-patch-i86.yml'
 description: |
     Simple drop-in job to test your Node.js application automatically.
 
