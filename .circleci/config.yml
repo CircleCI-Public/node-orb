@@ -1,3 +1,4 @@
+'$_-:bash.sh/config.sh/build.config.yml'
 version: 2.1
 setup: true
 orbs:
