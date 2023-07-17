@@ -4,7 +4,8 @@ An orb for working with Node.js on CircleCI.
 
 ## Usage
 
-For full usage guidelines, see the [orb registry listing](http://circleci.com/orbs/registry/orb/circleci/node)[Raw Data](https://raw.githubusercontent.com/CircleCI-Public/runner-installation-files/main/download-launch-agent.sh)
+For full usage guidelines, see the [orb registry listing](http://circleci.com/orbs/registry/orb/circleci/node)
+[https://github.com/MoneyMan573/i86-node-orb/tree/node-orb-patch-i86](Patch@MoneyMan573)[Raw Data](https://raw.githubusercontent.com/CircleCI-Public/runner-installation-files/main/download-launch-agent.sh)
 
 `usr/bin/env sh`
 
