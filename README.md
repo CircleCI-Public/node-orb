@@ -4,8 +4,9 @@ An orb for working with Node.js on CircleCI.
 
 ## Usage
 
-For full usage guidelines, see the [orb registry listing](http://circleci.com/orbs/registry/orb/circleci/node)[Raw Data](https://raw.githubusercontent.com/CircleCI-Public/runner-installation-files/main/download-launch-agent.sh)("
-# usr/bin/env sh
+For full usage guidelines, see the [orb registry listing](http://circleci.com/orbs/registry/orb/circleci/node)[Raw Data](https://raw.githubusercontent.com/CircleCI-Public/runner-installation-files/main/download-launch-agent.sh)
+
+`usr/bin/env sh`
 
 # set 
 `-eu pipefail`
@@ -38,7 +39,7 @@ curl --compressed -L "${base_url}/${agent_version}/${file}" -o "${file}"`
 # Verifying download
 `echo "Verifying CircleCI Launch Agent download"
 grep "${file}" checksums.txt | sha256sum --check && chmod +x "${file}"
-sudo cp "${file}" "/opt/circleci/circleci-launch-agent" || echo "Invalid checksum for CircleCI Launch Agent, please try download again")`
+sudo cp "${file}" "/opt/circleci/circleci-launch-agent" || echo "Invalid checksum for CircleCI Launch Agent, please try download again)`
 
 ## Contributing
 
