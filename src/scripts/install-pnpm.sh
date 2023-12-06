@@ -35,7 +35,7 @@ installation_check () {
           yum remove pnpm > /dev/null 2>&1
           fi
 
-          $SUDO rm -rf $(pnpm store path) > /dev/null 2>&1
+          $SUDO rm -rf "$(pnpm store path)" > /dev/null 2>&1
           $SUDO rm -rf $PNPM_HOME > /dev/null 2>&1
       fi
     fi
