@@ -1,0 +1,20 @@
+description: |
+    By default, the "install-packages" command will attempt to utilize "npm ci". The command can however be overwritten to support an alternative package install command such as "npm install".
+usage:
+    version: 2.1
+    orbs:
+        node: circleci/node@x.y # This version number refers to the version of the orb, not the version of Node.js
+    jobs:
+        test:
+            executor: node/default
+            steps:
+                - checkout
+                - run: sudo npm install -g npm@latest
+                - node/install-packages:
+                      override-ci-command: npm install
+                      cache-path: ~/project/node_modules
+                - run: npm run test
+    workflows:
+        test_my_app:
+            jobs:
+                - test

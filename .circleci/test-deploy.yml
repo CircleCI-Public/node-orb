@@ -129,6 +129,15 @@ jobs:
           cache-version: override-v3
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && npm run test
+  integration-test-pnpm:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: pnpm
+          app-dir: "~/project/sample"
+      - run: cd ~/project/sample && pnpm test
   integration-test-yarn:
     executor:
       name: node/default
@@ -168,6 +177,9 @@ jobs:
           job-name: node-yarn-jest-test-job
           expected-tests: 1
       - check-uploaded-test-results:
+          job-name: node-pnpm-jest-test-job
+          expected-tests: 1
+      - check-uploaded-test-results:
           job-name: node-test-results-file-job
           expected-tests: 1
       - check-uploaded-test-results:
@@ -175,6 +187,9 @@ jobs:
           expected-tests: 1
       - check-uploaded-test-results:
           job-name: node-yarn-mocha-test-job
+          expected-tests: 1
+      - check-uploaded-test-results:
+          job-name: node-pnpm-mocha-test-job
           expected-tests: 1
 
 workflows:
@@ -234,6 +249,15 @@ workflows:
           filters:
             tags:
               only: /.*/
+          name: node-pnpm-jest-test-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: jest
+          pkg-manager: pnpm
+      - node/test:
+          filters:
+            tags:
+              only: /.*/
           name: node-npm-mocha-test-job
           app-dir: "~/project/sample"
           cache-version: v4
@@ -252,7 +276,17 @@ workflows:
       - node/test:
           filters:
             tags:
-              only: /.*/        
+              only: /.*/
+          name: node-pnpm-mocha-test-job
+          app-dir: "~/project/sample"
+          cache-version: v4
+          test-results-for: mocha
+          pkg-manager: pnpm
+          run-command: testmocha
+      - node/test:
+          filters:
+            tags:
+              only: /.*/
           name: node-yarn-mocha-with-test-result-path-job
           app-dir: "~/project/sample"
           cache-version: v4
@@ -282,8 +316,10 @@ workflows:
           requires:
             - node-npm-jest-test-job
             - node-yarn-jest-test-job
+            - node-pnpm-jest-test-job
             - node-npm-mocha-test-job
             - node-yarn-mocha-test-job
+            - node-pnpm-mocha-test-job
             - node-test-results-file-job
       - node/run:
           filters:
@@ -302,14 +338,27 @@ workflows:
           cache-version: v5
           pkg-manager: yarn
           yarn-run: build
+      - node/run:
+          filters:
+            tags:
+              only: /.*/
+          name: node-run-pnpm-job
+          app-dir: "~/project/sample"
+          cache-version: v5
+          pkg-manager: pnpm
+          yarn-run: build
       - integration-test-override-ci:
           filters:
             tags:
-              only: /.*/  
+              only: /.*/
       - integration-test-override-ci-windows:
           filters:
             tags:
-              only: /.*/  
+              only: /.*/
+      - integration-test-pnpm:
+          filters:
+            tags:
+              only: /.*/
       - integration-test-yarn:
           filters:
             tags:
@@ -329,11 +378,13 @@ workflows:
             - integration-test-install-specified-version
             - integration-test-install-latest
             - integration-test-install-lts
+            - integration-test-pnpm
             - check-test-results-uploaded
             - node-yarn-mocha-with-test-result-path-job
             - node-test-results-file-job
             - node-run-npm-job
             - node-run-yarn-job
+            - node-run-pnpm-job
           github-token: GHI_TOKEN
           context: orb-publisher
           filters:
