@@ -13,6 +13,9 @@ elif [ -f "npm-shrinkwrap.json" ]; then
 elif [ -f "yarn.lock" ]; then
     echo "Found yarn.lock file, assuming lockfile"
     cp yarn.lock $TARGET_DIR/node-project-lockfile
+else
+    echo "Found no lockfile, adding empty one"
+    touch $TARGET_DIR/node-project-lockfile
 fi
 
 cp package.json $TARGET_DIR/node-project-package.json
