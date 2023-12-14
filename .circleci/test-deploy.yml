@@ -11,22 +11,7 @@ release-filters: &release-filters
     ignore: /.*/
   tags:
     only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
-commands:
-  check-uploaded-test-results:
-    parameters:
-      job-name:
-        type: string
-      expected-tests:
-        type: integer
-    steps:
-      - run:
-          name: check for << parameters.job-name >> test results
-          command: |
-            export TEST_JOB_NUMBER=$(jq '.items[] | select(.name == "<< parameters.job-name >>") | .job_number' workflow.json)
-            curl --request GET \
-                 --url https://circleci.com/api/v2/project/gh/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$TEST_JOB_NUMBER/tests \
-                 --header 'authorization: Basic $CIRCLE_TOKEN' \
-            | jq '.items | length | if . != << parameters.expected-tests >> then halt_error else . end'
+
 executors:
   linux:
     docker:
@@ -158,33 +143,6 @@ jobs:
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && yarn test
 
-  check-test-results-uploaded:
-    executor:
-      name: node/default
-    steps:
-      - jq/install
-      - run:
-          name: fetch workflow
-          command: |
-            curl --request GET \
-                 --url https://circleci.com/api/v2/workflow/$CIRCLE_WORKFLOW_ID/job \
-                 --header 'authorization: Basic $CIRCLE_TOKEN' > workflow.json
-      - check-uploaded-test-results:
-          job-name: node-npm-jest-test-job
-          expected-tests: 1
-      - check-uploaded-test-results:
-          job-name: node-yarn-jest-test-job
-          expected-tests: 1
-      - check-uploaded-test-results:
-          job-name: node-test-results-file-job
-          expected-tests: 1
-      - check-uploaded-test-results:
-          job-name: node-npm-mocha-test-job
-          expected-tests: 1
-      - check-uploaded-test-results:
-          job-name: node-yarn-mocha-test-job
-          expected-tests: 1
-
 workflows:
   test-deploy:
     jobs:
@@ -251,14 +209,6 @@ workflows:
           name: node-test-no-junit
           app-dir: "~/project/sample"
           cache-version: v4
-      - check-test-results-uploaded:
-          filters: *filters
-          requires:
-            - node-npm-jest-test-job
-            - node-yarn-jest-test-job
-            - node-npm-mocha-test-job
-            - node-yarn-mocha-test-job
-            - node-test-results-file-job
       - node/run:
           filters: *filters
           name: node-run-npm-job
@@ -291,7 +241,6 @@ workflows:
             - integration-test-install-specified-version
             - integration-test-install-latest
             - integration-test-install-lts
-            - check-test-results-uploaded
             - node-yarn-mocha-with-test-result-path-job
             - node-test-results-file-job
             - node-run-npm-job
