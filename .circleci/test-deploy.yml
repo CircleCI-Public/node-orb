@@ -1,8 +1,16 @@
 version: 2.1
 orbs:
-  node: circleci/node@dev:<<pipeline.git.revision>>
-  orb-tools: circleci/orb-tools@11.5
-  jq: circleci/jq@2.2.0
+  node: {}
+  orb-tools: circleci/orb-tools@12.0
+  jq: circleci/jq@3.0
+filters: &filters
+  tags:
+    only: /.*/
+release-filters: &release-filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 commands:
   check-uploaded-test-results:
     parameters:
@@ -25,7 +33,7 @@ executors:
       - image: cimg/base:stable
   macos:
     macos:
-      xcode: 13.2.0
+      xcode: 15.1.0
   machine:
     machine:
       image: ubuntu-2004:202111-01
@@ -180,69 +188,43 @@ jobs:
 workflows:
   test-deploy:
     jobs:
-      - orb-tools/lint:
-          filters:
-            tags:
-              only: /.*/
-      - orb-tools/pack:
-          filters:
-            tags:
-              only: /.*/
-      - orb-tools/review:
-          filters:
-            tags:
-              only: /.*/
       - integration-test-install-specified-version:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           matrix:
             parameters:
               os: [linux, macos, machine]
       - integration-test-install-latest:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           matrix:
             parameters:
               os: [linux, macos, machine]
       - integration-test-install-lts:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           matrix:
             parameters:
               os: [linux, macos, machine]
       - node/test:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           name: node-npm-jest-test-job
           app-dir: "~/project/sample"
           cache-version: v4
           test-results-for: jest
       - node/test:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           name: node-yarn-jest-test-job
           app-dir: "~/project/sample"
           cache-version: v4
           test-results-for: jest
           pkg-manager: yarn
       - node/test:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           name: node-npm-mocha-test-job
           app-dir: "~/project/sample"
           cache-version: v4
           test-results-for: mocha
           run-command: testmocha
       - node/test:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           name: node-yarn-mocha-test-job
           app-dir: "~/project/sample"
           cache-version: v4
@@ -250,9 +232,7 @@ workflows:
           pkg-manager: yarn
           run-command: testmocha
       - node/test:
-          filters:
-            tags:
-              only: /.*/        
+          filters: *filters    
           name: node-yarn-mocha-with-test-result-path-job
           app-dir: "~/project/sample"
           cache-version: v4
@@ -261,24 +241,18 @@ workflows:
           run-command: testmocha
           test-results-path: sample/test-results.xml
       - node/test:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           name: node-test-results-file-job
           app-dir: "~/project/sample"
           cache-version: v4
           test-results-path: sample/other-junit.xml
       - node/test:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           name: node-test-no-junit
           app-dir: "~/project/sample"
           cache-version: v4
       - check-test-results-uploaded:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           requires:
             - node-npm-jest-test-job
             - node-yarn-jest-test-job
@@ -286,45 +260,33 @@ workflows:
             - node-yarn-mocha-test-job
             - node-test-results-file-job
       - node/run:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           name: node-run-npm-job
           app-dir: "~/project/sample"
           cache-version: v4
           npm-run: build
       - node/run:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           name: node-run-yarn-job
           app-dir: "~/project/sample"
           cache-version: v5
           pkg-manager: yarn
           yarn-run: build
       - integration-test-override-ci:
-          filters:
-            tags:
-              only: /.*/  
+          filters: *filters 
       - integration-test-override-ci-windows:
-          filters:
-            tags:
-              only: /.*/  
+          filters: *filters
       - integration-test-yarn:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
       - integration-test-yarn-berry:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
+      - orb-tools/pack:
+          filters: *release-filters
       - orb-tools/publish:
-          orb-name: circleci/node
-          vcs-type: << pipeline.project.type >>
-          pub-type: production
+          orb_name: circleci/node
+          vcs_type: << pipeline.project.type >>
+          pub_type: production
           requires:
-            - orb-tools/lint
-            - orb-tools/review
             - orb-tools/pack
             - integration-test-install-specified-version
             - integration-test-install-latest
@@ -334,10 +296,6 @@ workflows:
             - node-test-results-file-job
             - node-run-npm-job
             - node-run-yarn-job
-          github-token: GHI_TOKEN
+          github_token: GHI_TOKEN
           context: orb-publisher
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+          filters: *release-filters
