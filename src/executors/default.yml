@@ -21,6 +21,10 @@ parameters:
             - xlarge
             - 2xlarge
             - 2xlarge+
+            - arm.medium
+            - arm.large
+            - arm.xlarge
+            - arm.2xlarge
 
 docker:
     - image: cimg/node:<<parameters.tag>>
