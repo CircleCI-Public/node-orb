@@ -282,6 +282,6 @@ workflows:
             - node-run-npm-job
             - node-run-yarn-job
             - node-run-pnpm-job
-          github-token: GHI_TOKEN
+          github_token: GHI_TOKEN
           context: orb-publisher
           filters: *release-filters
