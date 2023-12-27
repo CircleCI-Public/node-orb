@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
 # FUNCTIONS
@@ -22,7 +24,7 @@ installation_check () {
           echo "A different version of pnpm is installed ($(pnpm --version)); removing it"
 
           $SUDO rm -rf "$(pnpm store path)" > /dev/null 2>&1
-          $SUDO rm -rf $PNPM_HOME > /dev/null 2>&1
+          $SUDO rm -rf "$PNPM_HOME" > /dev/null 2>&1
           $SUDO npm rm -g pnpm > /dev/null 2>&1
       fi
     fi
@@ -36,7 +38,7 @@ installation_check
 
 # install pnpm
 echo "Installing pnpm v$PNPM_ORB_VERSION"
-curl --retry 5 -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=$PNPM_ORB_VERSION sh -
+curl --retry 5 -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION="$PNPM_ORB_VERSION" sh -
 
 # test/verify version
 echo "Verifying pnpm install"
