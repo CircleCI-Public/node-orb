@@ -11,6 +11,7 @@ usage:
                 - checkout
                 - run: sudo npm install -g npm@latest
                 - node/install-packages:
+                      override-ci-command: pnpm install
                       pkg-manager: pnpm
                 - run: pnpm run test
     workflows:
