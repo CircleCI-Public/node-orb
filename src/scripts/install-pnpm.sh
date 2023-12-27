@@ -21,22 +21,9 @@ installation_check () {
       else
           echo "A different version of pnpm is installed ($(pnpm --version)); removing it"
 
-          if uname -a | grep Darwin > /dev/null 2>&1; then
-          brew uninstall pnpm > /dev/null 2>&1
-          elif grep Alpine /etc/issue > /dev/null 2>&1; then
-          apk del pnpm > /dev/null 2>&1
-          elif grep Debian /etc/issue > /dev/null 2>&1; then
-          $SUDO apt-get remove pnpm > /dev/null 2>&1 && \
-              $SUDO apt-get purge pnpm > /dev/null 2>&1
-          elif grep Ubuntu /etc/issue > /dev/null 2>&1; then
-          $SUDO apt-get remove pnpm > /dev/null 2>&1 && \
-              $SUDO apt-get purge pnpm > /dev/null 2>&1
-          elif command -v yum > /dev/null 2>&1; then
-          yum remove pnpm > /dev/null 2>&1
-          fi
-
           $SUDO rm -rf "$(pnpm store path)" > /dev/null 2>&1
           $SUDO rm -rf $PNPM_HOME > /dev/null 2>&1
+          $SUDO npm rm -g pnpm > /dev/null 2>&1
       fi
     fi
 }
