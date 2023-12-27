@@ -187,7 +187,7 @@ workflows:
           filters: *filters
           name: node-pnpm-jest-test-job
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           test-results-for: jest
           pkg-manager: pnpm
       - node/test:
@@ -209,7 +209,7 @@ workflows:
           filters: *filters
           name: node-pnpm-mocha-test-job
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           test-results-for: mocha
           pkg-manager: pnpm
           run-command: testmocha
@@ -250,9 +250,9 @@ workflows:
           filters: *filters
           name: node-run-pnpm-job
           app-dir: "~/project/sample"
-          cache-version: v5
+          cache-version: v1
           pkg-manager: pnpm
-          yarn-run: build
+          pnpm-run: build
       - integration-test-override-ci:
           filters: *filters
       - integration-test-override-ci-windows:
