@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Fail if package.json does not exist in working directory
 
 if [ ! -f "package.json" ]; then
