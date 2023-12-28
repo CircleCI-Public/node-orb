@@ -143,6 +143,11 @@ jobs:
       name: node/default
     steps:
       - checkout
+      - run:
+          name: Remove other lock files
+          command: |
+            rm ~/project/sample/package-lock.json
+            rm ~/project/sample/yarn.lock
       - node/install-packages:
           pkg-manager: pnpm
           cache-version: pnpm-v1
