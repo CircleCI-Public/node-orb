@@ -203,6 +203,12 @@ workflows:
           app-dir: "~/project/sample"
           cache-version: v4
           test-results-for: jest
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/pnpm-lock.yaml
+                  rm ~/project/sample/yarn.lock
       - node/test:
           filters: *filters
           name: node-yarn-jest-test-job
@@ -210,6 +216,12 @@ workflows:
           cache-version: v4
           test-results-for: jest
           pkg-manager: yarn
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/package-lock.json
+                  rm ~/project/sample/pnpm-lock.yaml
       - node/test:
           filters: *filters
           name: node-pnpm-jest-test-job
@@ -217,6 +229,12 @@ workflows:
           cache-version: v4
           test-results-for: jest
           pkg-manager: pnpm
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/package-lock.json
+                  rm ~/project/sample/yarn.lock
       - node/test:
           filters: *filters
           name: node-npm-mocha-test-job
@@ -224,6 +242,12 @@ workflows:
           cache-version: v4
           test-results-for: mocha
           run-command: testmocha
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/pnpm-lock.yaml
+                  rm ~/project/sample/yarn.lock
       - node/test:
           filters: *filters
           name: node-yarn-mocha-test-job
@@ -232,6 +256,12 @@ workflows:
           test-results-for: mocha
           pkg-manager: yarn
           run-command: testmocha
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/package-lock.json
+                  rm ~/project/sample/pnpm-lock.yaml
       - node/test:
           filters: *filters
           name: node-pnpm-mocha-test-job
@@ -240,6 +270,12 @@ workflows:
           test-results-for: mocha
           pkg-manager: pnpm
           run-command: testmocha
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/package-lock.json
+                  rm ~/project/sample/yarn.lock
       - node/test:
           filters: *filters
           name: node-yarn-mocha-with-test-result-path-job
@@ -249,23 +285,47 @@ workflows:
           pkg-manager: yarn
           run-command: testmocha
           test-results-path: sample/test-results.xml
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/package-lock.json
+                  rm ~/project/sample/pnpm-lock.yaml
       - node/test:
           filters: *filters
           name: node-test-results-file-job
           app-dir: "~/project/sample"
           cache-version: v4
           test-results-path: sample/other-junit.xml
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/pnpm-lock.yaml
+                  rm ~/project/sample/yarn.lock
       - node/test:
           filters: *filters
           name: node-test-no-junit
           app-dir: "~/project/sample"
           cache-version: v4
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/pnpm-lock.yaml
+                  rm ~/project/sample/yarn.lock
       - node/run:
           filters: *filters
           name: node-run-npm-job
           app-dir: "~/project/sample"
           cache-version: v4
           npm-run: build
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/pnpm-lock.yaml
+                  rm ~/project/sample/yarn.lock
       - node/run:
           filters: *filters
           name: node-run-yarn-job
@@ -273,6 +333,12 @@ workflows:
           cache-version: v5
           pkg-manager: yarn
           yarn-run: build
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/package-lock.json
+                  rm ~/project/sample/pnpm-lock.yaml
       - node/run:
           filters: *filters
           name: node-run-pnpm-job
@@ -280,6 +346,12 @@ workflows:
           cache-version: v5
           pkg-manager: pnpm
           pnpm-run: build
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/package-lock.json
+                  rm ~/project/sample/yarn.lock
       - integration-test-override-ci:
           filters: *filters
       - integration-test-override-ci-windows:

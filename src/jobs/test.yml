@@ -69,36 +69,6 @@ executor:
 steps:
     - checkout
     - steps: << parameters.setup >>
-    - when:
-        condition:
-            and:
-                - equal: [ npm, << parameters.pkg-manager >> ]
-        steps:
-            - run:
-                name: Remove other lock files
-                command: |
-                    rm ~/project/sample/pnpm-lock.yaml
-                    rm ~/project/sample/yarn.lock
-    - when:
-        condition:
-            and:
-                - equal: [ pnpm, << parameters.pkg-manager >> ]
-        steps:
-            - run:
-                name: Remove other lock files
-                command: |
-                    rm ~/project/sample/package-lock.json
-                    rm ~/project/sample/yarn.lock
-    - when:
-        condition:
-            and:
-                - equal: [ yarn, << parameters.pkg-manager >> ]
-        steps:
-            - run:
-                name: Remove other lock files
-                command: |
-                    rm ~/project/sample/package-lock.json
-                    rm ~/project/sample/pnpm-lock.yaml
     - install-packages:
           app-dir: <<parameters.app-dir>>
           pkg-manager: <<parameters.pkg-manager>>
