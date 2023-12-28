@@ -38,7 +38,7 @@ installation_check
 
 # install pnpm
 echo "Installing pnpm v$PNPM_ORB_VERSION"
-curl --retry 5 -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION="$PNPM_ORB_VERSION" sh -
+npm install -g pnpm@"$PNPM_ORB_VERSION"
 
 # test/verify version
 echo "Verifying pnpm install"
