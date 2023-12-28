@@ -177,6 +177,11 @@ workflows:
           matrix:
             parameters:
               os: [linux, macos, machine]
+      - integration-test-install-pnpm:
+          filters: *filters
+          matrix:
+            parameters:
+              os: [ linux, macos, machine ]
       - integration-test-install-latest:
           filters: *filters
           matrix:
