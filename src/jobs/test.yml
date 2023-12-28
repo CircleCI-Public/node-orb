@@ -203,7 +203,7 @@ steps:
           - run:
               name: Check for test reporter
               working_directory: <<parameters.app-dir>>
-              command: pnpm list --pattern jest-junit | grep " jest-junit@" || (echo "Add the package jest-junit to your projects dev dependencies with `pnpm add -D jest-junit`" && exit 1)
+              command: pnpm list "jest-junit@*" | grep "jest-junit" || (echo "Add the package jest-junit to your projects dev dependencies with `pnpm add -D jest-junit`" && exit 1)
           - run:
               name: Run pnpm Tests
               working_directory: <<parameters.app-dir>>
@@ -217,7 +217,7 @@ steps:
           - run:
               name: Check for test reporter
               working_directory: <<parameters.app-dir>>
-              command: pnpm list --pattern "mocha-junit-reporter|mocha-multi" | grep "mocha-junit-reporter@\|mocha-multi@" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `pnpm add -D mocha-junit-reporter mocha-multi`" && exit 1)
+              command: pnpm list "mocha-junit-reporter@*" "mocha-multi@*" | grep "mocha-junit-reporter\|mocha-multi" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `pnpm add -D mocha-junit-reporter mocha-multi`" && exit 1)
           - run:
               name: Run pnpm Tests
               working_directory: <<parameters.app-dir>>
