@@ -1,5 +1,5 @@
 description: |
-    By default, the "install-packages" command will attempt to utilize "pnpm ci". The command can however be overwritten to support an alternative package install command such as "npm install".
+    By default, the "install-packages" command will attempt to utilize "pnpm i --frozen-lockfile". The command can however be overwritten to support an alternative package install command such as "pnpm install".
 usage:
     version: 2.1
     orbs:
@@ -11,7 +11,7 @@ usage:
                 - checkout
                 - run: sudo npm install -g npm@latest
                 - node/install-packages:
-                      override-ci-command: pnpm install
+                      override-ci-command: pnpm i
                       pkg-manager: pnpm
                 - run: pnpm run test
     workflows:

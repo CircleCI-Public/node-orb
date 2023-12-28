@@ -46,6 +46,21 @@ jobs:
               echo "Node version 16 not found"
               exit 1
             fi
+  integration-test-install-pnpm:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
+    steps:
+      - checkout
+      - node/install:
+          install-pnpm: true # Test the install of PNPM
+      - run:
+          command: |
+            if ! pnpm; then
+              echo "pnpm not found"
+              exit 1
+            fi
 
   integration-test-install-latest:
     parameters:
@@ -129,6 +144,7 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: pnpm
+          cache-version: pnpm-v1
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && pnpm test
   integration-test-yarn:
