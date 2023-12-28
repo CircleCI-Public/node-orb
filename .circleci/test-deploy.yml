@@ -55,10 +55,11 @@ jobs:
       - checkout
       - node/install:
           install-pnpm: true # Test the install of PNPM
+          pnpm-version: "7.33.6"
       - run:
           command: |
-            if ! pnpm; then
-              echo "pnpm not found"
+            if ! pnpm --version | grep -q "7.33.6"; then
+              echo "pnpm version 7.33.6 not found"
               exit 1
             fi
 
@@ -292,6 +293,7 @@ workflows:
             - integration-test-install-specified-version
             - integration-test-install-latest
             - integration-test-install-lts
+            - integration-test-install-pnpm
             - integration-test-pnpm
             - node-yarn-mocha-with-test-result-path-job
             - node-test-results-file-job
