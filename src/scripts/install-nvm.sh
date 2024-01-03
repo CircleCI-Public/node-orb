@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2016
+
 # Only install nvm if it's not already installed
 if command -v nvm &> /dev/null; then
     echo "nvm is already installed. Skipping nvm install.";

@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Configure npm cache path if provided
 if [[ -n "$PARAM_CACHE_PATH" ]]; then
     npm config set cache "$PARAM_CACHE_PATH"
