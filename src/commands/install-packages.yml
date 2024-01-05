@@ -206,7 +206,8 @@ steps:
                                   - save_cache:
                                         key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<^parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-package.json" }}-<</parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-lockfile" }}
                                         paths:
-                                            - <<parameters.app-dir>>/.yarn/cache
+                                            - ~/.yarn/berry/cache # global cache, the default in Yarn Berry v4+
+                                            - <<parameters.app-dir>>/.yarn/cache # project cache, the default in Yarn Berry > 2 and < 4
     - when:
           condition: << parameters.with-cache >>
           steps:
