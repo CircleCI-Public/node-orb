@@ -1,0 +1,18 @@
+description: >
+    Install a custom version of the pnpm package manager
+
+parameters:
+    version:
+        type: string
+        default: ''
+        description: >
+            Pick a version of pnpm to install (if no version is specified,
+            the latest stable version will be installed):
+            https://github.com/pnpm/pnpm/releases
+
+steps:
+    - run:
+          name: Install pnpm
+          environment:
+              NODE_PARAM_PNPM_VERSION: <<parameters.version>>
+          command: <<include(scripts/install-pnpm.sh)>>
