@@ -21,7 +21,7 @@ executors:
       xcode: 15.1.0
   machine:
     machine:
-      image: ubuntu-2004:202111-01
+      image: ubuntu-2004:current
   windows:
     machine:
       image: windows-server-2022-gui:current
