@@ -16,6 +16,10 @@ executors:
   linux:
     docker:
       - image: cimg/base:stable
+  linux-arm:
+    docker:
+      - image: cimg/base:stable
+    resource_class: arm.medium
   macos:
     macos:
       xcode: 15.1.0
@@ -150,17 +154,17 @@ workflows:
           filters: *filters
           matrix:
             parameters:
-              os: [linux, macos, machine]
+              os: [linux, linux-arm, macos, machine]
       - integration-test-install-latest:
           filters: *filters
           matrix:
             parameters:
-              os: [linux, macos, machine]
+              os: [linux, linux-arm, macos, machine]
       - integration-test-install-lts:
           filters: *filters
           matrix:
             parameters:
-              os: [linux, macos, machine]
+              os: [linux, linux-arm, macos, machine]
       - node/test:
           filters: *filters
           name: node-npm-jest-test-job
