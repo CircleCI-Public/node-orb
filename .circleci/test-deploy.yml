@@ -209,6 +209,13 @@ workflows:
           name: node-test-no-junit
           app-dir: "~/project/sample"
           cache-version: v4
+      - node/test:
+          filters: *filters
+          name: node-test-with-coverage
+          app-dir: "~/project/sample"
+          cache-version: v4
+          run-command: "test:coverage"
+          test-coverage-path: coverage
       - node/run:
           filters: *filters
           name: node-run-npm-job
