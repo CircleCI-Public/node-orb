@@ -222,6 +222,13 @@ workflows:
           cache-version: v5
           pkg-manager: yarn
           yarn-run: build
+      - node/run:
+          filters: *filters
+          name: node-run-upload-artifacts
+          app-dir: "~/project/sample"
+          cache-version: v4
+          npm-run: build
+          artifacts-path: "~/project/sample/dist"
       - integration-test-override-ci:
           filters: *filters 
       - integration-test-override-ci-windows:
