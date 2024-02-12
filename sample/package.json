@@ -8,7 +8,8 @@
     "build": "tsc -h",
     "start": "node dist/index.js",
     "test": "jest jest-tests",
-    "testmocha": "mocha mocha-tests"
+    "testmocha": "mocha mocha-tests",
+    "test:coverage": "jest --coverage jest-tests"
   },
   "author": "",
   "license": "ISC",

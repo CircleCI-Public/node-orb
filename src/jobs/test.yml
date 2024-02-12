@@ -48,6 +48,12 @@ parameters:
             Testing framework your project uses.
             If this is set to jest or mocha, test results will be automatically produced. When using jest, the jest-junit package is required as a dev dependency. See https://github.com/jest-community/jest-junit for more information.
             When using mocha, the mocha-junit-reporter and mocha-multi packages are required as dev dependency. See https://github.com/michaelleeallen/mocha-junit-reporter and https://github.com/glenjamin/mocha-multi for more information.
+    test-coverage-path:
+        type: string
+        default: ''
+        description: |
+            Set this to the location where code coverage files will be placed after running tests.
+            The code coverage files will be uploaded to artifacts for this workflow.
     resource_class:
         default: large
         description: Configure the executor resource class
@@ -205,3 +211,8 @@ steps:
           steps:
               store_test_results:
                   path: <<parameters.app-dir>>/test-results.xml
+    - when: # upload coverage files if test-coverage-path was configured
+          condition: <<parameters.test-coverage-path>>
+          steps:
+              - store_artifacts:
+                    path: <<parameters.test-coverage-path>>
