@@ -27,6 +27,10 @@ elif [ -f ".nvmrc" ]; then
     NVMRC_SPECIFIED_VERSION=$(<.nvmrc)
     nvm install "$NVMRC_SPECIFIED_VERSION"
     nvm alias default "$NVMRC_SPECIFIED_VERSION"
+elif [ -f ".node-version" ]; then
+    NVMRC_SPECIFIED_VERSION=$(<.node-version)
+    nvm install "$NVMRC_SPECIFIED_VERSION"
+    nvm alias default "$NVMRC_SPECIFIED_VERSION"
 else
     nvm install --lts
     nvm alias default lts/*
