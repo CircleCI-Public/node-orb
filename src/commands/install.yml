@@ -1,5 +1,5 @@
 description: |
-    Install custom versions of Node.js, and optionally NPM/Yarn, in any
+    Install custom versions of Node.js, and optionally NPM/pnpm/Yarn, in any
     execution environment (Docker/Linux, macOS, machine) that does not have
     it preinstalled.
 
@@ -21,6 +21,20 @@ parameters:
         description: >
             Where should Node.js be installed?
 
+    # pnpm
+    install-pnpm:
+        type: boolean
+        default: false
+        description: Install pnpm?
+
+    pnpm-version:
+        type: string
+        default: ''
+        description: >
+            Pick a version of pnpm to install (if no version is specified,
+            the latest stable version will be installed):
+            https://github.com/pnpm/pnpm/releases
+
     # yarn
     install-yarn:
         type: boolean
@@ -37,13 +51,19 @@ parameters:
 
 steps:
     - run:
-          name: Install Node.js <<parameters.node-version>>
-          environment:
-              NODE_PARAM_VERSION: <<parameters.node-version>>
-          command: <<include(scripts/install-nvm.sh)>>
+        name: Install Node.js <<parameters.node-version>>
+        environment:
+            NODE_PARAM_VERSION: <<parameters.node-version>>
+        command: <<include(scripts/install-nvm.sh)>>
 
     - when:
-          condition: <<parameters.install-yarn>>
-          steps:
-              - install-yarn:
-                    version: <<parameters.yarn-version>>
+        condition: <<parameters.install-pnpm>>
+        steps:
+            - install-pnpm:
+                version: <<parameters.pnpm-version>>
+
+    - when:
+        condition: <<parameters.install-yarn>>
+        steps:
+            - install-yarn:
+                version: <<parameters.yarn-version>>
