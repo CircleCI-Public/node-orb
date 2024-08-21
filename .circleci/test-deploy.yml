@@ -55,11 +55,11 @@ jobs:
       - checkout
       - node/install:
           install-pnpm: true # Test the install of PNPM
-          pnpm-version: "7.33.6"
+          pnpm-version: "9.7.1"
       - run:
           command: |
-            if ! pnpm --version | grep -q "7.33.6"; then
-              echo "pnpm version 7.33.6 not found"
+            if ! pnpm --version | grep -q "9.7.1"; then
+              echo "pnpm version 9.7.1 not found"
               exit 1
             fi
 
