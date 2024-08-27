@@ -347,7 +347,7 @@ workflows:
           filters: *filters
           name: node-run-yarn-job
           app-dir: "~/project/sample"
-          cache-version: v5
+          cache-version: v6
           pkg-manager: yarn
           yarn-run: build
           setup:
