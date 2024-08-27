@@ -15,6 +15,9 @@ elif [ -f "npm-shrinkwrap.json" ]; then
 elif [ -f "yarn.lock" ]; then
     echo "Found yarn.lock file, assuming lockfile"
     cp yarn.lock "$TARGET_DIR"/node-project-lockfile
+elif [ -f "pnpm-lock.yaml" ]; then
+    echo "Found pnpm-lock.yaml file, assuming lockfile"
+    cp pnpm-lock.yaml "$TARGET_DIR"/node-project-lockfile
 else
     echo "Found no lockfile, adding empty one"
     touch "$TARGET_DIR"/node-project-lockfile

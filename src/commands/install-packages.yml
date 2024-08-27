@@ -5,7 +5,7 @@ description: >
 parameters:
     pkg-manager:
         type: enum
-        enum: ['npm', 'yarn', 'yarn-berry']
+        enum: ['npm', 'yarn', 'yarn-berry', 'pnpm']
         default: 'npm'
         description: Select the default node package manager to use. NPM v5+ Required.
     with-cache:
@@ -26,7 +26,7 @@ parameters:
         description: Path to the directory containing your package.json file. Not needed if package.json lives in the root.
     override-ci-command:
         description: |
-            By default, packages will be installed with "npm ci", "yarn install --frozen-lockfile" or "yarn install --immutable".
+            By default, packages will be installed with "npm ci", "yarn install --frozen-lockfile", "yarn install --immutable" or "pnpm install --frozen-lockfile".
             Optionally supply a custom package installation command, with any additional flags needed.
         type: string
         default: ''
@@ -100,6 +100,36 @@ steps:
                                         key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<^parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-package.json" }}-<</parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-lockfile" }}
                                         paths:
                                             - ~/.npm
+
+    - when: # Install packages based on PNPM
+        condition:
+          equal: [ pnpm, << parameters.pkg-manager >> ]
+        steps:
+          - run:
+              name: Installing PNPM packages
+              working_directory: <<parameters.app-dir>>
+              environment:
+                PARAM_CACHE_PATH: << parameters.cache-path >>
+                PARAM_OVERRIDE_COMMAND: << parameters.override-ci-command >>
+              command: <<include(scripts/packages/pnpm-install.sh)>>
+
+          - when: # cache enabled, save cache
+              condition: << parameters.with-cache >>
+              steps:
+                - when: # custom cache path selected
+                    condition: << parameters.cache-path >>
+                    steps:
+                      - save_cache:
+                          key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<^parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-package.json" }}-<</parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-lockfile" }}
+                          paths:
+                            - <<parameters.cache-path>>
+                - unless: # use node modules
+                    condition: << parameters.cache-path >>
+                    steps:
+                      - save_cache:
+                          key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<^parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-package.json" }}-<</parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-lockfile" }}
+                          paths:
+                            - <<parameters.app-dir>>/node_modules
 
     - when: # Install packages based on YARN
           condition:
@@ -176,7 +206,8 @@ steps:
                                   - save_cache:
                                         key: node-deps-{{ arch }}-<<parameters.cache-version>>-<<#parameters.include-branch-in-cache-key>>{{ .Branch }}-<</parameters.include-branch-in-cache-key>><<^parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-package.json" }}-<</parameters.cache-only-lockfile>>{{ checksum "/tmp/node-project-lockfile" }}
                                         paths:
-                                            - <<parameters.app-dir>>/.yarn/cache
+                                            - ~/.yarn/berry/cache # global cache, the default in Yarn Berry v4+
+                                            - <<parameters.app-dir>>/.yarn/cache # project cache, the default in Yarn Berry > 2 and < 4
     - when:
           condition: << parameters.with-cache >>
           steps:
