@@ -42,6 +42,11 @@ parameters:
             Optionally supply a custom package installation command, with any additional flags needed.
         type: string
         default: ''
+    artifacts-path:
+        description: |
+            Path to a file or directory to upload to artifacts after running the script.
+        type: string
+        default: ''
     resource_class:
         default: large
         description: Configure the executor resource class
@@ -77,3 +82,8 @@ steps:
               ORB_PARAM_YARN_RUN: <<parameters.yarn-run>>
               ORB_PARAM_PNPM_RUN: <<parameters.pnpm-run>>
           command: <<include(scripts/run-commands-with.sh)>>
+    - when:
+          condition: <<parameters.artifacts-path>>
+          steps:
+              - store_artifacts:
+                    path: <<parameters.artifacts-path>>

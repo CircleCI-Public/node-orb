@@ -358,6 +358,13 @@ workflows:
                   rm ~/project/sample/pnpm-lock.yaml
       - node/run:
           filters: *filters
+          name: node-run-upload-artifacts
+          app-dir: "~/project/sample"
+          cache-version: v4
+          npm-run: build
+          artifacts-path: "~/project/sample/dist"
+      - node/run:
+          filters: *filters
           name: node-run-pnpm-job
           app-dir: "~/project/sample"
           cache-version: v5
@@ -399,6 +406,7 @@ workflows:
             - node-run-npm-job
             - node-run-yarn-job
             - node-run-pnpm-job
+            - node-run-upload-artifacts
           github_token: GHI_TOKEN
           context: orb-publisher
           filters: *release-filters
