@@ -330,7 +330,7 @@ workflows:
           app-dir: "~/project/sample"
           cache-version: v4
           run-command: "test:coverage"
-          test-coverage-path: coverage
+          test-coverage-path: ~/project/sample/coverage
       - node/run:
           filters: *filters
           name: node-run-npm-job
