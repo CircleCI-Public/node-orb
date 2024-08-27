@@ -94,6 +94,16 @@ jobs:
       - run: echo '16.13' > .nvmrc
       - node/install
 
+  integration-test-use-node-version-version:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
+    steps:
+      - checkout
+      - run: echo '16.13' > .node-version
+      - node/install
+
   integration-test-install-lts:
     parameters:
       os:
