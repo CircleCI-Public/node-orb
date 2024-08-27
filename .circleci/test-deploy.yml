@@ -378,8 +378,6 @@ workflows:
                   rm ~/project/sample/yarn.lock
       - integration-test-override-ci:
           filters: *filters
-      - integration-test-override-ci-windows:
-          filters: *filters
       - integration-test-pnpm:
           filters: *filters
       - integration-test-override-ci-windows:
