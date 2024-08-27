@@ -9,7 +9,7 @@ parameters:
             Pick a specific cimg/node image version tag: https://hub.docker.com/r/cimg/node
     pkg-manager:
         type: enum
-        enum: ['npm', 'yarn', 'yarn-berry']
+        enum: ['npm', 'yarn', 'yarn-berry', 'pnpm']
         default: 'npm'
         description: Select the default node package manager to use.
     cache-version:
@@ -28,6 +28,10 @@ parameters:
         type: string
         default: ''
         description: The name of the script within your package.json which you would like to run.
+    pnpm-run:
+        type: string
+        default: ''
+        description: The name of the script within your package.json which you would like to run.
     app-dir:
         type: string
         default: '~/project'
@@ -36,6 +40,11 @@ parameters:
         description: |
             By default, packages will be installed with "npm ci" or "yarn install --frozen-lockfile".
             Optionally supply a custom package installation command, with any additional flags needed.
+        type: string
+        default: ''
+    artifacts-path:
+        description: |
+            Path to a file or directory to upload to artifacts after running the script.
         type: string
         default: ''
     resource_class:
@@ -71,4 +80,10 @@ steps:
               ORB_PARAM_PKG_MANAGER: <<parameters.pkg-manager>>
               ORB_PARAM_NPM_RUN: <<parameters.npm-run>>
               ORB_PARAM_YARN_RUN: <<parameters.yarn-run>>
+              ORB_PARAM_PNPM_RUN: <<parameters.pnpm-run>>
           command: <<include(scripts/run-commands-with.sh)>>
+    - when:
+          condition: <<parameters.artifacts-path>>
+          steps:
+              - store_artifacts:
+                    path: <<parameters.artifacts-path>>
