@@ -1,0 +1,22 @@
+description: |
+    Utilize the pnpm package manager with the CircleCI Node orb. Caching of your Node packages is enabled by default.
+usage:
+    version: 2.1
+    orbs:
+        node: circleci/node@x.y # This version number refers to the version of the orb, not the version of Node.js
+    jobs:
+        test:
+            executor:
+                name: node/default
+                tag: '16' # You could specify the node version via the docker image.
+            steps:
+                - checkout
+                - node/install-packages:
+                      pkg-manager: pnpm
+                - run:
+                      name: Run pnpm tests
+                      command: pnpm run test
+    workflows:
+        test_my_app:
+            jobs:
+                - test
