@@ -9,7 +9,7 @@ parameters:
             Pick a specific cimg/node image version tag: https://hub.docker.com/r/cimg/node
     pkg-manager:
         type: enum
-        enum: ['npm', 'yarn', 'yarn-berry']
+        enum: ['npm', 'yarn', 'yarn-berry', 'pnpm']
         default: 'npm'
         description: Select the default node package manager to use.
     cache-version:
@@ -184,6 +184,44 @@ steps:
                     name: Run YARN 2.x Tests
                     working_directory: <<parameters.app-dir>>
                     command: yarn run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
+    - when: # Run tests for pnpm, without test results
+        condition:
+          and:
+            - equal: [ pnpm, << parameters.pkg-manager >> ]
+            - equal: [ other, << parameters.test-results-for >> ]
+        steps:
+          - run:
+              name: Run pnpm Tests
+              working_directory: <<parameters.app-dir>>
+              command: pnpm run <<parameters.run-command>>
+    - when: # Run tests for pnpm, with jest test results
+        condition:
+          and:
+            - equal: [ pnpm, << parameters.pkg-manager >> ]
+            - equal: [ jest, << parameters.test-results-for >> ]
+        steps:
+          - run:
+              name: Check for test reporter
+              working_directory: <<parameters.app-dir>>
+              command: pnpm list "jest-junit@*" | grep "jest-junit" || (echo "Add the package jest-junit to your projects dev dependencies with `pnpm add -D jest-junit`" && exit 1)
+          - run:
+              name: Run pnpm Tests
+              working_directory: <<parameters.app-dir>>
+              command: pnpm run <<parameters.run-command>> --reporters=default --reporters=jest-junit
+    - when: # Run tests for pnpm, with mocha test results
+        condition:
+          and:
+            - equal: [ pnpm, << parameters.pkg-manager >> ]
+            - equal: [ mocha, << parameters.test-results-for >> ]
+        steps:
+          - run:
+              name: Check for test reporter
+              working_directory: <<parameters.app-dir>>
+              command: pnpm list "mocha-junit-reporter@*" "mocha-multi@*" | grep "mocha-junit-reporter\|mocha-multi" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `pnpm add -D mocha-junit-reporter mocha-multi`" && exit 1)
+          - run:
+              name: Run pnpm Tests
+              working_directory: <<parameters.app-dir>>
+              command: pnpm run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
     - when: # upload test results if a path was given
           condition: << parameters.test-results-path >>
           steps:
