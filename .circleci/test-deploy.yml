@@ -347,7 +347,7 @@ workflows:
           filters: *filters
           name: node-run-yarn-job
           app-dir: "~/project/sample"
-          cache-version: v5
+          cache-version: v6
           pkg-manager: yarn
           yarn-run: build
           setup:
@@ -377,8 +377,6 @@ workflows:
                   rm ~/project/sample/package-lock.json
                   rm ~/project/sample/yarn.lock
       - integration-test-override-ci:
-          filters: *filters
-      - integration-test-override-ci-windows:
           filters: *filters
       - integration-test-pnpm:
           filters: *filters
