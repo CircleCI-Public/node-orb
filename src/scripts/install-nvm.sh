@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2016
+
 # Only install nvm if it's not already installed
 if command -v nvm &> /dev/null; then
     echo "nvm is already installed. Skipping nvm install.";
@@ -22,6 +25,10 @@ elif [ -n "$NODE_PARAM_VERSION" ] && [ "$NODE_PARAM_VERSION" != "lts" ]; then
     nvm alias default "$NODE_PARAM_VERSION"
 elif [ -f ".nvmrc" ]; then
     NVMRC_SPECIFIED_VERSION=$(<.nvmrc)
+    nvm install "$NVMRC_SPECIFIED_VERSION"
+    nvm alias default "$NVMRC_SPECIFIED_VERSION"
+elif [ -f ".node-version" ]; then
+    NVMRC_SPECIFIED_VERSION=$(<.node-version)
     nvm install "$NVMRC_SPECIFIED_VERSION"
     nvm alias default "$NVMRC_SPECIFIED_VERSION"
 else
