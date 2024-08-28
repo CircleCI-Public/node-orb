@@ -15,12 +15,6 @@ parameters:
             If unspecified, the version listed in .nvmrc or .node-version will be installed. If no .nvmrc file and .node-version file exists the active LTS version of Node.js will be installed by default.
             For a full list of releases, see the following: https://nodejs.org/en/download/releases
 
-    node-install-dir:
-        type: string
-        default: /usr/local
-        description: >
-            Where should Node.js be installed?
-
     # pnpm
     install-pnpm:
         type: boolean
@@ -34,7 +28,6 @@ parameters:
             Pick a version of pnpm to install (if no version is specified,
             the latest stable version will be installed):
             https://github.com/pnpm/pnpm/releases
-
     # yarn
     install-yarn:
         type: boolean
