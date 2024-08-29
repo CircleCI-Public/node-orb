@@ -182,15 +182,11 @@ jobs:
     steps:
       - checkout
       - run: mv ~/project/sample/package-berry.json ~/project/sample/package.json
-      - run: corepack enable --install-directory ~/bin
-      - run: echo y | yarn set version berry
-      - run: yarn install
-      - run: echo "export YARN_ENABLE_IMMUTABLE_INSTALLS=false" >> "$BASH_ENV" && source "$BASH_ENV"
-      # - run: rm ~/project/sample/yarn.lock
       - node/install-packages:
           pkg-manager: yarn-berry
           cache-version: yarn-berry-v2
           app-dir: "~/project/sample"
+          override-ci-command: yarn install
       - run: yarn --version
       - run: cd ~/project/sample && yarn test
 
