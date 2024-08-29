@@ -179,6 +179,7 @@ jobs:
       name: node/default
     steps:
       - checkout
+      - run: mv package-berry.json package.json
       - node/install-packages:
           pkg-manager: yarn-berry
           cache-version: yarn-berry-v1

@@ -1,5 +1,6 @@
 {
   "name": "opd-server",
+  "packageManager": "yarn@4.3.0",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
