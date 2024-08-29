@@ -29,9 +29,13 @@ installation_check () {
             elif grep Debian /etc/issue > /dev/null 2>&1; then
                 $SUDO apt-get remove yarn > /dev/null 2>&1 && \
                 $SUDO apt-get purge yarn > /dev/null 2>&1
+                OLD_YARN=$(which yarn)
+                rm $OLD_YARN
             elif grep Ubuntu /etc/issue > /dev/null 2>&1; then
                 $SUDO apt-get remove yarn > /dev/null 2>&1 && \
                 $SUDO apt-get purge yarn > /dev/null 2>&1
+                OLD_YARN=$(which yarn)
+                rm $OLD_YARN
             elif command -v yum > /dev/null 2>&1; then
                 yum remove yarn > /dev/null 2>&1
             fi
