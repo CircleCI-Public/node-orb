@@ -84,7 +84,12 @@ steps:
                     command: <<include(scripts/packages/npm-install.sh)>>
 
               - when: # cache enabled, save cache
-                    condition: << parameters.with-cache >>
+                    condition:
+                        and:
+                        - << parameters.with-cache >>
+                        - << parameters.override-ci-command >>
+                        - not:
+                            equal: ["npm-ci", << parameters.override-ci-command >>]
                     steps:
                         - when: # custom cache path selected
                               condition: << parameters.cache-path >>
