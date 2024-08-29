@@ -5,41 +5,40 @@ if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 # FUNCTIONS
 get_yarn_version () {
     if [[ "$NODE_PARAM_YARN_VERSION" == "" ]]; then
-    YARN_ORB_VERSION=$(curl -s https://cdn.jsdelivr.net/npm/yarn/package.json | sed -n 's/.*version": "\(.*\)".*/\1/p')
-    echo "Latest version of Yarn is $YARN_ORB_VERSION"
+        YARN_ORB_VERSION=$(curl -s https://cdn.jsdelivr.net/npm/yarn/package.json | sed -n 's/.*version": "\(.*\)".*/\1/p')
+        echo "Latest version of Yarn is $YARN_ORB_VERSION"
     else
-    YARN_ORB_VERSION="$NODE_PARAM_YARN_VERSION"
-
-    echo "Selected version of Yarn is $YARN_ORB_VERSION"
+        YARN_ORB_VERSION="$NODE_PARAM_YARN_VERSION"
+        echo "Selected version of Yarn is $YARN_ORB_VERSION"
     fi
 }
 
 installation_check () {
     echo "Checking if YARN is already installed..."
     if command -v yarn > /dev/null 2>&1; then
-    if yarn --version | grep "$YARN_ORB_VERSION" > /dev/null 2>&1; then
-        echo "Yarn $YARN_ORB_VERSION is already installed"
-        exit 0
-    else
-        echo "A different version of Yarn is installed ($(yarn --version)); removing it"
+        if yarn --version | grep "$YARN_ORB_VERSION" > /dev/null 2>&1; then
+            echo "Yarn $YARN_ORB_VERSION is already installed"
+            exit 0
+        else
+            echo "A different version of Yarn is installed ($(yarn --version)); removing it"
 
-        if uname -a | grep Darwin > /dev/null 2>&1; then
-        brew uninstall yarn > /dev/null 2>&1
-        elif grep Alpine /etc/issue > /dev/null 2>&1; then
-        apk del yarn > /dev/null 2>&1
-        elif grep Debian /etc/issue > /dev/null 2>&1; then
-        $SUDO apt-get remove yarn > /dev/null 2>&1 && \
-            $SUDO apt-get purge yarn > /dev/null 2>&1
-        elif grep Ubuntu /etc/issue > /dev/null 2>&1; then
-        $SUDO apt-get remove yarn > /dev/null 2>&1 && \
-            $SUDO apt-get purge yarn > /dev/null 2>&1
-        elif command -v yum > /dev/null 2>&1; then
-        yum remove yarn > /dev/null 2>&1
+            if uname -a | grep Darwin > /dev/null 2>&1; then
+                brew uninstall yarn > /dev/null 2>&1
+            elif grep Alpine /etc/issue > /dev/null 2>&1; then
+                apk del yarn > /dev/null 2>&1
+            elif grep Debian /etc/issue > /dev/null 2>&1; then
+                $SUDO apt-get remove yarn > /dev/null 2>&1 && \
+                $SUDO apt-get purge yarn > /dev/null 2>&1
+            elif grep Ubuntu /etc/issue > /dev/null 2>&1; then
+                $SUDO apt-get remove yarn > /dev/null 2>&1 && \
+                $SUDO apt-get purge yarn > /dev/null 2>&1
+            elif command -v yum > /dev/null 2>&1; then
+                yum remove yarn > /dev/null 2>&1
+            fi
+
+            $SUDO rm -rf "$HOME/.yarn" > /dev/null 2>&1
+            $SUDO rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg > /dev/null 2>&1
         fi
-
-        $SUDO rm -rf "$HOME/.yarn" > /dev/null 2>&1
-        $SUDO rm -f /usr/local/bin/yarn /usr/local/bin/yarnpkg > /dev/null 2>&1
-    fi
     fi
 }
 
