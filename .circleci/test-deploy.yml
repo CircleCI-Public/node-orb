@@ -185,6 +185,7 @@ jobs:
       - run: corepack enable --install-directory ~/bin
       - run: echo y | yarn set version berry
       - run: yarn install
+      - run: echo "export YARN_ENABLE_IMMUTABLE_INSTALLS=false" >> "$BASH_ENV" && source "$BASH_ENV"
       # - run: rm ~/project/sample/yarn.lock
       - node/install-packages:
           pkg-manager: yarn-berry
