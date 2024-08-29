@@ -180,6 +180,7 @@ jobs:
     steps:
       - checkout
       - run: mv ~/project/sample/package-berry.json ~/project/sample/package.json
+      - run: rm ~/project/sample/yarn.lock
       - node/install-packages:
           pkg-manager: yarn-berry
           cache-version: yarn-berry-v2
