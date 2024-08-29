@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-$SUDO corepack enable
+corepack enable --install-directory ~/bin
 # Run override ci command if provided, otherwise run default yarn install
 # See: https://yarnpkg.com/configuration/yarnrc/#cacheFolder
 if [[ -n "$PARAM_CACHE_PATH" ]]; then
