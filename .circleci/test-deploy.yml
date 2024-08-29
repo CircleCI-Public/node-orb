@@ -183,6 +183,7 @@ jobs:
       - checkout
       - run: mv ~/project/sample/package-berry.json ~/project/sample/package.json
       - run: echo y | yarn set version berry
+      - run: yarn install
       # - run: rm ~/project/sample/yarn.lock
       - node/install-packages:
           pkg-manager: yarn-berry
