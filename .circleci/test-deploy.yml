@@ -172,6 +172,7 @@ jobs:
           pkg-manager: yarn
           cache-version: yarn-v3
           app-dir: "~/project/sample"
+      - run: yarn --version
       - run: cd ~/project/sample && yarn test
   integration-test-yarn-berry:
     executor:
@@ -182,6 +183,7 @@ jobs:
           pkg-manager: yarn-berry
           cache-version: yarn-berry-v1
           app-dir: "~/project/sample"
+      - run: yarn --version
       - run: cd ~/project/sample && yarn test
 
 workflows:
