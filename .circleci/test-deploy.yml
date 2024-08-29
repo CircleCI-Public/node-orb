@@ -187,7 +187,6 @@ jobs:
           cache-version: yarn-berry-v2
           app-dir: "~/project/sample"
           override-ci-command: yarn install
-      - run: yarn --version
       - run: cd ~/project/sample && yarn test
 
 workflows:
