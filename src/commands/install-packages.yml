@@ -58,7 +58,16 @@ steps:
           command: <<include(scripts/packages/find-package.sh)>>
 
     - when:
-          condition: << parameters.with-cache >>
+          condition: 
+            and:
+            - << parameters.with-cache >>
+            - or:
+                - not:
+                    equal: [npm, << parameters.pkg-manager >>]
+                - and:
+                    - << parameters.override-ci-command >>
+                    - not:
+                        equal: ["npm-ci", << parameters.override-ci-command >>]
           steps:
               - run:
                     working_directory: <<parameters.app-dir>>
