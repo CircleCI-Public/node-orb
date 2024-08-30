@@ -7,7 +7,9 @@ parameters:
         type: enum
         enum: ['npm', 'yarn', 'yarn-berry', 'pnpm']
         default: 'npm'
-        description: Select the default node package manager to use. NPM v5+ Required.
+        description: |
+            Select the default node package manager to use. NPM v5+ Required.
+            To use yarn-berry your package.json must have packageManager set to a yarn berry version, otherwise it will use old yarn.
     with-cache:
         type: boolean
         default: true

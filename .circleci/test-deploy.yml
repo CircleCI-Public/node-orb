@@ -176,16 +176,21 @@ jobs:
           pkg-manager: yarn
           cache-version: yarn-v3
           app-dir: "~/project/sample"
+      - run: yarn --version
       - run: cd ~/project/sample && yarn test
   integration-test-yarn-berry:
+    environment:
+      YARN_ENABLE_IMMUTABLE_INSTALLS: false
     executor:
       name: node/default
     steps:
       - checkout
+      - run: mv ~/project/sample/package-berry.json ~/project/sample/package.json
       - node/install-packages:
           pkg-manager: yarn-berry
-          cache-version: yarn-berry-v1
+          cache-version: yarn-berry-v2
           app-dir: "~/project/sample"
+          override-ci-command: yarn install
       - run: cd ~/project/sample && yarn test
 
 workflows:
