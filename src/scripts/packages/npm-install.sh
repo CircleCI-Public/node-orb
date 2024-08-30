@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Configure npm cache path if provided
-if [[ -n "$PARAM_CACHE_PATH" ]]; then
+if [[ -n "$PARAM_CACHE_PATH" ]] && [[ "$PARAM_OVERRIDE_COMMAND" != "npm ci" ]] && [[ -n "$PARAM_OVERRIDE_COMMAND" ]]; then
     npm config set cache "$PARAM_CACHE_PATH"
 fi
 

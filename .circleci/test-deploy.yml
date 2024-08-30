@@ -62,7 +62,11 @@ jobs:
               echo "pnpm version 9.7.1 not found"
               exit 1
             fi
-
+  integration-test-reinstall-yarn:
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - node/install-yarn
   integration-test-install-latest:
     parameters:
       os:
@@ -192,6 +196,7 @@ jobs:
 workflows:
   test-deploy:
     jobs:
+      - integration-test-reinstall-yarn
       - integration-test-install-specified-version:
           filters: *filters
           matrix:
@@ -404,6 +409,7 @@ workflows:
             - integration-test-install-lts
             - integration-test-install-pnpm
             - integration-test-pnpm
+            - integration-test-reinstall-yarn
             - node-yarn-mocha-with-test-result-path-job
             - node-test-results-file-job
             - node-run-npm-job

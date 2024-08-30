@@ -13,7 +13,9 @@ parameters:
     with-cache:
         type: boolean
         default: true
-        description: Cache your node packages automatically for faster install times.
+        description: |
+            Cache your node packages automatically for faster install times.
+            Cache will be ignored when using npm ci.
     check-cache:
         type: enum
         default: 'never'
@@ -30,11 +32,13 @@ parameters:
         description: |
             By default, packages will be installed with "npm ci", "yarn install --frozen-lockfile", "yarn install --immutable" or "pnpm install --frozen-lockfile".
             Optionally supply a custom package installation command, with any additional flags needed.
+            When the command npm ci is used, no cache will be used, as the command doesn't benefit from it.
         type: string
         default: ''
     cache-path:
         description: |
             By default, this orb will utilize 'npm ci' and cache the '~/.npm' directory. Override which path to cache with this parameter.
+            The cache will be ignored when using npm ci, as the command doesn't benefit from cache.
         type: string
         default: ''
     cache-only-lockfile:
@@ -60,7 +64,16 @@ steps:
           command: <<include(scripts/packages/find-package.sh)>>
 
     - when:
-          condition: << parameters.with-cache >>
+          condition:
+            and:
+            - << parameters.with-cache >>
+            - or:
+                - not:
+                    equal: [npm, << parameters.pkg-manager >>]
+                - and:
+                    - << parameters.override-ci-command >>
+                    - not:
+                        equal: ["npm-ci", << parameters.override-ci-command >>]
           steps:
               - run:
                     working_directory: <<parameters.app-dir>>
@@ -86,7 +99,12 @@ steps:
                     command: <<include(scripts/packages/npm-install.sh)>>
 
               - when: # cache enabled, save cache
-                    condition: << parameters.with-cache >>
+                    condition:
+                        and:
+                        - << parameters.with-cache >>
+                        - << parameters.override-ci-command >>
+                        - not:
+                            equal: ["npm-ci", << parameters.override-ci-command >>]
                     steps:
                         - when: # custom cache path selected
                               condition: << parameters.cache-path >>
