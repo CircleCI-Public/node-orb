@@ -41,14 +41,41 @@ parameters:
             Pick a version of Yarn to install (if no version is specified,
             the latest stable version will be installed):
             https://github.com/yarnpkg/yarn/releases
-
+    use-nvm-cache:
+        type: boolean
+        default: true
+        description: >
+            Indicates if cache would be used when installing nodejs,
+            this would reduce the amount of errors when downloading the binaries.
+            Defaults to true.
+    nvm-cache-key:
+        type: string
+        default: v1
+        description: >
+            Cache key to use when downloading nodejs.
+            This is only used when use-nvm-cache is set to true.
+            Defaults to v1, update this value if you need to restart the cache.
 steps:
+    - when:
+        condition: <<parameters.use-nvm-cache>>
+        steps:
+        - restore_cache:
+            name: Restore Nvm Cache
+            keys: 
+            - <<parameters.nvm-cache-key>>
     - run:
         name: Install Node.js <<parameters.node-version>>
         environment:
             NODE_PARAM_VERSION: <<parameters.node-version>>
         command: <<include(scripts/install-nvm.sh)>>
-
+    - when:
+        condition: <<parameters.use-nvm-cache>>
+        steps:
+        - save_cache:
+            name: Save Nvm Cache
+            keys: <<parameters.nvm-cache-key>>
+            paths:
+            - /opt/circleci/.nvm/.cache
     - when:
         condition: <<parameters.install-pnpm>>
         steps:
