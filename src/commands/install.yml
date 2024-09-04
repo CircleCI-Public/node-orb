@@ -76,8 +76,7 @@ steps:
                 name: Save Nvm Cache
                 key: <<parameters.nvm-cache-key>>-<<parameters.node-version>>
                 paths:
-                - ~/.nvm/.cache
-                - /opt/circleci/.nvm/.cache
+                - ${NVM_DIR}/.nvm/.cache
     - when:
         condition: <<parameters.install-pnpm>>
         steps:
