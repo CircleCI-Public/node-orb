@@ -76,6 +76,7 @@ steps:
                 key: <<parameters.nvm-cache-key>>
                 paths:
                 - ~/.nvm/.cache
+                - /opt/circleci/.nvm/.cache
     - when:
         condition: <<parameters.install-pnpm>>
         steps:
