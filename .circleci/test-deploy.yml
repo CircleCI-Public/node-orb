@@ -40,7 +40,7 @@ jobs:
           node-version: "16.13"
           install-yarn: true # Test the install of YARN
           yarn-version: "1.22.5"
-          # nvm-cache-key: v1-<<parameters.os>>
+          nvm-cache-key: v2-<<parameters.os>>
       - run:
           command: |
             if ! node --version | grep -q "16"; then
@@ -57,7 +57,7 @@ jobs:
       - node/install:
           install-pnpm: true # Test the install of PNPM
           pnpm-version: "9.7.1"
-          # nvm-cache-key: v1-lts-<<parameters.os>>
+          nvm-cache-key: v2-lts-<<parameters.os>>
       - run:
           command: |
             if ! pnpm --version | grep -q "9.7.1"; then
@@ -78,7 +78,7 @@ jobs:
       - checkout
       - node/install:
           node-version: "latest"
-          # nvm-cache-key: v1-latest-<<parameters.os>>
+          nvm-cache-key: v2-latest-<<parameters.os>>
       - run:
           name: Check that latest Node.js is installed.
           command: |
