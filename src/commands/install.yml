@@ -50,11 +50,12 @@ parameters:
             Defaults to true.
     nvm-cache-key:
         type: string
-        default: nvm-v1-<<parameters.node-version>>-
+        default: nvm-v1-cache
         description: >
             Cache key to use when downloading nodejs.
             This is only used when use-nvm-cache is set to true.
-            Defaults to v1, update this value if you need to restart the cache.
+            Defaults to nvm-v1-cache-<node-version>, update this value if you need to restart the cache.
+            If you are using multiple executors, add the executor as part of the key.
 steps:
     - when:
         condition: <<parameters.use-nvm-cache>>
@@ -62,7 +63,7 @@ steps:
             - restore_cache:
                 name: Restore Nvm Cache
                 keys:
-                - <<parameters.nvm-cache-key>>
+                - <<parameters.nvm-cache-key>>-<<parameters.node-version>>
     - run:
         name: Install Node.js <<parameters.node-version>>
         environment:
@@ -73,7 +74,7 @@ steps:
         steps:
             - save_cache:
                 name: Save Nvm Cache
-                key: <<parameters.nvm-cache-key>>
+                key: <<parameters.nvm-cache-key>>-<<parameters.node-version>>
                 paths:
                 - ~/.nvm/.cache
                 - /opt/circleci/.nvm/.cache
