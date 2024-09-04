@@ -59,10 +59,10 @@ steps:
     - when:
         condition: <<parameters.use-nvm-cache>>
         steps:
-        - restore_cache:
-            name: Restore Nvm Cache
-            keys:
-            - <<parameters.nvm-cache-key>>
+            - restore_cache:
+                name: Restore Nvm Cache
+                keys:
+                - <<parameters.nvm-cache-key>>
     - run:
         name: Install Node.js <<parameters.node-version>>
         environment:
@@ -71,11 +71,11 @@ steps:
     - when:
         condition: <<parameters.use-nvm-cache>>
         steps:
-        - save_cache:
-            name: Save Nvm Cache
-            keys: <<parameters.nvm-cache-key>>
-            paths:
-            - /opt/circleci/.nvm/.cache
+            - save_cache:
+                name: Save Nvm Cache
+                keys: <<parameters.nvm-cache-key>>
+                paths:
+                - /opt/circleci/.nvm/.cache
     - when:
         condition: <<parameters.install-pnpm>>
         steps:
