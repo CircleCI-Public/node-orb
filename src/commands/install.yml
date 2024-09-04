@@ -50,7 +50,7 @@ parameters:
             Defaults to true.
     nvm-cache-key:
         type: string
-        default: v1
+        default: nvm-cache-v1
         description: >
             Cache key to use when downloading nodejs.
             This is only used when use-nvm-cache is set to true.
