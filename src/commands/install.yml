@@ -54,7 +54,8 @@ parameters:
         description: >
             Cache key to use when downloading nodejs.
             This is only used when use-nvm-cache is set to true.
-            Defaults to nvm-v1-cache-<node-version>, update this value if you need to restart the cache.
+            Defaults to nvm-v1-cache, update this value if you need to restart the cache.
+            The node-version is added by default at the end of the cache key.
             If you are using multiple executors, add the executor as part of the key.
 steps:
     - when:
