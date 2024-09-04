@@ -73,7 +73,7 @@ steps:
         steps:
             - save_cache:
                 name: Save Nvm Cache
-                keys: <<parameters.nvm-cache-key>>
+                key: <<parameters.nvm-cache-key>>
                 paths:
                 - /opt/circleci/.nvm/.cache
     - when:
