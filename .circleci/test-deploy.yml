@@ -181,7 +181,7 @@ jobs:
           app-dir: "~/project/sample"
       - run: yarn --version
       - run: cd ~/project/sample && yarn test
-  integration-test-yarn-berry:
+  integration-test-yarn-berry-nocimg:
     environment:
       YARN_ENABLE_IMMUTABLE_INSTALLS: false
     docker:
@@ -195,7 +195,7 @@ jobs:
           app-dir: "~/project/sample"
           override-ci-command: yarn install
       - run: cd ~/project/sample && yarn test
-  integration-test-yarn-berry-nocimg:
+  integration-test-yarn-berry:
     environment:
       YARN_ENABLE_IMMUTABLE_INSTALLS: false
     executor:
@@ -412,6 +412,8 @@ workflows:
       - integration-test-yarn:
           filters: *filters
       - integration-test-yarn-berry:
+          filters: *filters
+      - integration-test-yarn-berry-nocimg:
           filters: *filters
       - orb-tools/pack:
           filters: *release-filters
