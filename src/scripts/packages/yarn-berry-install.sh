@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-corepack enable --install-directory ~/bin
+if ! corepack enable; then
+    echo "Using alternative corepack location"
+    corepack enable --install-directory ~/bin
+fi
 # Run override ci command if provided, otherwise run default yarn install
 # See: https://yarnpkg.com/configuration/yarnrc/#cacheFolder
 if [[ -n "$PARAM_CACHE_PATH" ]]; then

@@ -181,6 +181,20 @@ jobs:
           app-dir: "~/project/sample"
       - run: yarn --version
       - run: cd ~/project/sample && yarn test
+  integration-test-yarn-berry-nocimg:
+    environment:
+      YARN_ENABLE_IMMUTABLE_INSTALLS: false
+    docker:
+    - image: cypress/browsers
+    steps:
+      - checkout
+      - run: mv ~/project/sample/package-berry.json ~/project/sample/package.json
+      - node/install-packages:
+          pkg-manager: yarn-berry
+          cache-version: yarn-berry-v2
+          app-dir: "~/project/sample"
+          override-ci-command: yarn install
+      - run: cd ~/project/sample && yarn test
   integration-test-yarn-berry:
     environment:
       YARN_ENABLE_IMMUTABLE_INSTALLS: false
@@ -224,7 +238,7 @@ workflows:
           filters: *filters
           name: node-npm-jest-test-job
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           test-results-for: jest
           setup:
             - run:
@@ -236,7 +250,7 @@ workflows:
           filters: *filters
           name: node-yarn-jest-test-job
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           test-results-for: jest
           pkg-manager: yarn
           setup:
@@ -249,7 +263,7 @@ workflows:
           filters: *filters
           name: node-pnpm-jest-test-job
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           test-results-for: jest
           pkg-manager: pnpm
           setup:
@@ -262,7 +276,7 @@ workflows:
           filters: *filters
           name: node-npm-mocha-test-job
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           test-results-for: mocha
           run-command: testmocha
           setup:
@@ -275,7 +289,7 @@ workflows:
           filters: *filters
           name: node-yarn-mocha-test-job
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           test-results-for: mocha
           pkg-manager: yarn
           run-command: testmocha
@@ -289,7 +303,7 @@ workflows:
           filters: *filters
           name: node-pnpm-mocha-test-job
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           test-results-for: mocha
           pkg-manager: pnpm
           run-command: testmocha
@@ -303,7 +317,7 @@ workflows:
           filters: *filters
           name: node-yarn-mocha-with-test-result-path-job
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           test-results-for: mocha
           pkg-manager: yarn
           run-command: testmocha
@@ -318,7 +332,7 @@ workflows:
           filters: *filters
           name: node-test-results-file-job
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           test-results-path: sample/other-junit.xml
           setup:
             - run:
@@ -330,7 +344,7 @@ workflows:
           filters: *filters
           name: node-test-no-junit
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           setup:
             - run:
                 name: Remove other lock files
@@ -341,14 +355,14 @@ workflows:
           filters: *filters
           name: node-test-with-coverage
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           run-command: "test:coverage"
           test-coverage-path: ~/project/sample/coverage
       - node/run:
           filters: *filters
           name: node-run-npm-job
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           npm-run: build
           setup:
             - run:
@@ -373,7 +387,7 @@ workflows:
           filters: *filters
           name: node-run-upload-artifacts
           app-dir: "~/project/sample"
-          cache-version: v4
+          cache-version: v1
           npm-run: build
           artifacts-path: "~/project/sample/dist"
       - node/run:
@@ -398,6 +412,8 @@ workflows:
       - integration-test-yarn:
           filters: *filters
       - integration-test-yarn-berry:
+          filters: *filters
+      - integration-test-yarn-berry-nocimg:
           filters: *filters
       - orb-tools/pack:
           filters: *release-filters
