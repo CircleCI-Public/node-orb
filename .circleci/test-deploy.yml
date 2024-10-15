@@ -423,6 +423,11 @@ workflows:
           pub_type: production
           requires:
             - orb-tools/pack
+            - integration-test-override-ci-windows
+            - integration-test-override-ci
+            - integration-test-yarn
+            - integration-test-yarn-berry
+            - integration-test-yarn-berry-nocimg
             - integration-test-install-specified-version
             - integration-test-install-latest
             - integration-test-install-lts
@@ -430,8 +435,15 @@ workflows:
             - integration-test-pnpm
             - integration-test-reinstall-yarn
             - node-yarn-mocha-with-test-result-path-job
+            - node-yarn-mocha-test-job
+            - node-yarn-jest-test-job
             - node-test-results-file-job
+            - node-npm-jest-test-job
+            - node-test-with-coverage
             - node-run-npm-job
+            - node-pnpm-mocha-test-job
+            - node-test-no-junit
+            - node-pnpm-jest-test-job
             - node-run-yarn-job
             - node-run-pnpm-job
             - node-run-upload-artifacts
