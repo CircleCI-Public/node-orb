@@ -66,7 +66,37 @@ parameters:
         - 2xlarge
         - 2xlarge+
         type: enum
-
+    include-branch-in-cache-key:
+        type: boolean
+        default: true
+        description: >
+            If true, this cache bucket will only apply to jobs within the same branch.
+    cache-path:
+        description: |
+            By default, this orb will utilize 'npm ci' and cache the '~/.npm' directory. Override which path to cache with this parameter.
+            The cache will be ignored when using npm ci, as the command doesn't benefit from cache.
+        type: string
+        default: ''
+    cache-only-lockfile:
+        type: boolean
+        default: true
+        description: |
+            If true, package.json will be ignored in the cache key. Useful for projects where package.json changes do not always invalidate dependencies.
+            Note: package.json will still be the final fallback key incase a project is not configured with a lock file.
+    with-cache:
+        type: boolean
+        default: true
+        description: |
+            Cache your node packages automatically for faster install times.
+            Cache will be ignored when using npm ci.
+    check-cache:
+        type: enum
+        default: 'never'
+        enum: ['never', 'always', 'detect']
+        description: |
+            Yarn berry only for Zero install support -
+            Use 'always' to always --check-cache argument to yarn install.
+            Use 'detect' to enable caching of yarn.lock and to only add when required.
 executor:
     name: default
     tag: << parameters.version >>
@@ -80,6 +110,11 @@ steps:
           pkg-manager: <<parameters.pkg-manager>>
           cache-version: <<parameters.cache-version>>
           override-ci-command: <<parameters.override-ci-command>>
+          include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
+          cache-path: <<parameters.cache-path>>
+          cache-only-lockfile: <<parameters.cache-only-lockfile>>
+          with-cache: <<parameters.with-cache>>
+          check-cache: <<parameters.check-cache>>
     - when: # Run tests for NPM, without test results
           condition:
               and:
