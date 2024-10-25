@@ -64,7 +64,7 @@ steps:
             - restore_cache:
                 name: Restore Nvm Cache
                 keys:
-                - <<parameters.nvm-cache-key>>-<<parameters.node-version>>
+                - <<parameters.nvm-cache-key>>-<<parameters.node-version>>-{{ arch }}
     - run:
         name: Install Node.js <<parameters.node-version>>
         environment:
@@ -75,7 +75,7 @@ steps:
         steps:
             - save_cache:
                 name: Save Nvm Cache
-                key: <<parameters.nvm-cache-key>>-<<parameters.node-version>>
+                key: <<parameters.nvm-cache-key>>-<<parameters.node-version>>-{{ arch }}
                 paths:
                 - ~/.nvm/.cache
                 - /opt/circleci/.nvm/.cache
