@@ -91,6 +91,14 @@ jobs:
               exit 1
             fi
 
+  integration-test-override-yarn:
+    docker:
+      - image: cimg/ruby:3.3.5-browsers
+    steps:
+      - node/install: 
+          install-yarn: true
+          node-version: '22.11.0'
+
   integration-test-use-nvmrc-version:
     parameters:
       os:
@@ -213,7 +221,10 @@ jobs:
 workflows:
   test-deploy:
     jobs:
-      - integration-test-reinstall-yarn
+      - integration-test-override-yarn:
+          filters: *filters
+      - integration-test-reinstall-yarn:
+          filters: *filters
       - integration-test-install-specified-version:
           filters: *filters
           matrix:
@@ -435,6 +446,7 @@ workflows:
             - integration-test-pnpm
             - integration-test-reinstall-yarn
             - node-yarn-mocha-with-test-result-path-job
+            - integration-test-override-yarn
             - node-yarn-mocha-test-job
             - node-yarn-jest-test-job
             - node-test-results-file-job

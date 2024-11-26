@@ -23,21 +23,21 @@ installation_check () {
             echo "A different version of Yarn is installed ($(yarn --version)); removing it"
 
             if uname -a | grep Darwin > /dev/null 2>&1; then
-                brew uninstall yarn > /dev/null 2>&1
+                $SUDO brew uninstall yarn > /dev/null 2>&1
             elif grep Alpine /etc/issue > /dev/null 2>&1; then
-                apk del yarn > /dev/null 2>&1
+                $SUDO apk del yarn > /dev/null 2>&1
             elif grep Debian /etc/issue > /dev/null 2>&1; then
                 $SUDO apt-get remove yarn > /dev/null 2>&1 && \
                 $SUDO apt-get purge yarn > /dev/null 2>&1
                 OLD_YARN=$(which yarn)
-                rm "$OLD_YARN"
+                $SUDO rm "$OLD_YARN"
             elif grep Ubuntu /etc/issue > /dev/null 2>&1; then
                 $SUDO apt-get remove yarn > /dev/null 2>&1 && \
                 $SUDO apt-get purge yarn > /dev/null 2>&1
                 OLD_YARN=$(which yarn)
-                rm "$OLD_YARN"
+                $SUDO rm "$OLD_YARN"
             elif command -v yum > /dev/null 2>&1; then
-                yum remove yarn > /dev/null 2>&1
+                $SUDO yum remove yarn > /dev/null 2>&1
             fi
 
             $SUDO rm -rf "$HOME/.yarn" > /dev/null 2>&1
