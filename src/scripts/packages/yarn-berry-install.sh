@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 if ! corepack enable; then
     echo "Using alternative corepack location"
     corepack enable --install-directory ~/bin
