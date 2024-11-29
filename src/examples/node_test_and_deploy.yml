@@ -9,11 +9,13 @@ usage:
     workflows:
         test-and-deploy:
             jobs:
-                - node/test
+                - node/test:
+                    executor:
+                        name: node/default
                 - heroku/deploy-via-git:
-                      requires:
-                          - node/test
-                      filters:
-                          branches:
-                              only:
-                                  - master
+                    requires:
+                        - node/test
+                    filters:
+                        branches:
+                            only:
+                                - master

@@ -10,6 +10,17 @@ usage:
         matrix-tests:
             jobs:
                 - node/test:
-                      matrix:
-                          parameters:
-                              version: ['13.11.0', '12.16.0', '10.19.0']
+                    matrix:
+                        parameters:
+                            executor: [node13, node12, node10]
+
+    executors:
+        node13:
+            docker:
+                - image: cimg/node:13.11.0
+        node12:
+            docker:
+                - image: cimg/node:12.16.0
+        node10:
+            docker:
+                - image: cimg/node:10.19.0

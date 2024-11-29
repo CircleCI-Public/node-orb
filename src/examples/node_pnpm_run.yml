@@ -9,4 +9,6 @@ usage:
         run-npm-command:
             jobs:
                 - node/run:
-                      pnpm-run: build
+                    pnpm-run: build
+                    executor:
+                        name: node/default
