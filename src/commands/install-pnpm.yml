@@ -12,7 +12,7 @@ parameters:
 
 steps:
     - run:
-          name: Install pnpm
-          environment:
-              NODE_PARAM_PNPM_VERSION: <<parameters.version>>
-          command: <<include(scripts/install-pnpm.sh)>>
+        name: Install pnpm
+        environment:
+            NODE_PARAM_PNPM_VERSION: <<parameters.version>>
+        command: <<include(scripts/install-pnpm.sh)>>

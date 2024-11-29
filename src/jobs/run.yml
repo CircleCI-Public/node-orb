@@ -85,26 +85,26 @@ steps:
     - checkout
     - steps: << parameters.setup >>
     - install-packages:
-          app-dir: <<parameters.app-dir>>
-          pkg-manager: <<parameters.pkg-manager>>
-          cache-version: <<parameters.cache-version>>
-          override-ci-command: <<parameters.override-ci-command>>
-          include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
-          cache-path: <<parameters.cache-path>>
-          cache-only-lockfile: <<parameters.cache-only-lockfile>>
-          with-cache: <<parameters.with-cache>>
-          check-cache: <<parameters.check-cache>>
+        app-dir: <<parameters.app-dir>>
+        pkg-manager: <<parameters.pkg-manager>>
+        cache-version: <<parameters.cache-version>>
+        override-ci-command: <<parameters.override-ci-command>>
+        include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
+        cache-path: <<parameters.cache-path>>
+        cache-only-lockfile: <<parameters.cache-only-lockfile>>
+        with-cache: <<parameters.with-cache>>
+        check-cache: <<parameters.check-cache>>
     - run:
-          name: Run <<parameters.pkg-manager>> <<parameters.npm-run>>
-          working_directory: <<parameters.app-dir>>
-          environment:
-              ORB_PARAM_PKG_MANAGER: <<parameters.pkg-manager>>
-              ORB_PARAM_NPM_RUN: <<parameters.npm-run>>
-              ORB_PARAM_YARN_RUN: <<parameters.yarn-run>>
-              ORB_PARAM_PNPM_RUN: <<parameters.pnpm-run>>
-          command: <<include(scripts/run-commands-with.sh)>>
+        name: Run <<parameters.pkg-manager>> <<parameters.npm-run>>
+        working_directory: <<parameters.app-dir>>
+        environment:
+            ORB_PARAM_PKG_MANAGER: <<parameters.pkg-manager>>
+            ORB_PARAM_NPM_RUN: <<parameters.npm-run>>
+            ORB_PARAM_YARN_RUN: <<parameters.yarn-run>>
+            ORB_PARAM_PNPM_RUN: <<parameters.pnpm-run>>
+        command: <<include(scripts/run-commands-with.sh)>>
     - when:
-          condition: <<parameters.artifacts-path>>
-          steps:
-              - store_artifacts:
-                    path: <<parameters.artifacts-path>>
+        condition: <<parameters.artifacts-path>>
+        steps:
+            - store_artifacts:
+                path: <<parameters.artifacts-path>>

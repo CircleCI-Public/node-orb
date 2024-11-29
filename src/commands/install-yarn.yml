@@ -12,7 +12,7 @@ parameters:
 
 steps:
     - run:
-          name: Install Yarn
-          environment:
-              NODE_PARAM_YARN_VERSION: <<parameters.version>>
-          command: <<include(scripts/install-yarn.sh)>>
+        name: Install Yarn
+        environment:
+            NODE_PARAM_YARN_VERSION: <<parameters.version>>
+        command: <<include(scripts/install-yarn.sh)>>
