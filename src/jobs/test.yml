@@ -51,7 +51,7 @@ parameters:
             The code coverage files will be uploaded to artifacts for this workflow.
     include-branch-in-cache-key:
         type: boolean
-        default: true
+        default: false
         description: >
             If true, this cache bucket will only apply to jobs within the same branch.
     cache-path:
@@ -250,17 +250,17 @@ steps:
                 working_directory: <<parameters.app-dir>>
                 command: pnpm run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
     - when: # upload test results if a path was given
-            condition: << parameters.test-results-path >>
-            steps:
-                store_test_results:
-                    path: << parameters.test-results-path >>
+        condition: << parameters.test-results-path >>
+        steps:
+            - store_test_results:
+                path: << parameters.test-results-path >>
     - when: # upload test results if jest was automatically configured and test-results-path is not specified
         condition:
             and:
                 - equal: [jest, << parameters.test-results-for >>]
                 - equal: ['', << parameters.test-results-path >>]
         steps:
-            store_test_results:
+            - store_test_results:
                 path: <<parameters.app-dir>>/junit.xml
     - when: # upload test results if mocha was automatically configured and test-results-path is not specified
         condition:
@@ -268,7 +268,7 @@ steps:
                 - equal: [mocha, << parameters.test-results-for >>]
                 - equal: ['', << parameters.test-results-path >>]
         steps:
-            store_test_results:
+            - store_test_results:
                 path: <<parameters.app-dir>>/test-results.xml
     - when: # upload coverage files if test-coverage-path was configured
         condition: <<parameters.test-coverage-path>>

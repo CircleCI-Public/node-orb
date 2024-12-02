@@ -44,7 +44,7 @@ parameters:
         default: ''
     include-branch-in-cache-key:
         type: boolean
-        default: true
+        default: false
         description: >
             If true, this cache bucket will only apply to jobs within the same branch.
     cache-path:
