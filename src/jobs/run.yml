@@ -2,11 +2,6 @@ description: |
     Simple drop-in job to run commands for your Node.js application automatically.
 
 parameters:
-    version:
-        type: string
-        default: 'lts'
-        description: >
-            Pick a specific cimg/node image version tag: https://hub.docker.com/r/cimg/node
     pkg-manager:
         type: enum
         enum: ['npm', 'yarn', 'yarn-berry', 'pnpm']
@@ -47,18 +42,6 @@ parameters:
             Path to a file or directory to upload to artifacts after running the script.
         type: string
         default: ''
-    resource_class:
-        default: large
-        description: Configure the executor resource class
-        enum:
-        - small
-        - medium
-        - medium+
-        - large
-        - xlarge
-        - 2xlarge
-        - 2xlarge+
-        type: enum
     include-branch-in-cache-key:
         type: boolean
         default: true
@@ -90,35 +73,38 @@ parameters:
             Yarn berry only for Zero install support -
             Use 'always' to always --check-cache argument to yarn install.
             Use 'detect' to enable caching of yarn.lock and to only add when required.
-executor:
-    name: default
-    tag: << parameters.version >>
-    resource_class: << parameters.resource_class >>
+    executor:
+        type: executor
+        default: default
+        description: |
+            The name of executor to use.
+
+executor: <<parameters.executor>>
 
 steps:
     - checkout
     - steps: << parameters.setup >>
     - install-packages:
-          app-dir: <<parameters.app-dir>>
-          pkg-manager: <<parameters.pkg-manager>>
-          cache-version: <<parameters.cache-version>>
-          override-ci-command: <<parameters.override-ci-command>>
-          include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
-          cache-path: <<parameters.cache-path>>
-          cache-only-lockfile: <<parameters.cache-only-lockfile>>
-          with-cache: <<parameters.with-cache>>
-          check-cache: <<parameters.check-cache>>
+        app-dir: <<parameters.app-dir>>
+        pkg-manager: <<parameters.pkg-manager>>
+        cache-version: <<parameters.cache-version>>
+        override-ci-command: <<parameters.override-ci-command>>
+        include-branch-in-cache-key: <<parameters.include-branch-in-cache-key>>
+        cache-path: <<parameters.cache-path>>
+        cache-only-lockfile: <<parameters.cache-only-lockfile>>
+        with-cache: <<parameters.with-cache>>
+        check-cache: <<parameters.check-cache>>
     - run:
-          name: Run <<parameters.pkg-manager>> <<parameters.npm-run>>
-          working_directory: <<parameters.app-dir>>
-          environment:
-              ORB_PARAM_PKG_MANAGER: <<parameters.pkg-manager>>
-              ORB_PARAM_NPM_RUN: <<parameters.npm-run>>
-              ORB_PARAM_YARN_RUN: <<parameters.yarn-run>>
-              ORB_PARAM_PNPM_RUN: <<parameters.pnpm-run>>
-          command: <<include(scripts/run-commands-with.sh)>>
+        name: Run <<parameters.pkg-manager>> <<parameters.npm-run>>
+        working_directory: <<parameters.app-dir>>
+        environment:
+            ORB_PARAM_PKG_MANAGER: <<parameters.pkg-manager>>
+            ORB_PARAM_NPM_RUN: <<parameters.npm-run>>
+            ORB_PARAM_YARN_RUN: <<parameters.yarn-run>>
+            ORB_PARAM_PNPM_RUN: <<parameters.pnpm-run>>
+        command: <<include(scripts/run-commands-with.sh)>>
     - when:
-          condition: <<parameters.artifacts-path>>
-          steps:
-              - store_artifacts:
-                    path: <<parameters.artifacts-path>>
+        condition: <<parameters.artifacts-path>>
+        steps:
+            - store_artifacts:
+                path: <<parameters.artifacts-path>>
