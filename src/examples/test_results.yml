@@ -9,4 +9,6 @@ usage:
         test:
             jobs:
                 - node/test:
-                      test-results-path: junit.xml
+                    test-results-path: junit.xml
+                    executor:
+                        name: node/default

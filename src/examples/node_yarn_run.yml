@@ -9,4 +9,6 @@ usage:
         run-npm-command:
             jobs:
                 - node/run:
-                      yarn-run: build
+                    yarn-run: build
+                    executor:
+                        name: node/default

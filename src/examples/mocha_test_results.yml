@@ -9,4 +9,6 @@ usage:
         test:
             jobs:
                 - node/test:
-                      test-results-for: mocha
+                    test-results-for: mocha
+                    executor:
+                        name: node/default
