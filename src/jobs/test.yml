@@ -2,6 +2,10 @@ description: |
     Simple drop-in job to test your Node.js application automatically.
 
 parameters:
+    parallelism:
+        type: integer
+        default: 1
+        description: The number of parallel jobs to run. See https://circleci.com/docs/parallelism-faster-jobs/
     pkg-manager:
         type: enum
         enum: ['npm', 'yarn', 'yarn-berry', 'pnpm']
@@ -14,6 +18,10 @@ parameters:
     setup:
         type: steps
         description: Provide any optional steps you would like to run prior to installing the node dependencies. This is a good place to install global modules.
+        default: []
+    post_install_steps:
+        type: steps
+        description: Provide any optional steps you would like to run after installing the node dependencies.
         default: []
     run-command:
         type: string
@@ -83,11 +91,10 @@ parameters:
     executor:
         type: executor
         default: default
-        description: |
-            The name of executor to use.
+        description: The name of executor to use.
 
 executor: <<parameters.executor>>
-
+parallelism: <<parameters.parallelism>>
 steps:
     - checkout
     - steps: << parameters.setup >>
@@ -101,6 +108,7 @@ steps:
         cache-only-lockfile: <<parameters.cache-only-lockfile>>
         with-cache: <<parameters.with-cache>>
         check-cache: <<parameters.check-cache>>
+    - steps: << parameters.post_install_steps >>
     - when: # Run tests for NPM, without test results
         condition:
             and:
