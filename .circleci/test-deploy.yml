@@ -364,6 +364,22 @@ workflows:
                   rm ~/project/sample/yarn.lock
       - node/test:
           filters: *filters
+          name: node-test-no-junit-new-features
+          app-dir: "~/project/sample"
+          cache-version: v1
+          executor: machine
+          parallelism: 4
+          post_install_steps:
+            - run: |
+                echo "Packages installed"
+          setup:
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/pnpm-lock.yaml
+                  rm ~/project/sample/yarn.lock
+      - node/test:
+          filters: *filters
           name: node-test-with-coverage
           app-dir: "~/project/sample"
           cache-version: v1
