@@ -249,7 +249,7 @@ workflows:
           filters: *filters
           name: node-npm-jest-test-job
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           test-results-for: jest
           setup:
             - run:
@@ -261,7 +261,7 @@ workflows:
           filters: *filters
           name: node-yarn-jest-test-job
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           test-results-for: jest
           pkg-manager: yarn
           setup:
@@ -274,7 +274,7 @@ workflows:
           filters: *filters
           name: node-pnpm-jest-test-job
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           test-results-for: jest
           pkg-manager: pnpm
           setup:
@@ -287,7 +287,7 @@ workflows:
           filters: *filters
           name: node-npm-mocha-test-job
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           test-results-for: mocha
           run-command: testmocha
           setup:
@@ -300,7 +300,7 @@ workflows:
           filters: *filters
           name: node-yarn-mocha-test-job
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           test-results-for: mocha
           pkg-manager: yarn
           run-command: testmocha
@@ -314,7 +314,7 @@ workflows:
           filters: *filters
           name: node-pnpm-mocha-test-job
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           test-results-for: mocha
           pkg-manager: pnpm
           run-command: testmocha
@@ -328,7 +328,7 @@ workflows:
           filters: *filters
           name: node-yarn-mocha-with-test-result-path-job
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           test-results-for: mocha
           pkg-manager: yarn
           run-command: testmocha
@@ -343,7 +343,7 @@ workflows:
           filters: *filters
           name: node-test-results-file-job
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           test-results-path: sample/other-junit.xml
           setup:
             - run:
@@ -355,7 +355,7 @@ workflows:
           filters: *filters
           name: node-test-no-junit
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           setup:
             - run:
                 name: Remove other lock files
@@ -366,7 +366,7 @@ workflows:
           filters: *filters
           name: node-test-no-junit-new-features
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           executor: machine
           parallelism: 4
           post_install_steps:
@@ -382,14 +382,14 @@ workflows:
           filters: *filters
           name: node-test-with-coverage
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           run-command: "test:coverage"
           test-coverage-path: ~/project/sample/coverage
       - node/run:
           filters: *filters
           name: node-run-npm-job
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           npm-run: build
           setup:
             - run:
@@ -414,7 +414,7 @@ workflows:
           filters: *filters
           name: node-run-upload-artifacts
           app-dir: "~/project/sample"
-          cache-version: v1
+          cache-version: v2
           npm-run: build
           artifacts-path: "~/project/sample/dist"
       - node/run:
