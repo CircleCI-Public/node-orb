@@ -139,7 +139,17 @@ jobs:
             fi
 
   integration-test-override-ci:
-    executor: node/default
+    parameters:
+      resource_class:
+        type: enum
+        default: medium
+        description: Configure the executor resource class
+        enum:
+            - medium
+            - arm.medium
+    executor:
+      name: node/default
+      resource_class: <<parameters.resource_class>>
     steps:
       - checkout
       - node/install-packages:
@@ -164,8 +174,17 @@ jobs:
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && npm run test
   integration-test-pnpm:
+    parameters:
+      resource_class:
+        type: enum
+        default: medium
+        description: Configure the executor resource class
+        enum:
+            - medium
+            - arm.medium
     executor:
       name: node/default
+      resource_class: <<parameters.resource_class>>
     steps:
       - checkout
       - run:
@@ -179,8 +198,17 @@ jobs:
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && pnpm test
   integration-test-yarn:
+    parameters:
+      resource_class:
+        type: enum
+        default: medium
+        description: Configure the executor resource class
+        enum:
+            - medium
+            - arm.medium
     executor:
       name: node/default
+      resource_class: <<parameters.resource_class>>
     steps:
       - checkout
       - node/install-packages:
@@ -206,8 +234,17 @@ jobs:
   integration-test-yarn-berry:
     environment:
       YARN_ENABLE_IMMUTABLE_INSTALLS: false
+    parameters:
+      resource_class:
+        type: enum
+        default: medium
+        description: Configure the executor resource class
+        enum:
+            - medium
+            - arm.medium
     executor:
       name: node/default
+      resource_class: <<parameters.resource_class>>
     steps:
       - checkout
       - run: mv ~/project/sample/package-berry.json ~/project/sample/package.json
@@ -431,14 +468,30 @@ workflows:
                   rm ~/project/sample/package-lock.json
                   rm ~/project/sample/yarn.lock
       - integration-test-override-ci:
+          matrix:
+            alias: integration-test-override-ci
+            parameters:
+              resource_class: [arm.medium, medium]
           filters: *filters
       - integration-test-pnpm:
+          matrix:
+            alias: integration-test-pnpm
+            parameters:
+              resource_class: [arm.medium, medium]
           filters: *filters
       - integration-test-override-ci-windows:
           filters: *filters
       - integration-test-yarn:
+          matrix:
+            alias: integration-test-yarn
+            parameters:
+              resource_class: [arm.medium, medium]
           filters: *filters
       - integration-test-yarn-berry:
+          matrix:
+            alias: integration-test-yarn-berry
+            parameters:
+              resource_class: [arm.medium, medium]
           filters: *filters
       - integration-test-yarn-berry-nocimg:
           filters: *filters
