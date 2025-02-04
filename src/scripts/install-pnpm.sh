@@ -38,9 +38,9 @@ installation_check
 
 # install pnpm
 echo "Installing pnpm v$PNPM_ORB_VERSION"
-mkdir ~/.npm-global
-npm config set prefix "~/.npm-global"
-echo 'export PATH="~/.npm-global/bin:$PATH"' >> "$BASH_ENV"
+mkdir "$HOME/.npm-global"
+npm config set prefix "$HOME/.npm-global"
+echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> "$BASH_ENV"
 # shellcheck source=/dev/null
 source "$BASH_ENV";
 npm install -g "pnpm@$PNPM_ORB_VERSION"
