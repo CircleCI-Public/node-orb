@@ -37,6 +37,7 @@ get_pnpm_version
 installation_check
 
 # install pnpm
+set -x
 echo "Installing pnpm v$PNPM_ORB_VERSION"
 mkdir "$HOME/.npm-global"
 npm config set prefix "$HOME/.npm-global"
@@ -44,7 +45,7 @@ echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> "$BASH_ENV"
 # shellcheck source=/dev/null
 source "$BASH_ENV";
 npm install -g "pnpm@$PNPM_ORB_VERSION"
-
+set +x
 # test/verify version
 echo "Verifying pnpm install"
 if pnpm --version | grep "$PNPM_ORB_VERSION" > /dev/null 2>&1; then
