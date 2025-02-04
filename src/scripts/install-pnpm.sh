@@ -38,7 +38,11 @@ installation_check
 
 # install pnpm
 echo "Installing pnpm v$PNPM_ORB_VERSION"
-$SUDO npm install -g "pnpm@$PNPM_ORB_VERSION"
+mkdir ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH="~/.npm-global/bin:$PATH"' >> "$BASH_ENV"
+source "$BASH_ENV";
+npm install -g "pnpm@$PNPM_ORB_VERSION"
 
 # test/verify version
 echo "Verifying pnpm install"
