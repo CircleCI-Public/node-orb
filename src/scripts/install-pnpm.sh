@@ -39,7 +39,11 @@ installation_check
 # install pnpm
 set -x
 echo "Installing pnpm v$PNPM_ORB_VERSION"
-npm install -g "pnpm@$PNPM_ORB_VERSION"
+if [ -w "$(npm root -g)" ]; then
+    npm install -g "pnpm@$PNPM_ORB_VERSION"
+else
+    $SUDO npm install -g "pnpm@$PNPM_ORB_VERSION"
+fi
 set +x
 # test/verify version
 echo "Verifying pnpm install"
