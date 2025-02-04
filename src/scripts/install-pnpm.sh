@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# shellcheck disable=SC2016
 if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
 # FUNCTIONS
@@ -39,8 +39,9 @@ installation_check
 # install pnpm
 echo "Installing pnpm v$PNPM_ORB_VERSION"
 mkdir ~/.npm-global
-npm config set prefix '~/.npm-global'
+npm config set prefix "~/.npm-global"
 echo 'export PATH="~/.npm-global/bin:$PATH"' >> "$BASH_ENV"
+# shellcheck source=/dev/null
 source "$BASH_ENV";
 npm install -g "pnpm@$PNPM_ORB_VERSION"
 
