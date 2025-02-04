@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2016
 if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
 # FUNCTIONS
@@ -37,14 +36,14 @@ get_pnpm_version
 installation_check
 
 # install pnpm
-set -x
+
 echo "Installing pnpm v$PNPM_ORB_VERSION"
 if [ -w "$(npm root -g)" ]; then
     npm install -g "pnpm@$PNPM_ORB_VERSION"
 else
     $SUDO npm install -g "pnpm@$PNPM_ORB_VERSION"
 fi
-set +x
+
 # test/verify version
 echo "Verifying pnpm install"
 if pnpm --version | grep "$PNPM_ORB_VERSION" > /dev/null 2>&1; then
