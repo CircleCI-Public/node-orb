@@ -192,6 +192,8 @@ jobs:
           command: |
             rm ~/project/sample/package-lock.json
             rm ~/project/sample/yarn.lock
+      - node/install-pnpm:
+          version: "9.12.3"
       - node/install-packages:
           pkg-manager: pnpm
           cache-version: pnpm-v1
