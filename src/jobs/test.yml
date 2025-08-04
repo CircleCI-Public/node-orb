@@ -166,7 +166,6 @@ steps:
             - run:
                 name: Check for test reporter
                 working_directory: <<parameters.app-dir>>
-                command: yarn list --pattern jest-junit | grep " jest-junit@" || (echo "Add the package jest-junit to your projects dev dependencies with `yarn add --dev jest-junit`" && exit 1)
                 command: <<include(scripts/yarn-verify-reporter.sh)>>
                 environment:
                     PARAM_PATTERN: jest-junit
@@ -185,11 +184,10 @@ steps:
             - run:
                 name: Check for test reporter
                 working_directory: <<parameters.app-dir>>
-                command: yarn list --pattern "mocha-junit-reporter|mocha-multi" | grep "mocha-junit-reporter@\|mocha-multi@" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `yarn add --dev mocha-junit-reporter mocha-multi`" && exit 1)
                 command: <<include(scripts/yarn-verify-reporter.sh)>>
                 environment:
-                    PARAM_PATTERN: "mocha-junit-reporter|mocha-multi"
-                    PARAM_GREP: "mocha-junit-reporter@\|mocha-multi@"
+                    PARAM_PATTERN: 'mocha-junit-reporter|mocha-multi'
+                    PARAM_GREP: 'mocha-junit-reporter@\|mocha-multi@'
                     PARAM_ERROR: "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `yarn add --dev mocha-junit-reporter mocha-multi`"
             - run:
                 name: Run YARN Tests
@@ -224,11 +222,10 @@ steps:
             - run:
                 name: Check for test reporter
                 working_directory: <<parameters.app-dir>>
-                command: yarn list --pattern "mocha-junit-reporter|mocha-multi" | grep "mocha-junit-reporter@\|mocha-multi@" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `yarn add --dev mocha-junit-reporter mocha-multi`" && exit 1)
                 command: <<include(scripts/yarn-verify-reporter.sh)>>
                 environment:
-                    PARAM_PATTERN: "mocha-junit-reporter|mocha-multi"
-                    PARAM_GREP: "mocha-junit-reporter@\|mocha-multi@"
+                    PARAM_PATTERN: 'mocha-junit-reporter|mocha-multi'
+                    PARAM_GREP: 'mocha-junit-reporter@\|mocha-multi@'
                     PARAM_ERROR: "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with `yarn add --dev mocha-junit-reporter mocha-multi`"
             - run:
                 name: Run YARN 2.x Tests
