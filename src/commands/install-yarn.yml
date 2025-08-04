@@ -1,5 +1,6 @@
 description: >
-    Install a custom version of the Yarn package manager
+    Install a custom version of the Yarn package manager.
+    This only works for yarn classic versions, if you want to use yarn-berry, use the install-packages directly and select yarn-berry as pkg-manager.
 
 parameters:
     version:
