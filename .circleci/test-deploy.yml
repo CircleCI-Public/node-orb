@@ -363,7 +363,7 @@ workflows:
                 command: |
                   rm ~/project/sample/package-lock.json
                   rm ~/project/sample/pnpm-lock.yaml
-                  rm ~/project/sample/yarn.yaml
+                  rm ~/project/sample/yarn.lock
                   rm ~/project/sample/package.json
                   mv ~/project/sample/package-berry.json ~/project/sample/package.json
       - node/test:
