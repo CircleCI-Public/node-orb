@@ -349,6 +349,11 @@ workflows:
                 command: |
                   rm ~/project/sample/package-lock.json
                   rm ~/project/sample/pnpm-lock.yaml
+            - run: yarn --version
+            - node/install:
+                install-yarn: true
+                yarn-version: 4.9.2
+            - run: yarn --version
       - node/test:
           filters: *filters
           name: node-pnpm-mocha-test-job
