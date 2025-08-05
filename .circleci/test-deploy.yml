@@ -358,7 +358,7 @@ workflows:
           filters: *filters
           name: node-yarn-berry-mocha-test-job
           app-dir: "~/project/sample"
-          cache-version: v2
+          cache-version: v2-berry
           test-results-for: mocha
           pkg-manager: yarn-berry
           run-command: testmocha
