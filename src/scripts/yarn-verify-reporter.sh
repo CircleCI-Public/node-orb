@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -x
 YARN_VERSION=$(yarn --version)
 
 MAJOR_VERSION=${YARN_VERSION%%.*}
