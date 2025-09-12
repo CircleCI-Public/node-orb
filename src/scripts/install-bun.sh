@@ -5,7 +5,7 @@ if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 # FUNCTIONS
 get_bun_version () {
     if [[ "$NODE_PARAM_BUN_VERSION" == "" ]]; then
-        BUN_ORB_VERSION=$(curl --retry 5 -s https://api.github.com/repos/oven-sh/bun/releases/latest | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+        BUN_ORB_VERSION=$(curl --fail --retry 5 -Ls -o /dev/null -w '%{url_effective}' "https://github.com/oven-sh/bun/releases/latest" | sed 's:.*/bun-v::')
         echo "Latest version of Bun is $BUN_ORB_VERSION"
     else
         BUN_ORB_VERSION="$NODE_PARAM_BUN_VERSION"
