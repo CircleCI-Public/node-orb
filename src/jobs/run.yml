@@ -8,7 +8,7 @@ parameters:
         description: The number of parallel jobs to run. See https://circleci.com/docs/parallelism-faster-jobs/
     pkg-manager:
         type: enum
-        enum: ['npm', 'yarn', 'yarn-berry', 'pnpm']
+        enum: ['npm', 'yarn', 'yarn-berry', 'pnpm', 'bun']
         default: 'npm'
         description: Select the default node package manager to use.
     cache-version:
@@ -32,6 +32,10 @@ parameters:
         default: ''
         description: The name of the script within your package.json which you would like to run.
     pnpm-run:
+        type: string
+        default: ''
+        description: The name of the script within your package.json which you would like to run.
+    bun-run:
         type: string
         default: ''
         description: The name of the script within your package.json which you would like to run.
@@ -110,6 +114,7 @@ steps:
             ORB_PARAM_NPM_RUN: <<parameters.npm-run>>
             ORB_PARAM_YARN_RUN: <<parameters.yarn-run>>
             ORB_PARAM_PNPM_RUN: <<parameters.pnpm-run>>
+            ORB_PARAM_BUN_RUN: <<parameters.bun-run>>
         command: <<include(scripts/run-commands-with.sh)>>
     - when:
         condition: <<parameters.artifacts-path>>

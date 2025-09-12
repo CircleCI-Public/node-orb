@@ -64,6 +64,41 @@ jobs:
               echo "pnpm version 9.7.1 not found"
               exit 1
             fi
+  integration-test-install-bun-specified:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
+    steps:
+      - checkout
+      - node/install:
+          nvm-cache-key: v2
+      - node/install-bun:
+          version: "1.2.21" # Test the install of specific Bun version
+      - run:
+          command: |
+            if ! bun --version | grep -q "1.2.21"; then
+              echo "Bun version 1.2.21 not found"
+              exit 1
+            fi
+  integration-test-install-bun-latest:
+    parameters:
+      os:
+        type: executor
+    executor: <<parameters.os>>
+    steps:
+      - checkout
+      - node/install:
+          nvm-cache-key: v2
+      - node/install-bun # Test the install of latest Bun version
+      - run:
+          name: Check that Bun is installed and working
+          command: |
+            bun --version
+            echo "Bun version: $(bun --version)"
+            # Verify Bun can execute basic JavaScript
+            echo 'console.log("Hello from Bun!")' > test.js
+            bun run test.js
   integration-test-reinstall-yarn:
     machine:
       image: ubuntu-2004:current
@@ -199,6 +234,35 @@ jobs:
           cache-version: pnpm-v1
           app-dir: "~/project/sample"
       - run: cd ~/project/sample && pnpm test
+  integration-test-bun:
+    parameters:
+      resource_class:
+        type: enum
+        default: medium
+        description: Configure the executor resource class
+        enum:
+            - medium
+            - arm.medium
+    executor:
+      name: node/default
+      resource_class: <<parameters.resource_class>>
+    steps:
+      - checkout
+      - run:
+          name: Remove other lock files and create bun lockfile
+          command: |
+            rm ~/project/sample/package-lock.json
+            rm ~/project/sample/yarn.lock
+            rm ~/project/sample/pnpm-lock.yaml
+            rm ~/project/sample/yarn-berry.lock
+      - node/install-bun:
+          version: "1.2.21"
+      - node/install-packages:
+          pkg-manager: bun
+          cache-path: ~/.bun/install/cache
+          cache-version: bun-v1
+          app-dir: "~/project/sample"
+      - run: cd ~/project/sample && bun test
   integration-test-yarn:
     parameters:
       resource_class:
@@ -270,6 +334,16 @@ workflows:
             parameters:
               os: [linux, macos, machine]
       - integration-test-install-pnpm:
+          filters: *filters
+          matrix:
+            parameters:
+              os: [ linux, macos, machine ]
+      - integration-test-install-bun-specified:
+          filters: *filters
+          matrix:
+            parameters:
+              os: [ linux, macos, machine ]
+      - integration-test-install-bun-latest:
           filters: *filters
           matrix:
             parameters:
@@ -389,6 +463,43 @@ workflows:
                   rm ~/project/sample/yarn-berry.lock
       - node/test:
           filters: *filters
+          name: node-bun-jest-test-job
+          app-dir: "~/project/sample"
+          cache-version: v2
+          test-results-for: jest
+          pkg-manager: bun
+          cache-path: ~/.bun/install/cache
+          setup:
+            - node/install-bun:
+                version: "1.2.21"
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/package-lock.json
+                  rm ~/project/sample/yarn.lock
+                  rm ~/project/sample/pnpm-lock.yaml
+                  rm ~/project/sample/yarn-berry.lock
+      - node/test:
+          filters: *filters
+          name: node-bun-mocha-test-job
+          app-dir: "~/project/sample"
+          cache-version: v2
+          test-results-for: mocha
+          pkg-manager: bun
+          cache-path: ~/.bun/install/cache
+          run-command: testmocha
+          setup:
+            - node/install-bun:
+                version: "1.2.21"
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/package-lock.json
+                  rm ~/project/sample/yarn.lock
+                  rm ~/project/sample/pnpm-lock.yaml
+                  rm ~/project/sample/yarn-berry.lock
+      - node/test:
+          filters: *filters
           name: node-yarn-mocha-with-test-result-path-job
           app-dir: "~/project/sample"
           cache-version: v2
@@ -500,6 +611,24 @@ workflows:
                   rm ~/project/sample/package-lock.json
                   rm ~/project/sample/yarn.lock
                   rm ~/project/sample/yarn-berry.lock
+      - node/run:
+          filters: *filters
+          name: node-run-bun-job
+          app-dir: "~/project/sample"
+          cache-version: v3
+          pkg-manager: bun
+          bun-run: build
+          cache-path: ~/.bun/install/cache
+          setup:
+            - node/install-bun:
+                version: "1.2.21"
+            - run:
+                name: Remove other lock files
+                command: |
+                  rm ~/project/sample/package-lock.json
+                  rm ~/project/sample/yarn.lock
+                  rm ~/project/sample/pnpm-lock.yaml
+                  rm ~/project/sample/yarn-berry.lock
       - integration-test-override-ci:
           matrix:
             alias: integration-test-override-ci
@@ -509,6 +638,12 @@ workflows:
       - integration-test-pnpm:
           matrix:
             alias: integration-test-pnpm
+            parameters:
+              resource_class: [arm.medium, medium]
+          filters: *filters
+      - integration-test-bun:
+          matrix:
+            alias: integration-test-bun
             parameters:
               resource_class: [arm.medium, medium]
           filters: *filters
@@ -545,7 +680,10 @@ workflows:
             - integration-test-install-latest
             - integration-test-install-lts
             - integration-test-install-pnpm
+            - integration-test-install-bun-specified
+            - integration-test-install-bun-latest
             - integration-test-pnpm
+            - integration-test-bun
             - integration-test-reinstall-yarn
             - node-yarn-mocha-with-test-result-path-job
             - integration-test-override-yarn
@@ -556,10 +694,13 @@ workflows:
             - node-test-with-coverage
             - node-run-npm-job
             - node-pnpm-mocha-test-job
+            - node-bun-jest-test-job
+            - node-bun-mocha-test-job
             - node-test-no-junit
             - node-pnpm-jest-test-job
             - node-run-yarn-job
             - node-run-pnpm-job
+            - node-run-bun-job
             - node-run-upload-artifacts
           github_token: GHI_TOKEN
           context: orb-publisher

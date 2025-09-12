@@ -18,6 +18,12 @@ elif [ -f "yarn.lock" ]; then
 elif [ -f "pnpm-lock.yaml" ]; then
     echo "Found pnpm-lock.yaml file, assuming lockfile"
     cp pnpm-lock.yaml "$TARGET_DIR"/node-project-lockfile
+elif [ -f "bun.lock" ]; then
+    echo "Found bun.lock file, assuming lockfile"
+    cp bun.lock "$TARGET_DIR"/node-project-lockfile
+elif [ -f "bun.lockb" ]; then
+    echo "Found bun.lockb file, assuming lockfile"
+    cp bun.lockb "$TARGET_DIR"/node-project-lockfile
 else
     echo "Found no lockfile, adding empty one"
     touch "$TARGET_DIR"/node-project-lockfile

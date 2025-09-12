@@ -1,0 +1,18 @@
+description: >
+    Install a custom version of the Bun package manager
+
+parameters:
+    version:
+        type: string
+        default: ''
+        description: >
+            Pick a version of Bun to install (if no version is specified,
+            the latest stable version will be installed):
+            https://github.com/oven-sh/bun/releases
+
+steps:
+    - run:
+        name: Install Bun
+        environment:
+            NODE_PARAM_BUN_VERSION: <<parameters.version>>
+        command: <<include(scripts/install-bun.sh)>>
