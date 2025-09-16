@@ -325,11 +325,6 @@ workflows:
           matrix:
             parameters:
               os: [ linux, macos, machine ]
-      - integration-test-install-bun-latest:
-          filters: *filters
-          matrix:
-            parameters:
-              os: [ linux, macos, machine ]
       - integration-test-install-latest:
           filters: *filters
           matrix:
@@ -663,7 +658,6 @@ workflows:
             - integration-test-install-lts
             - integration-test-install-pnpm
             - integration-test-install-bun-specified
-            - integration-test-install-bun-latest
             - integration-test-pnpm
             - integration-test-bun
             - integration-test-reinstall-yarn
