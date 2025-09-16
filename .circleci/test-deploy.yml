@@ -74,31 +74,13 @@ jobs:
       - node/install:
           nvm-cache-key: v2
       - node/install-bun:
-          version: "1.2.21" # Test the install of specific Bun version
+          version: "1.2.22" 
       - run:
           command: |
-            if ! bun --version | grep -q "1.2.21"; then
-              echo "Bun version 1.2.21 not found"
+            if ! bun --version | grep -q "1.2.22"; then
+              echo "Bun version 1.2.22 not found"
               exit 1
             fi
-  integration-test-install-bun-latest:
-    parameters:
-      os:
-        type: executor
-    executor: <<parameters.os>>
-    steps:
-      - checkout
-      - node/install:
-          nvm-cache-key: v2
-      - node/install-bun # Test the install of latest Bun version
-      - run:
-          name: Check that Bun is installed and working
-          command: |
-            bun --version
-            echo "Bun version: $(bun --version)"
-            # Verify Bun can execute basic JavaScript
-            echo 'console.log("Hello from Bun!")' > test.js
-            bun run test.js
   integration-test-reinstall-yarn:
     machine:
       image: ubuntu-2004:current

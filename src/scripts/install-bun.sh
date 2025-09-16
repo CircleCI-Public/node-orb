@@ -48,7 +48,7 @@ if [[ "$BUN_ORB_VERSION" == "" ]]; then
     curl --retry 5 -fsSL https://bun.sh/install | bash
 else
     # Install specific version
-    curl --retry 5 -fsSL https://bun.sh/install | bash -s "v$BUN_ORB_VERSION"
+    curl --retry 5 -fsSL https://bun.sh/install | bash -s "bun-v$BUN_ORB_VERSION"
 fi
 
 # Ensure bun is in PATH for current session
