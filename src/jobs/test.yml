@@ -348,6 +348,15 @@ steps:
         steps:
             - store_test_results:
                 path: <<parameters.app-dir>>/test-results
+    - when: # upload test results if bun native mode was automatically configured and test-results-path is not specified
+        condition:
+            and:
+                - equal: [bun, << parameters.pkg-manager >>]
+                - equal: [bun, << parameters.test-results-for >>]
+                - equal: ['', << parameters.test-results-path >>]
+        steps:
+            - store_test_results:
+                path: <<parameters.app-dir>>/test-results/bun
     - when: # upload coverage files if test-coverage-path was configured
         condition: <<parameters.test-coverage-path>>
         steps:
