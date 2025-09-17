@@ -13,7 +13,8 @@ usage:
                       version: "1.2.22" # Specify Bun version, or omit for latest
                 - node/install-packages:
                       pkg-manager: bun
-                      cache-path: ~/.bun/install/cache # Optional: customize cache location via BUN_INSTALL_CACHE_DIR
+                      # The orb automatically caches ~/.bun/install/cache by default
+                      # You can override with cache-path: here if you need a custom location
                 - run: bun run test
     workflows:
         test_my_app:
