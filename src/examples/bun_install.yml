@@ -10,7 +10,7 @@ usage:
             steps:
                 - checkout
                 - node/install-bun:
-                      version: "1.2.21" # Specify Bun version, or omit for latest
+                      version: "1.2.22" # Specify Bun version, or omit for latest
                 - node/install-packages:
                       pkg-manager: bun
                       cache-path: ~/.bun/install/cache # Optional: customize cache location via BUN_INSTALL_CACHE_DIR

@@ -238,7 +238,7 @@ jobs:
             rm ~/project/sample/pnpm-lock.yaml
             rm ~/project/sample/yarn-berry.lock
       - node/install-bun:
-          version: "1.2.21"
+          version: "1.2.22"
       - node/install-packages:
           pkg-manager: bun
           cache-path: ~/.bun/install/cache
@@ -448,7 +448,7 @@ workflows:
           cache-path: ~/.bun/install/cache
           setup:
             - node/install-bun:
-                version: "1.2.21"
+                version: "1.2.22"
             - run:
                 name: Remove other lock files
                 command: |
@@ -467,7 +467,7 @@ workflows:
           run-command: testmocha
           setup:
             - node/install-bun:
-                version: "1.2.21"
+                version: "1.2.22"
             - run:
                 name: Remove other lock files
                 command: |
@@ -598,7 +598,7 @@ workflows:
           cache-path: ~/.bun/install/cache
           setup:
             - node/install-bun:
-                version: "1.2.21"
+                version: "1.2.22"
             - run:
                 name: Remove other lock files
                 command: |
