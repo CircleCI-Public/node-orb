@@ -1,6 +1,7 @@
 description: |
-    How to quickly and easily run your Node.js tests on CircleCI with Bun and caching automatically included. This example assumes you are using Bun as your package manager and test runner.
-    The "bun install" command will automatically be applied and Bun's cache directory will be cached. Bun includes a built-in test runner that can be used with "bun test".
+    Manual approach for running Bun's native test runner. This example shows how to manually configure Bun tests with JUnit output.
+    For automatic test result collection, consider using the node/test job with test-results-for: bun (see test_with_bun_native.yml example).
+    The "bun install" command will automatically be applied and Bun's cache directory will be cached.
 usage:
     version: 2.1
     orbs:

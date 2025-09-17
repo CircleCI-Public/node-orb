@@ -46,11 +46,12 @@ parameters:
     test-results-for:
         default: other
         type: enum
-        enum: ['jest', 'mocha', 'other']
+        enum: ['jest', 'mocha', 'bun', 'other']
         description: |
             Testing framework your project uses.
             If this is set to jest or mocha, test results will be automatically produced. When using jest, the jest-junit package is required as a dev dependency. See https://github.com/jest-community/jest-junit for more information.
             When using mocha, the mocha-junit-reporter and mocha-multi packages are required as dev dependency. See https://github.com/michaelleeallen/mocha-junit-reporter and https://github.com/glenjamin/mocha-multi for more information.
+            When using bun with pkg-manager: bun, Bun's native test runner will be used with built-in JUnit output.
     test-coverage-path:
         type: string
         default: ''
@@ -286,9 +287,13 @@ steps:
                 - equal: [ jest, << parameters.test-results-for >> ]
         steps:
             - run:
-                name: Run Bun Tests with JUnit output
+                name: Check for test reporter
                 working_directory: <<parameters.app-dir>>
-                command: mkdir -p ./test-results/bun && bun test --reporter=junit --reporter-outfile=./test-results/bun/results.xml
+                command: bun pm ls | grep "jest-junit" || (echo "Add the package jest-junit to your projects dev dependencies with \`bun add -D jest-junit\`" && exit 1)
+            - run:
+                name: Run Bun Tests
+                working_directory: <<parameters.app-dir>>
+                command: bun run <<parameters.run-command>> --reporters=default --reporters=jest-junit
     - when: # Run tests for bun, with mocha test results
         condition:
             and:
@@ -298,11 +303,21 @@ steps:
             - run:
                 name: Check for test reporter
                 working_directory: <<parameters.app-dir>>
-                command: bun pm ls | grep -E "mocha-junit-reporter|mocha-multi" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with \`bun add -d mocha-junit-reporter mocha-multi\`" && exit 1)
+                command: bun pm ls | grep -E "mocha-junit-reporter|mocha-multi" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with \`bun add -D mocha-junit-reporter mocha-multi\`" && exit 1)
             - run:
                 name: Run Bun Tests
                 working_directory: <<parameters.app-dir>>
                 command: bun run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
+    - when: # Run tests for bun, with bun native test runner
+        condition:
+            and:
+                - equal: [ bun, << parameters.pkg-manager >> ]
+                - equal: [ bun, << parameters.test-results-for >> ]
+        steps:
+            - run:
+                name: Run Bun Native Tests with JUnit output
+                working_directory: <<parameters.app-dir>>
+                command: mkdir -p ./test-results/bun && bun test --reporter=junit --reporter-outfile=./test-results/bun/results.xml
     - when: # upload test results if a path was given
         condition: << parameters.test-results-path >>
         steps:
