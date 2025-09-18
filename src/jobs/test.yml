@@ -293,7 +293,7 @@ steps:
             - run:
                 name: Run Bun Tests
                 working_directory: <<parameters.app-dir>>
-                command: bun run <<parameters.run-command>> --reporters=default --reporters=jest-junit
+                command: bun run <<parameters.run-command>> --reporters=default --reporters=jest-junit --modulePathIgnorePatterns='<rootDir>/\.bun/' --modulePathIgnorePatterns='\.bun/'
     - when: # Run tests for bun, with mocha test results
         condition:
             and:
@@ -317,7 +317,7 @@ steps:
             - run:
                 name: Run Bun Native Tests with JUnit output
                 working_directory: <<parameters.app-dir>>
-                command: mkdir -p ./test-results/bun && bun test --reporter=junit --reporter-outfile=./test-results/bun/results.xml
+                command: mkdir -p ./test-results/bun && bun test bun-tests --reporter=junit --reporter-outfile=./test-results/bun/results.xml
     - when: # upload test results if a path was given
         condition: << parameters.test-results-path >>
         steps:
