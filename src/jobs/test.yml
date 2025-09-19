@@ -308,16 +308,29 @@ steps:
                 name: Run Bun Tests
                 working_directory: <<parameters.app-dir>>
                 command: bun run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
-    - when: # Run tests for bun, with bun native test runner
+    - when: # Run tests for bun native with custom test-results-path
         condition:
             and:
                 - equal: [ bun, << parameters.pkg-manager >> ]
                 - equal: [ bun, << parameters.test-results-for >> ]
+                - not:
+                    equal: ['', << parameters.test-results-path >>]
         steps:
             - run:
                 name: Run Bun Native Tests with JUnit output
                 working_directory: <<parameters.app-dir>>
-                command: mkdir -p ./test-results/bun && bun test bun-tests --reporter=junit --reporter-outfile=./test-results/bun/results.xml
+                command: bun test bun-tests --reporter=junit --reporter-outfile=<<parameters.test-results-path>>
+    - when: # Run tests for bun native without custom test-results-path
+        condition:
+            and:
+                - equal: [ bun, << parameters.pkg-manager >> ]
+                - equal: [ bun, << parameters.test-results-for >> ]
+                - equal: ['', << parameters.test-results-path >>]
+        steps:
+            - run:
+                name: Run Bun Native Tests with JUnit output
+                working_directory: <<parameters.app-dir>>
+                command: bun test bun-tests --reporter=junit --reporter-outfile=junit.xml
     - when: # upload test results if a path was given
         condition: << parameters.test-results-path >>
         steps:
@@ -347,7 +360,7 @@ steps:
                 - equal: ['', << parameters.test-results-path >>]
         steps:
             - store_test_results:
-                path: <<parameters.app-dir>>/test-results
+                path: <<parameters.app-dir>>/junit.xml
     - when: # upload test results if bun native mode was automatically configured and test-results-path is not specified
         condition:
             and:
@@ -356,7 +369,7 @@ steps:
                 - equal: ['', << parameters.test-results-path >>]
         steps:
             - store_test_results:
-                path: <<parameters.app-dir>>/test-results/bun
+                path: <<parameters.app-dir>>/junit.xml
     - when: # upload coverage files if test-coverage-path was configured
         condition: <<parameters.test-coverage-path>>
         steps:

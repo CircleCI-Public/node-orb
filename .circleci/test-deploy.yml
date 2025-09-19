@@ -501,18 +501,25 @@ workflows:
                   rm ~/project/sample/yarn.lock
                   rm ~/project/sample/pnpm-lock.yaml
                   rm ~/project/sample/yarn-berry.lock
-          post_install_steps:
+      - node/test:
+          filters: *filters
+          name: node-bun-native-with-test-result-path-job
+          app-dir: "~/project/sample"
+          cache-version: v2
+          test-results-for: bun
+          pkg-manager: bun
+          cache-path: ~/.bun/install/cache
+          test-results-path: sample/bun-junit.xml
+          setup:
+            - node/install-bun:
+                version: "1.2.22"
             - run:
-                name: Verify test results file was created
+                name: Remove other lock files
                 command: |
-                  if [ -f ~/project/sample/test-results/bun/results.xml ] && [ -s ~/project/sample/test-results/bun/results.xml ]; then
-                    echo "Test results file created successfully at ~/project/sample/test-results/bun/results.xml"
-                    echo "File size: $(stat -f%z ~/project/sample/test-results/bun/results.xml 2>/dev/null || stat -c%s ~/project/sample/test-results/bun/results.xml) bytes"
-                  else
-                    echo "ERROR: Test results file not found or is empty"
-                    ls -la ~/project/sample/test-results/ 2>/dev/null || echo "test-results directory doesn't exist"
-                    exit 1
-                  fi
+                  rm ~/project/sample/package-lock.json
+                  rm ~/project/sample/yarn.lock
+                  rm ~/project/sample/pnpm-lock.yaml
+                  rm ~/project/sample/yarn-berry.lock
       - node/test:
           filters: *filters
           name: node-yarn-mocha-with-test-result-path-job
@@ -707,6 +714,7 @@ workflows:
             - integration-test-bun
             - integration-test-reinstall-yarn
             - node-yarn-mocha-with-test-result-path-job
+            - node-bun-native-with-test-result-path-job
             - integration-test-override-yarn
             - node-yarn-mocha-test-job
             - node-yarn-jest-test-job
