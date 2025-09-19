@@ -1,7 +1,7 @@
 version: 2.1
 
 description: >
-    Easily install Node.js and its package managers (npm, yarn). Best of all, install your packages with caching enabled by default.
+    Easily install Node.js and its package managers (npm, yarn, yarn-berry, pnpm, bun). Best of all, install your packages with caching enabled by default.
     Supports Linux x86_64, MacOS, and Arm64 V8.
 
 display:

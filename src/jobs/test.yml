@@ -8,7 +8,7 @@ parameters:
         description: The number of parallel jobs to run. See https://circleci.com/docs/parallelism-faster-jobs/
     pkg-manager:
         type: enum
-        enum: ['npm', 'yarn', 'yarn-berry', 'pnpm']
+        enum: ['npm', 'yarn', 'yarn-berry', 'pnpm', 'bun']
         default: 'npm'
         description: Select the default node package manager to use.
     cache-version:
@@ -46,11 +46,12 @@ parameters:
     test-results-for:
         default: other
         type: enum
-        enum: ['jest', 'mocha', 'other']
+        enum: ['jest', 'mocha', 'bun', 'other']
         description: |
             Testing framework your project uses.
             If this is set to jest or mocha, test results will be automatically produced. When using jest, the jest-junit package is required as a dev dependency. See https://github.com/jest-community/jest-junit for more information.
             When using mocha, the mocha-junit-reporter and mocha-multi packages are required as dev dependency. See https://github.com/michaelleeallen/mocha-junit-reporter and https://github.com/glenjamin/mocha-multi for more information.
+            When using bun with pkg-manager: bun, Bun's native test runner will be used with built-in JUnit output.
     test-coverage-path:
         type: string
         default: ''
@@ -269,6 +270,67 @@ steps:
                 name: Run pnpm Tests
                 working_directory: <<parameters.app-dir>>
                 command: pnpm run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
+    - when: # Run tests for bun, without test results
+        condition:
+            and:
+                - equal: [ bun, << parameters.pkg-manager >> ]
+                - equal: [ other, << parameters.test-results-for >> ]
+        steps:
+            - run:
+                name: Run Bun Tests
+                working_directory: <<parameters.app-dir>>
+                command: bun run <<parameters.run-command>>
+    - when: # Run tests for bun, with jest test results
+        condition:
+            and:
+                - equal: [ bun, << parameters.pkg-manager >> ]
+                - equal: [ jest, << parameters.test-results-for >> ]
+        steps:
+            - run:
+                name: Check for test reporter
+                working_directory: <<parameters.app-dir>>
+                command: bun pm ls | grep "jest-junit" || (echo "Add the package jest-junit to your projects dev dependencies with \`bun add -D jest-junit\`" && exit 1)
+            - run:
+                name: Run Bun Tests
+                working_directory: <<parameters.app-dir>>
+                command: bun run <<parameters.run-command>> --reporters=default --reporters=jest-junit --modulePathIgnorePatterns='<rootDir>/\.bun/' --modulePathIgnorePatterns='\.bun/'
+    - when: # Run tests for bun, with mocha test results
+        condition:
+            and:
+                - equal: [ bun, << parameters.pkg-manager >> ]
+                - equal: [ mocha, << parameters.test-results-for >> ]
+        steps:
+            - run:
+                name: Check for test reporter
+                working_directory: <<parameters.app-dir>>
+                command: bun pm ls | grep -E "mocha-junit-reporter|mocha-multi" || (echo "Add the packages mocha-junit-reporter & mocha-multi to the dev dependencies of your project with \`bun add -D mocha-junit-reporter mocha-multi\`" && exit 1)
+            - run:
+                name: Run Bun Tests
+                working_directory: <<parameters.app-dir>>
+                command: bun run <<parameters.run-command>> --reporter mocha-multi --reporter-options spec=-,mocha-junit-reporter=-
+    - when: # Run tests for bun native with custom test-results-path
+        condition:
+            and:
+                - equal: [ bun, << parameters.pkg-manager >> ]
+                - equal: [ bun, << parameters.test-results-for >> ]
+                - not:
+                    equal: ['', << parameters.test-results-path >>]
+        steps:
+            - run:
+                name: Run Bun Native Tests with JUnit output
+                working_directory: <<parameters.app-dir>>
+                command: bun test bun-tests --reporter=junit --reporter-outfile=<<parameters.test-results-path>>
+    - when: # Run tests for bun native without custom test-results-path
+        condition:
+            and:
+                - equal: [ bun, << parameters.pkg-manager >> ]
+                - equal: [ bun, << parameters.test-results-for >> ]
+                - equal: ['', << parameters.test-results-path >>]
+        steps:
+            - run:
+                name: Run Bun Native Tests with JUnit output
+                working_directory: <<parameters.app-dir>>
+                command: bun test bun-tests --reporter=junit --reporter-outfile=junit.xml
     - when: # upload test results if a path was given
         condition: << parameters.test-results-path >>
         steps:
@@ -290,6 +352,24 @@ steps:
         steps:
             - store_test_results:
                 path: <<parameters.app-dir>>/test-results.xml
+    - when: # upload test results if bun jest mode was automatically configured and test-results-path is not specified
+        condition:
+            and:
+                - equal: [bun, << parameters.pkg-manager >>]
+                - equal: [jest, << parameters.test-results-for >>]
+                - equal: ['', << parameters.test-results-path >>]
+        steps:
+            - store_test_results:
+                path: <<parameters.app-dir>>/junit.xml
+    - when: # upload test results if bun native mode was automatically configured and test-results-path is not specified
+        condition:
+            and:
+                - equal: [bun, << parameters.pkg-manager >>]
+                - equal: [bun, << parameters.test-results-for >>]
+                - equal: ['', << parameters.test-results-path >>]
+        steps:
+            - store_test_results:
+                path: <<parameters.app-dir>>/junit.xml
     - when: # upload coverage files if test-coverage-path was configured
         condition: <<parameters.test-coverage-path>>
         steps:

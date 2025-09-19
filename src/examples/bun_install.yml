@@ -1,0 +1,22 @@
+description: |
+    By default, the "install-packages" command will attempt to utilize "bun install". The command can however be overwritten to support an alternative package install command such as "bun install --frozen-lockfile".
+usage:
+    version: 2.1
+    orbs:
+        node: circleci/node@x.y # This version number refers to the version of the orb, not the version of Node.js
+    jobs:
+        test:
+            executor: node/default
+            steps:
+                - checkout
+                - node/install-bun:
+                      version: "1.2.22" # Specify Bun version, or omit for latest
+                - node/install-packages:
+                      pkg-manager: bun
+                      # The orb automatically caches ~/.bun/install/cache by default
+                      # You can override with cache-path: here if you need a custom location
+                - run: bun run test
+    workflows:
+        test_my_app:
+            jobs:
+                - test

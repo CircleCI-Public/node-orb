@@ -41,6 +41,19 @@ parameters:
             Pick a version of Yarn to install (if no version is specified,
             the latest stable version will be installed):
             https://github.com/yarnpkg/yarn/releases
+    # bun
+    install-bun:
+        type: boolean
+        default: false
+        description: Install Bun?
+
+    bun-version:
+        type: string
+        default: ''
+        description: >
+            Pick a version of Bun to install (if no version is specified,
+            the latest stable version will be installed):
+            https://github.com/oven-sh/bun/releases
     use-nvm-cache:
         type: boolean
         default: true
@@ -90,3 +103,9 @@ steps:
         steps:
             - install-yarn:
                 version: <<parameters.yarn-version>>
+
+    - when:
+        condition: <<parameters.install-bun>>
+        steps:
+            - install-bun:
+                version: <<parameters.bun-version>>

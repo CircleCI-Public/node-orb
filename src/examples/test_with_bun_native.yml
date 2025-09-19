@@ -1,0 +1,31 @@
+description: |
+    Use the test job with Bun's native test runner for automatic test result collection.
+    When using "test-results-for: bun" with "pkg-manager: bun", the orb will automatically:
+    - Run Bun's built-in test runner with JUnit output
+    - Collect and store test results for CircleCI's test summary
+    Note: This is different from "test-results-for: jest" which runs Jest with Bun acting as a script runner.
+usage:
+    version: 2.1
+    orbs:
+        node: circleci/node@x.y
+    workflows:
+        test_my_app:
+            jobs:
+                # Use Bun's native test runner with automatic JUnit output
+                - node/test:
+                      name: test-with-bun-native
+                      pkg-manager: bun
+                      test-results-for: bun
+                      setup:
+                          - node/install-bun:
+                                version: '1.2.22'
+
+                # Or use Jest through Bun (requires jest-junit package)
+                - node/test:
+                      name: test-with-jest-via-bun
+                      pkg-manager: bun
+                      test-results-for: jest
+                      run-command: test:jest # Your package.json script that runs Jest
+                      setup:
+                          - node/install-bun:
+                                version: '1.2.22'

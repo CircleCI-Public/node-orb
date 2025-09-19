@@ -1,0 +1,17 @@
+description: |
+    Drop-in solution to automatically run custom bun commands for your Node.js applications.
+    This job will automatically download your code into any version node environment, install your dependencies with caching enabled, and execute your custom bun script.
+usage:
+    version: 2.1
+    orbs:
+        node: circleci/node@x.y # This version number refers to the version of the orb, not the version of Node.js
+    workflows:
+        run-bun-command:
+            jobs:
+                - node/run:
+                    bun-run: build
+                    pkg-manager: bun
+                    setup:
+                        - node/install-bun # Install Bun before running the job
+                    executor:
+                        name: node/default
