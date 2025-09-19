@@ -74,7 +74,7 @@ jobs:
       - node/install:
           nvm-cache-key: v2
       - node/install-bun:
-          version: "1.2.22" 
+          version: "1.2.22"
       - run:
           command: |
             if ! bun --version | grep -q "1.2.22"; then
@@ -112,7 +112,7 @@ jobs:
     docker:
       - image: cimg/ruby:3.3.5-browsers
     steps:
-      - node/install: 
+      - node/install:
           install-yarn: true
           node-version: '22.11.0'
 
