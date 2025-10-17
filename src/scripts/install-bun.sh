@@ -15,7 +15,7 @@ get_bun_version () {
 installation_check () {
     echo "Checking if Bun is already installed..."
     if command -v bun > /dev/null 2>&1; then
-        if bun --version | grep "$BUN_ORB_VERSION" > /dev/null 2>&1; then
+        if bun --version | grep -Eq "^$BUN_ORB_VERSION\.*" > /dev/null 2>&1; then
             echo "Bun $BUN_ORB_VERSION is already installed"
             exit 0
         else

@@ -16,7 +16,7 @@ get_pnpm_version () {
 installation_check () {
     echo "Checking if pnpm is already installed..."
     if command -v pnpm > /dev/null 2>&1; then
-      if pnpm --version | grep "$PNPM_ORB_VERSION" > /dev/null 2>&1; then
+      if pnpm --version | grep -Eq "^$PNPM_ORB_VERSION\.*" > /dev/null 2>&1; then
           echo "pnpm $PNPM_ORB_VERSION is already installed"
           exit 0
       else
