@@ -16,7 +16,7 @@ get_yarn_version () {
 installation_check () {
     echo "Checking if YARN is already installed..."
     if command -v yarn > /dev/null 2>&1; then
-        if yarn --version | grep "$YARN_ORB_VERSION" > /dev/null 2>&1; then
+        if yarn --version | grep -Eq "^$YARN_ORB_VERSION\.*" > /dev/null 2>&1; then
             echo "Yarn $YARN_ORB_VERSION is already installed"
             exit 0
         else
