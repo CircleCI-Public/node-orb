@@ -25,6 +25,14 @@ parameters:
             - arm.large
             - arm.xlarge
             - arm.2xlarge
+            # Gen2 is x86-only for Docker; Arm Gen2 Docker is not supported yet.
+            - small.gen2
+            - medium.gen2
+            - medium+.gen2
+            - large.gen2
+            - xlarge.gen2
+            - 2xlarge.gen2
+            - 2xlarge+.gen2
 
 docker:
     - image: cimg/node:<<parameters.tag>>
