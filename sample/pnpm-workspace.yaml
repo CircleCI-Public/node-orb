@@ -1,0 +1,7 @@
+# pnpm 9 requires a packages field once this file exists.
+packages:
+  - "."
+# Recent pnpm releases fail an install on unapproved build scripts. unrs-resolver's
+# is an optional prebuilt-binary fallback that the tests do not need.
+allowBuilds:
+  unrs-resolver: false

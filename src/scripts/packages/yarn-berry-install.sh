@@ -1,4 +1,15 @@
 #!/usr/bin/env bash
+# Node.js 26 and later no longer bundle Corepack, so install it from npm.
+# Install into the user's prefix when the global one is not writable or
+# already has pnpm/yarn shims, and keep it on PATH for later steps.
+if ! command -v corepack > /dev/null 2>&1; then
+    echo "Corepack is not bundled with Node.js $(node --version); installing it from npm"
+    if ! npm install -g corepack > /dev/null 2>&1; then
+        npm install -g --prefix "$HOME/.local" corepack
+        export PATH="$HOME/.local/bin:$PATH"
+        echo "export PATH=\"$HOME/.local/bin:\$PATH\"" >> "$BASH_ENV"
+    fi
+fi
 if ! corepack enable; then
     echo "Using alternative corepack location"
     corepack enable --install-directory ~/bin

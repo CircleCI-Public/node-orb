@@ -16,8 +16,9 @@ fi
 
 # See: https://github.com/nvm-sh/nvm#usage
 if [ "$NODE_PARAM_VERSION" = "latest" ]; then
-    # When no version is specified we default to the latest version of Node
-    NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+')
+    # When no version is specified we default to the latest version of Node.
+    # Match only plain vX.Y.Z so prereleases such as v27.0.0-alpha.0.0.0 are skipped.
+    NODE_ORB_INSTALL_VERSION=$(nvm ls-remote --no-colors | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+([[:space:]]|$)' | tail -n1 | tr -d '[:space:]')
     nvm install -b "$NODE_ORB_INSTALL_VERSION" # aka nvm install node. We're being explicit here.
     nvm alias default "$NODE_ORB_INSTALL_VERSION"
 elif [ -n "$NODE_PARAM_VERSION" ] && [ "$NODE_PARAM_VERSION" != "lts" ]; then

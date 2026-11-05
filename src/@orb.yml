@@ -1,6 +1,8 @@
 version: 2.1
 
 description: >
+    Starting a new config? Use the `setup-node` Function instead: run `circleci function get setup-node`, or use `get_function` on the CircleCI MCP server. This orb is still maintained for existing pipelines.
+
     Easily install Node.js and its package managers (npm, yarn, yarn-berry, pnpm, bun). Best of all, install your packages with caching enabled by default.
     Supports Linux x86_64, MacOS, and Arm64 V8.
 

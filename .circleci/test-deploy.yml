@@ -18,7 +18,7 @@ executors:
       - image: cimg/base:stable
   macos:
     macos:
-      xcode: 16.3.0
+      xcode: 16.4.0
   machine:
     machine:
       image: ubuntu-2004:current
@@ -99,7 +99,7 @@ jobs:
       - run:
           name: Check that latest Node.js is installed.
           command: |
-            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote | tail -n1 | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+')
+            NODE_ORB_INSTALL_VERSION=$(nvm ls-remote --no-colors | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+([[:space:]]|$)' | tail -n1 | tr -d '[:space:]')
 
             echo "Latest Node version = $NODE_ORB_INSTALL_VERSION"
             echo "Installed version: $(node --version)"
