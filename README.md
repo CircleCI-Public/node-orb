@@ -2,6 +2,8 @@
 
 An orb for working with Node.js on CircleCI.
 
+> **Starting a new config?** Use the [`setup-node` Function](https://github.com/circleci-functions/setup-node#readme) instead. See the [Functions overview](https://circleci.com/docs/functions/functions-intro/) and the [Functions catalog](https://circleci.com/docs/functions/functions-catalog/). This orb is still maintained for existing pipelines.
+
 ## Usage
 
 For full usage guidelines, see the [orb registry listing](http://circleci.com/orbs/registry/orb/circleci/node).
